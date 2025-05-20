@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+        html {
+            font-size: 22px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    
+    <div class="fixed top-10 right-10">
+        <a href="/" class="text-red-600 uppercase tracking-widest text-sm border border-red-600 px-4 py-2 rounded hover:text-white hover:bg-red-600 hover:shadow-[0_0_5px_#f87171,0_0_25px_#f87171,0_0_50px_#f87171,0_0_100px_#f87171] transition">Volver</a>
+    </div>
+
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center">Iniciar sesión</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="mb-4 text-red-500 text-sm">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="mb-4">
+                {{ form.username.label_tag }}
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+
+            <div class="mb-4">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+                {{ form.password.errors }}
+            </div>
+
+            <button type="submit" class="w-full text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+                Iniciar sesión
+            </button>
+        </form>
+    </div>
+</body>
+</html>

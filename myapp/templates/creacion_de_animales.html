@@ -1,0 +1,41 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="es">
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Crear Animal</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style type="text/tailwindcss">
+            html {
+                font-size: 22px;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100 py-10">
+        
+        <div class="fixed top-10 right-10">
+            <a href="/" class="text-red-600 uppercase tracking-widest text-sm border border-red-600 px-4 py-2 rounded hover:text-white hover:bg-red-600 hover:shadow-[0_0_5px_#f87171,0_0_25px_#f87171,0_0_50px_#f87171,0_0_100px_#f87171] transition">Volver</a>
+        </div>
+
+        <div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-md">
+            <h1 class="text-2xl font-bold mb-6">Registrar Animal</h1>
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">{{ field.label_tag }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-sm">{{ field.errors|striptags }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="w-full text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+                    Guardar
+                </button>
+            </form>
+        </div>
+    </body>
+    </html>
