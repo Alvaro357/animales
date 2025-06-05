@@ -4,7 +4,7 @@ from .views import registro_asociacion
 from .views import crear_animal
 
 urlpatterns = [
-path('', views.Index, name='Inicio'),
+path('', views.Inicio, name='Inicio'),
 path('registro/', views.registro_asociacion, name='registro_asociacion'),
 path('login/', views.login_view, name='login'),
 path('logout/', views.logout_view, name='logout'),

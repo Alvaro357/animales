@@ -5,7 +5,7 @@ from django.core.mail import send_mail  # Enviar correos
 from django.contrib.auth.decorators import login_required # Para exigir el login poner "@login_required"
 from functools import wraps
 from .forms import RegistroAsociacionForm, LoginForm, CreacionAnimalesForm
-from .models import RegistroAsociacion
+from .models import RegistroAsociacion, CreacionAnimales
 
 
 # Registro
@@ -34,11 +34,6 @@ def registro_asociacion(request):
         form = RegistroAsociacionForm()
     return render(request, 'registro_asociacion.html', {'form': form})
 
-
-# Página principal
-def Index(request):
-    esta_logueado = request.session.get('esta_logueado', False)
-    return render(request, 'index.html', {'esta_logueado': esta_logueado})
 
 
 
@@ -114,20 +109,27 @@ def logout_view(request):
 #Inicio
 def Inicio(request):
     # Verificamos si hay una cookie de la asociación
+    animal = CreacionAnimales.objects.all()
     asociacion_id = request.COOKIES.get('asociacion_id')
 
     if asociacion_id:
         try:
             # Intentamos obtener la asociación con ese ID
             asociacion = RegistroAsociacion.objects.get(id=asociacion_id)
-
+            if asociacion_id:
+                return render(request, 'index.html', {
+                    'asociacion': asociacion,
+                    'logueado': True,
+                 'animales': animal  # <-- pasar aquí también
+                })
             # Si la asociación existe, estamos logueados
             return render(request, 'index.html', {'asociacion': asociacion, 'logueado': True})
+            
         except RegistroAsociacion.DoesNotExist:
             pass  # Si la asociación no existe, no estamos logueados
             
     # Si no hay cookie o no existe la asociación, no estamos logueados
-    return render(request, 'index.html', {'logueado': False})
+    return render(request, 'index.html', {'logueado': False, 'animales': animal})
 
 def session_login_required(view_func):
     @wraps(view_func)
@@ -148,3 +150,7 @@ def crear_animal(request):
         form = CreacionAnimalesForm()
     
     return render(request, 'creacion_de_animales.html', {'form': form})
+
+def pagina_inicio(request):
+    animales = CreacionAnimales.objects.all()
+    return render(request, 'inicio.html', {'animales': animales})
