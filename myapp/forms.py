@@ -72,87 +72,90 @@ class LoginForm(forms.Form):
     remember_me = forms.BooleanField(required=False, initial=False, label="Recuérdame")
 
 
-class CreacionAnimalesForm(forms.Form):
-    nombre = forms.CharField(
-        label='Nombre',
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
-            'placeholder': 'Nombre del animal'
-        })
-    )
-    tipo_de_animal = forms.CharField(
-        label='Tipo de animal',
-        max_length=200,
-        widget=forms.TextInput(attrs={
-            'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
-            'placeholder': 'Ej: perro, gato...'
-        })
-    )
-    imagen = forms.ImageField(
-        label='Foto del animal',
-        required=False,
-        widget=forms.ClearableFileInput(attrs={
-            'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100'
-        })
-    )
-
-    video = forms.FileField(
-        label='Video del animal',
-        required=False,
-        widget=forms.ClearableFileInput(attrs={
-            'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100'
-        })
-    )
-    email = forms.EmailField(
-        label='Email',
-        widget=forms.EmailInput(attrs={
-            'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
-            'placeholder': 'ejemplo@email.com'
-        })
-    )
-    telefono = forms.CharField(
-        label='Teléfono',
-        max_length=130,
-        widget=forms.TextInput(attrs={
-            'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
-            'placeholder': '+34 600 123 456'
-        })
-    )
-    poblacion = forms.CharField(
-        label='Población',
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
-            'placeholder': 'Ciudad o pueblo'
-        })
-    )
-    provincia = forms.CharField(
-        label='Provincia',
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
-            'placeholder': 'Ej: Barcelona, Madrid...'
-        })
-    )
-    codigo_postal = forms.CharField(
-        label='Código Postal',
-        max_length=10,
-        widget=forms.TextInput(attrs={
-            'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
-            'placeholder': '08001'
-        })
-    )
+class CreacionAnimalesForm(forms.ModelForm):
+    class Meta:
+        model = CreacionAnimales
+        fields = ['nombre', 'tipo_de_animal', 'raza', 'imagen', 'video', 
+                 'email', 'telefono', 'poblacion', 'provincia', 
+                 'codigo_postal', 'descripcion', 'adoptado']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': 'Nombre del animal'
+            }),
+            'tipo_de_animal': forms.Select(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm'
+            }, choices=[
+                ('', 'Selecciona un tipo'),
+                ('perro', 'Perro'),
+                ('gato', 'Gato'),
+                ('otro', 'Otro'),
+            ]),
+            'raza': forms.TextInput(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': 'Ej: pastor alemán, border collie...'
+            }),
+            'imagen': forms.ClearableFileInput(attrs={
+                'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100'
+            }),
+            'video': forms.ClearableFileInput(attrs={
+                'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': 'ejemplo@email.com'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': '+34 600 123 456'
+            }),
+            'poblacion': forms.TextInput(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': 'Ciudad o pueblo'
+            }),
+            'provincia': forms.TextInput(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': 'Ej: Barcelona, Madrid...'
+            }),
+            'codigo_postal': forms.TextInput(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': '08001'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
+                'placeholder': 'Descripción del animal',
+                'rows': 4
+            }),
+            'adoptado': forms.CheckboxInput(attrs={
+                'class': 'h-4 w-4 text-cyan-400 focus:ring-cyan-400 border-gray-300 rounded'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        asociacion = kwargs.pop('asociacion', None)
+        super().__init__(*args, **kwargs)
+        
+        if asociacion:
+            # Autocompletar campos con datos de la asociación
+            self.fields['email'].initial = asociacion.email
+            self.fields['telefono'].initial = asociacion.telefono
+            self.fields['poblacion'].initial = asociacion.poblacion
+            self.fields['provincia'].initial = asociacion.provincia
+            self.fields['codigo_postal'].initial = asociacion.codigo_postal
 
     # Guarda los datos como modelo
-    def save(self):
-        data = self.cleaned_data
-        imagen = data.pop('imagen', None)
-        video = data.pop('video', None)
-        instancia = CreacionAnimales.objects.create(**data)
-        if imagen:
-            instancia.imagen = imagen
-        if video:
-            instancia.video = video
+def save(self, commit=True):
+    data = self.cleaned_data
+    imagen = data.pop('imagen', None)
+    video = data.pop('video', None)
+    instancia = CreacionAnimales(**data)  # todavía no se guarda en la base de datos
+
+    if imagen:
+        instancia.imagen = imagen
+    if video:
+        instancia.video = video
+
+    if commit:
         instancia.save()
-        return instancia
+
+    return instancia

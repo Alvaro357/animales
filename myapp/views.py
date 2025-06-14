@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail  # Enviar correos
@@ -6,6 +7,7 @@ from django.contrib.auth.decorators import login_required # Para exigir el login
 from functools import wraps
 from .forms import RegistroAsociacionForm, LoginForm, CreacionAnimalesForm
 from .models import RegistroAsociacion, CreacionAnimales
+
 
 
 # Registro
@@ -109,27 +111,29 @@ def logout_view(request):
 #Inicio
 def Inicio(request):
     # Verificamos si hay una cookie de la asociación
-    animal = CreacionAnimales.objects.all()
+    animales = CreacionAnimales.objects.all()
     asociacion_id = request.COOKIES.get('asociacion_id')
-
+    mis_animales = None
+    
     if asociacion_id:
         try:
-            # Intentamos obtener la asociación con ese ID
             asociacion = RegistroAsociacion.objects.get(id=asociacion_id)
-            if asociacion_id:
-                return render(request, 'index.html', {
-                    'asociacion': asociacion,
-                    'logueado': True,
-                 'animales': animal  # <-- pasar aquí también
-                })
-            # Si la asociación existe, estamos logueados
-            return render(request, 'index.html', {'asociacion': asociacion, 'logueado': True})
+            mis_animales = CreacionAnimales.objects.filter(asociacion=asociacion)
             
+            return render(request, 'index.html', {
+                'asociacion': asociacion,
+                'logueado': True,
+                'animales': animales,
+                'mis_animales': mis_animales  # Animales de la asociación logueada
+            })
         except RegistroAsociacion.DoesNotExist:
-            pass  # Si la asociación no existe, no estamos logueados
+            pass
             
-    # Si no hay cookie o no existe la asociación, no estamos logueados
-    return render(request, 'index.html', {'logueado': False, 'animales': animal})
+    return render(request, 'index.html', {
+        'logueado': False, 
+        'animales': animales,
+        'mis_animales': None
+    })
 
 def session_login_required(view_func):
     @wraps(view_func)
@@ -141,16 +145,89 @@ def session_login_required(view_func):
 
 @session_login_required
 def crear_animal(request):
-    if request.method == 'POST':
-        form = CreacionAnimalesForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('Inicio')  # Cambiar por la pagina de los animales o por la pagina en el que la asociaciones pueden ver sus animales
-    else:
-        form = CreacionAnimalesForm()
+    asociacion_id = request.COOKIES.get('asociacion_id')
+    asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
     
-    return render(request, 'creacion_de_animales.html', {'form': form})
+    if request.method == 'POST':
+        form = CreacionAnimalesForm(request.POST, request.FILES, asociacion=asociacion)
+        if form.is_valid():
+            animal = form.save(commit=False)
+            animal.asociacion = asociacion  # Asignar la asociación
+            animal.save()
+            return redirect('Inicio')
+    else:
+        form = CreacionAnimalesForm(asociacion=asociacion)
+    
+    return render(request, 'creacion_de_animales.html', {
+        'form': form,
+        'asociacion': asociacion
+    })
 
 def pagina_inicio(request):
     animales = CreacionAnimales.objects.all()
     return render(request, 'inicio.html', {'animales': animales})
+
+def vista_animal(request, animal_id):
+    animal = get_object_or_404(CreacionAnimales, id=animal_id)
+    return render(request, 'vista_animal.html', {'animal': animal})
+
+@session_login_required
+def lista_animales_asociacion(request):
+    # Obtener la asociación logueada
+    asociacion_id = request.COOKIES.get('asociacion_id')
+    asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
+    
+    # Obtener solo los animales de esta asociación
+    animales = CreacionAnimales.objects.filter(asociacion=asociacion)
+    
+    return render(request, 'vista_animal.html', {
+        'animales': animales,
+        'asociacion': asociacion
+    })
+
+
+@session_login_required
+def editar_animal(request, animal_id):
+    asociacion_id = request.COOKIES.get('asociacion_id')
+    asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
+    animal = get_object_or_404(CreacionAnimales, id=animal_id, asociacion=asociacion)
+    
+    if request.method == 'POST':
+        form = CreacionAnimalesForm(request.POST, request.FILES, instance=animal)
+        if form.is_valid():
+            form.save()
+            return redirect('Inicio')
+    else:
+        form = CreacionAnimalesForm(instance=animal)
+    
+    return render(request, 'editar_animal.html', {
+        'form': form,
+        'animal': animal,
+        'asociacion': asociacion
+    })
+
+@session_login_required
+def eliminar_animal(request, animal_id):
+    asociacion_id = request.COOKIES.get('asociacion_id')
+    asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
+    animal = get_object_or_404(CreacionAnimales, id=animal_id, asociacion=asociacion)
+    
+    if request.method == 'POST':
+        animal.delete()
+        return redirect('Inicio')
+    
+    return render(request, 'confirmar_eliminar.html', {
+        'animal': animal,
+        'asociacion': asociacion
+    })
+
+@session_login_required
+def toggle_adopcion(request, animal_id):
+    asociacion_id = request.COOKIES.get('asociacion_id')
+    asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
+    animal = get_object_or_404(CreacionAnimales, id=animal_id, asociacion=asociacion)
+    
+    animal.adoptado = not animal.adoptado
+    animal.save()
+    
+    return redirect('Inicio')
