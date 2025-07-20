@@ -31,7 +31,7 @@ def registro_asociacion(request):
                 recipient_list=['alvaro_m_a@icloud.com'],
                 fail_silently=False,
             )
-            return redirect('login')
+            return redirect('Inicio')
     else:
         form = RegistroAsociacionForm()
     return render(request, 'registro_asociacion.html', {'form': form})
@@ -231,3 +231,16 @@ def toggle_adopcion(request, animal_id):
     animal.save()
     
     return redirect('Inicio')
+
+
+def mis_animales(request):
+    if not request.session.get('esta_logueado'):
+        return redirect('login')
+    
+    asociacion_id = request.COOKIES.get('asociacion_id')
+    mis_animales = CreacionAnimales.objects.filter(asociacion_id=asociacion_id)
+    
+    return render(request, 'mis_animales.html', {
+        'mis_animales': mis_animales,
+        'asociacion_nombre': request.session.get('asociacion_nombre')
+    })

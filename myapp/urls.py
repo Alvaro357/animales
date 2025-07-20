@@ -13,5 +13,6 @@ path('ver_animal/<int:animal_id>/', views.vista_animal, name='vista_animal'),
 path('animales/editar/<int:animal_id>/', views.editar_animal, name='editar_animal'),
 path('animales/eliminar/<int:animal_id>/', views.eliminar_animal, name='eliminar_animal'),
 path('animales/toggle-adopcion/<int:animal_id>/', views.toggle_adopcion, name='toggle_adopcion'),
- path('animales/', views.lista_animales_asociacion, name='lista_animales_asociacion'),
+path('animales/', views.lista_animales_asociacion, name='lista_animales_asociacion'),
+path('mis_animales/', views.mis_animales, name='mis_animales'),
 ]

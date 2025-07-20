@@ -83,14 +83,9 @@ class CreacionAnimalesForm(forms.ModelForm):
                 'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
                 'placeholder': 'Nombre del animal'
             }),
-            'tipo_de_animal': forms.Select(attrs={
+            'tipo_de_animal': forms.TextInput(attrs={
                 'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm'
-            }, choices=[
-                ('', 'Selecciona un tipo'),
-                ('perro', 'Perro'),
-                ('gato', 'Gato'),
-                ('otro', 'Otro'),
-            ]),
+            }),
             'raza': forms.TextInput(attrs={
                 'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
                 'placeholder': 'Ej: pastor alemán, border collie...'

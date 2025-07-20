@@ -18,15 +18,9 @@ class RegistroAsociacion(models.Model):
         return self.nombre
 
 class CreacionAnimales(models.Model):
-    TIPO_ANIMAL_CHOICES = [
-        ('perro', 'Perro'),
-        ('gato', 'Gato'),
-        ('otro', 'Otro'),
-    ]
-    
     asociacion = models.ForeignKey(RegistroAsociacion, on_delete=models.CASCADE, related_name='animales')
     nombre = models.CharField(max_length=100)
-    tipo_de_animal = models.CharField(max_length=200, choices=TIPO_ANIMAL_CHOICES)
+    tipo_de_animal = models.CharField(max_length=200)
     raza = models.CharField(max_length=50)
     imagen = models.ImageField(upload_to='animales/imagenes/', blank=True, null=True)
     video = models.FileField(upload_to='animales/videos/', blank=True, null=True)

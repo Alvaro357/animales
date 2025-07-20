@@ -29,6 +29,12 @@
             text-decoration: none;
             margin: 10px;
         }
+        .hidden {
+            display: none;
+        }
+        .animal-card {
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -70,7 +76,8 @@
 
     {% if request.session.esta_logueado %}
         <div class="flex items-center gap-4">
-            <a href="/crear_animal/" class="text-[#a403b6] uppercase tracking-widest text-sm border border-[#a403b6] px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Crear Animal</a>
+          <a href="/mis_animales/" class="text-[#a403b6] uppercase tracking-widest text-sm border border-[#a403b6] px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Mis Animales</a>  
+          <a href="/crear_animal/" class="text-[#a403b6] uppercase tracking-widest text-sm border border-[#a403b6] px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Crear Animal</a>
             <a href="/logout/" class="text-red-600 uppercase tracking-widest text-sm border border-red-600 px-4 py-2 rounded hover:text-white hover:bg-red-600 hover:shadow-[0_0_5px_#f87171,0_0_25px_#f87171,0_0_50px_#f87171,0_0_100px_#f87171] transition">Cerrar sesión</a>
         </div>
     {% else %}
@@ -82,78 +89,36 @@
         </div>
     {% endif %}
 </nav>
-
-{% if request.session.esta_logueado and mis_animales %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-  <h2 class="text-3xl font-bold text-gray-800 mb-8">Mis Animales</h2>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-    {% for animal in mis_animales %}
-    <div class="flex flex-col h-full"> <!-- Añadido: Contenedor flex para igualar alturas -->
-      <div class="bg-white rounded-2xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_15px_50px_rgba(163,3,182,0.4)] flex flex-col h-full"> <!-- Añadido: flex-col h-full -->
-        <!-- Botones de edición -->
-        <div class="absolute top-4 right-4 flex gap-2 z-10">
-          <a href="{% url 'editar_animal' animal.id %}" 
-             class="bg-[#03e9f4] text-white p-2 rounded-full hover:bg-[#03b4bd] transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
-          </a>
-          <a href="{% url 'eliminar_animal' animal.id %}" 
-             class="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-          </a>
-        </div>
-        
-        {% if animal.imagen %}
-          <img src="{{ animal.imagen.url }}" alt="Imagen de {{ animal.nombre }}" class="w-full h-64 object-cover">
-        {% else %}
-          <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
-            Sin imagen
-          </div>
-        {% endif %}
-        
-        <div class="p-6 flex-grow"> <!-- Añadido: flex-grow para el contenido -->
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ animal.nombre }}</h3>
-          <p class="text-sm text-gray-600 mb-1"><strong>Tipo:</strong> {{ animal.tipo_de_animal }}</p>
-          <p class="text-sm text-gray-600 mb-1"><strong>Raza:</strong> {{ animal.raza }}</p>
-          <p class="text-sm text-gray-600 mb-1"><strong>Estado:</strong> 
-            <span class="{% if animal.adoptado %}text-red-500{% else %}text-green-500{% endif %}">
-              {% if animal.adoptado %}Adoptado{% else %}Disponible{% endif %}
-            </span>
-          </p>
-          
-          <!-- Botón para cambiar estado de adopción -->
-          <form method="post" action="{% url 'toggle_adopcion' animal.id %}" class="mt-4">
-            {% csrf_token %}
-            <button type="submit" class="text-sm {% if animal.adoptado %}bg-green-500 hover:bg-green-600{% else %}bg-red-500 hover:bg-red-600{% endif %} text-white px-3 py-1 rounded">
-              Marcar como {% if animal.adoptado %}Disponible{% else %}Adoptado{% endif %}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-    {% empty %}
-    <div class="col-span-full text-center text-gray-500 text-lg">
-      No has añadido ningún animal todavía.
-      <a href="/crear_animal/" class="text-[#03e9f4] underline">Añade tu primer animal</a>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
 <!-- Animales disponibles -->
 <div class="max-w-7xl mx-auto px-4 py-12">
-  <h2 class="text-3xl font-bold text-gray-800 mb-8">Animales disponibles</h2>
+  <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+    <h2 class="text-3xl font-bold text-gray-800">Animales disponibles</h2>
+    
+    <!-- Buscador -->
+    <div class="relative w-full md:w-1/3">
+      <input 
+        type="text" 
+        id="buscadorAnimales" 
+        placeholder="Buscar por nombre, tipo, raza o provincia" 
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#03e9f4] transition"
+      >
+      <button onclick="limpiarBusqueda()" class="absolute right-3 top-2 text-gray-400 hover:text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+  </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
     {% for animal in animales %}
-    <div class="flex flex-col h-full"> <!-- Añadido: Contenedor flex para igualar alturas -->
-      <a href="{% url 'vista_animal' animal.id %}" class="block hover:opacity-100 flex flex-col h-full"> <!-- Añadido: flex-col h-full -->
-        <div class="bg-white rounded-2xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_15px_50px_rgba(3,233,244,0.4)] flex flex-col h-full"> <!-- Añadido: flex-col h-full -->
+    <div class="animal-card flex flex-col h-full" 
+         data-nombre="{{ animal.nombre|lower }}" 
+         data-tipo="{{ animal.tipo_de_animal|lower }}"
+         data-raza="{{ animal.raza|lower }}"
+         data-provincia="{{ animal.provincia|lower }}">
+      <a href="{% url 'vista_animal' animal.id %}" class="block hover:opacity-100 flex flex-col h-full">
+        <div class="bg-white rounded-2xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_15px_50px_rgba(3,233,244,0.4)] flex flex-col h-full">
           {% if animal.imagen %}
             <img src="{{ animal.imagen.url }}" alt="Imagen de {{ animal.nombre }}" class="w-full h-64 object-cover">
           {% else %}
@@ -162,7 +127,7 @@
             </div>
           {% endif %}
           
-          <div class="p-6 flex-grow"> <!-- Añadido: flex-grow para el contenido -->
+          <div class="p-6 flex-grow">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ animal.nombre }}</h3>
             <p class="text-sm text-gray-600 mb-1"><strong>Tipo de animal:</strong> {{ animal.tipo_de_animal }}</p>
             <p class="text-sm text-gray-600 mb-1"><strong>Email:</strong> {{ animal.email }}</p>
@@ -203,6 +168,34 @@
       modal.classList.add('hidden');
     }, 1000);
   }
+
+  // Función para filtrar animales
+  function filtrarAnimales() {
+    const busqueda = document.getElementById('buscadorAnimales').value.toLowerCase();
+    const animales = document.querySelectorAll('.animal-card');
+    
+    animales.forEach(animal => {
+      const nombre = animal.getAttribute('data-nombre');
+      const tipo = animal.getAttribute('data-tipo');
+      const raza = animal.getAttribute('data-raza');
+      const provincia = animal.getAttribute('data-provincia');
+      
+      if (nombre.includes(busqueda) || tipo.includes(busqueda) || raza.includes(busqueda) || provincia.includes(busqueda)) {
+        animal.classList.remove('hidden');
+      } else {
+        animal.classList.add('hidden');
+      }
+    });
+  }
+
+  // Función para limpiar la búsqueda
+  function limpiarBusqueda() {
+    document.getElementById('buscadorAnimales').value = '';
+    filtrarAnimales();
+  }
+
+  // Escuchar cambios en el input de búsqueda
+  document.getElementById('buscadorAnimales').addEventListener('input', filtrarAnimales);
 </script>
 
 </body>
