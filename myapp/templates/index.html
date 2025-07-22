@@ -14,7 +14,12 @@
             font-family: sans-serif;
             background-color: #f5f5f5;
             text-align: center;
-            padding-top: 150px;
+            padding-top: 160px; /* Ajustado para móvil */
+        }
+        @media (min-width: 768px) {
+            body {
+                padding-top: 180px; /* Más espacio en desktop */
+            }
         }
         .card {
             background: white;
@@ -35,39 +40,63 @@
         .animal-card {
             transition: all 0.3s ease;
         }
+        .filter-btn {
+            transition: all 0.3s ease;
+            transform: scale(1);
+        }
+        .filter-btn:hover {
+            transform: scale(1.05);
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #03e9f4, #a403b6);
+            color: white;
+            box-shadow: 0 0 15px rgba(3,233,244,0.5);
+        }
     </style>
 </head>
 <body>
 
-<!-- Modal de Login -->
-<div id="loginModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-  <div id="modalContent" class="bg-white p-8 rounded-lg shadow-[0_25px_50px_rgba(0,0,0,0.3)] w-full max-w-md relative transform scale-95 opacity-0 transition-all duration-1000 ease-in-out">
-    <button onclick="cerrarLogin()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
-    <h2 class="text-2xl font-bold mb-6 text-center">Iniciar sesión</h2>
-    <form method="post" action="/login/">
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-            <div class="mb-4 text-red-500 text-sm">
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
-        <div class="mb-4">
-            <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
-            <input type="text" id="username" name="username" class="mt-1 block w-full px-4 py-2 border rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#03e9f4]" required>
-        </div>
-        <div class="mb-4">
-            <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-            <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#03e9f4]" required>
-        </div>
-        <button type="submit" class="w-full text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
-            Iniciar sesión
-        </button>
-    </form>
+<!-- Modal de Login SOLAMENTE -->
+<div id="authModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+  <div id="modalContent" class="bg-white p-8 rounded-lg shadow-[0_25px_50px_rgba(0,0,0,0.3)] w-full max-w-md max-h-[90vh] overflow-y-auto relative transform scale-95 opacity-0 transition-all duration-1000 ease-in-out">
+    <button onclick="cerrarModal()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold z-10">&times;</button>
+    
+    <!-- Formulario de Login -->
+    <div id="loginForm">
+      <h2 class="text-2xl font-bold mb-6 text-center">Iniciar sesión</h2>
+      <form method="post" action="/login/">
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+              <div class="mb-4 text-red-500 text-sm">
+                  {{ form.non_field_errors }}
+              </div>
+          {% endif %}
+          <div class="mb-4">
+              <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
+              <input type="text" id="username" name="username" class="mt-1 block w-full px-4 py-2 border rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#03e9f4]" required>
+          </div>
+          <div class="mb-4">
+              <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+              <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#03e9f4]" required>
+          </div>
+          <button type="submit" class="w-full text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+              Iniciar sesión
+          </button>
+      </form>
+      
+      <!-- Enlace para ir a la página de registro -->
+      <div class="mt-4 pt-4 border-t border-gray-200 text-center">
+          <p class="text-sm text-gray-600 mb-3">¿No tienes cuenta?</p>
+          <a href="/registro/" class="inline-block text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+              Regístrate
+          </a>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Navbar -->
-<nav class="fixed top-0 left-0 w-full bg-white shadow-md flex items-center justify-between gap-4 px-6 py-3 z-50">
+<nav class="fixed top-0 left-0 w-full bg-white shadow-md flex items-center justify-between gap-4 px-6 py-3 z-50 min-h-[64px]">
     <div class="text-left text-xl font-bold text-[#03e9f4]">
         {% if request.session.esta_logueado %}
             <p>Bienvenid@ {{ request.session.asociacion_nombre }}</p>
@@ -75,20 +104,70 @@
     </div>
 
     {% if request.session.esta_logueado %}
-        <div class="flex items-center gap-4">
-          <a href="/mis_animales/" class="text-[#a403b6] uppercase tracking-widest text-sm border border-[#a403b6] px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Mis Animales</a>  
-          <a href="/crear_animal/" class="text-[#a403b6] uppercase tracking-widest text-sm border border-[#a403b6] px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Crear Animal</a>
-            <a href="/logout/" class="text-red-600 uppercase tracking-widest text-sm border border-red-600 px-4 py-2 rounded hover:text-white hover:bg-red-600 hover:shadow-[0_0_5px_#f87171,0_0_25px_#f87171,0_0_50px_#f87171,0_0_100px_#f87171] transition">Cerrar sesión</a>
+        <div class="flex items-center gap-2 md:gap-4">
+          <a href="/mis_animales/" class="text-[#a403b6] uppercase tracking-widest text-xs md:text-sm border border-[#a403b6] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Mis Animales</a>  
+          <a href="/crear_animal/" class="text-[#a403b6] uppercase tracking-widest text-xs md:text-sm border border-[#a403b6] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Crear Animal</a>
+            <a href="/logout/" class="text-red-600 uppercase tracking-widest text-xs md:text-sm border border-red-600 px-2 md:px-4 py-2 rounded hover:text-white hover:bg-red-600 hover:shadow-[0_0_5px_#f87171,0_0_25px_#f87171,0_0_50px_#f87171,0_0_100px_#f87171] transition">Cerrar sesión</a>
         </div>
     {% else %}
-        <div class="flex items-center gap-4 justify-center flex-1 max-w-xs mx-auto">
-            <button onclick="abrirLogin()" class="text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+        <div class="flex items-center gap-2 md:gap-4 justify-center flex-1 max-w-xs mx-auto">
+            <button onclick="abrirLogin()" class="text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
                 Iniciar sesión
             </button>
-            <a href="/registro/" class="text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">Regístrate</a>
         </div>
     {% endif %}
 </nav>
+
+<!-- Filtros de animales -->
+<div class="fixed top-16 md:top-20 left-0 w-full z-40 flex justify-center px-4">
+  <div class="bg-white rounded-full shadow-lg px-4 py-2 flex gap-3 overflow-x-auto no-scrollbar">
+    <div class="flex justify-center gap-4 bg-gray-100 rounded-full shadow-inner p-1 mx-2 overflow-x-auto no-scrollbar">
+
+      <!-- Botón para mostrar todos -->
+      <button onclick="filtrarPorTipo('')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition active whitespace-nowrap" 
+              id="btn-todos">
+        ✨ Todos
+      </button>
+      
+      <!-- Botón para perros -->
+      <button onclick="filtrarPorTipo('perro')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-perro">
+        🐶 Perros
+      </button>
+      
+      <!-- Botón para gatos -->
+      <button onclick="filtrarPorTipo('gato')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-gato">
+        😺 Gatos
+      </button>
+      
+      <!-- Botón para conejos -->
+      <button onclick="filtrarPorTipo('conejo')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-conejo">
+        🐰 Conejos
+      </button>
+      
+      <!-- Botón para pájaros -->
+      <button onclick="filtrarPorTipo('pájaro')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-pájaro">
+        🐦 Pájaros
+      </button>
+      
+      <!-- Botón para otros -->
+      <button onclick="filtrarPorTipo('otros')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-otros">
+        🐾 Otros
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Animales disponibles -->
 <div class="max-w-7xl mx-auto px-4 py-12">
   <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
@@ -110,6 +189,11 @@
     </div>
   </div>
 
+  <!-- Contador de resultados -->
+  <div class="mb-4 text-center">
+    <span id="contadorResultados" class="text-sm text-gray-600"></span>
+  </div>
+
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
     {% for animal in animales %}
     <div class="animal-card flex flex-col h-full" 
@@ -129,12 +213,22 @@
           
           <div class="p-6 flex-grow">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ animal.nombre }}</h3>
-            <p class="text-sm text-gray-600 mb-1"><strong>Tipo de animal:</strong> {{ animal.tipo_de_animal }}</p>
-            <p class="text-sm text-gray-600 mb-1"><strong>Email:</strong> {{ animal.email }}</p>
-            <p class="text-sm text-gray-600 mb-1"><strong>Teléfono:</strong> {{ animal.telefono }}</p>
-            <p class="text-sm text-gray-600 mb-1"><strong>Población:</strong> {{ animal.poblacion }}</p>
+            <p class="text-sm text-gray-600 mb-1">
+              
+              {% if animal.tipo_de_animal == 'Perro' %}
+                🐶 
+              {% elif animal.tipo_de_animal == 'Gato' %}
+                😺 
+              {% else %}
+                <strong>{{ animal.tipo_de_animal }}</strong>
+              {% endif %}
+            </p>
+            <p class="text-sm text-gray-600 mb-4"><strong>{{ animal.raza }}</strong> </p>
+            <p class="text-sm text-gray-600 mb-1"><strong>{{ animal.email }}</strong> </p>
+            <p class="text-sm text-gray-600 mb-1"><strong>{{ animal.telefono }}</strong> </p>
+            <p class="text-sm text-gray-600 mb-1"><strong>Población:</strong> {{ animal.poblacion }} </p>
             <p class="text-sm text-gray-600 mb-1"><strong>Provincia:</strong> {{ animal.provincia }}</p>
-            <p class="text-sm text-gray-600 mb-4"><strong>Código Postal:</strong> {{ animal.codigo_postal }}</p>
+            
           </div>
         </div>
       </a>
@@ -145,10 +239,12 @@
   </div>
 </div>
 
-<!-- Script del modal -->
+<!-- Script del modal y filtros -->
 <script>
+  let filtroActual = '';
+
   function abrirLogin() {
-    const modal = document.getElementById('loginModal');
+    const modal = document.getElementById('authModal');
     const content = document.getElementById('modalContent');
     
     modal.classList.remove('hidden');
@@ -157,8 +253,8 @@
     content.classList.add('scale-100', 'opacity-100');
   }
 
-  function cerrarLogin() {
-    const modal = document.getElementById('loginModal');
+  function cerrarModal() {
+    const modal = document.getElementById('authModal');
     const content = document.getElementById('modalContent');
 
     content.classList.remove('scale-100', 'opacity-100');
@@ -169,10 +265,38 @@
     }, 1000);
   }
 
-  // Función para filtrar animales
+  // Función para filtrar por tipo de animal
+  function filtrarPorTipo(tipo) {
+    filtroActual = tipo;
+    
+    // Actualizar botones activos
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    if (tipo === '') {
+      document.getElementById('btn-todos').classList.add('active');
+    } else {
+      document.getElementById('btn-' + tipo).classList.add('active');
+    }
+    
+    // Aplicar filtros
+    aplicarFiltros();
+  }
+
+  // Función para filtrar animales (búsqueda de texto)
   function filtrarAnimales() {
+    aplicarFiltros();
+  }
+
+  // Función principal que aplica todos los filtros
+  function aplicarFiltros() {
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     const busqueda = document.getElementById('buscadorAnimales').value.toLowerCase();
     const animales = document.querySelectorAll('.animal-card');
+    let animalesVisibles = 0;
     
     animales.forEach(animal => {
       const nombre = animal.getAttribute('data-nombre');
@@ -180,22 +304,78 @@
       const raza = animal.getAttribute('data-raza');
       const provincia = animal.getAttribute('data-provincia');
       
-      if (nombre.includes(busqueda) || tipo.includes(busqueda) || raza.includes(busqueda) || provincia.includes(busqueda)) {
+      // Verificar filtro de texto
+      const cumpleBusqueda = !busqueda || 
+       nombre.includes(busqueda) || 
+       tipo.includes(busqueda) || 
+       raza.includes(busqueda) || 
+       provincia.includes(busqueda);
+      
+      // Verificar filtro de tipo
+      let cumpleTipo = true;
+      if (filtroActual !== '') {
+        if (filtroActual === 'otros') {
+          // Para "otros", mostrar todo lo que no sea perro, gato, conejo o pájaro
+          cumpleTipo = !tipo.includes('perro') && 
+                      !tipo.includes('gato') && 
+                      !tipo.includes('conejo') && 
+                      !tipo.includes('pájaro');
+        } else {
+          cumpleTipo = tipo.includes(filtroActual);
+        }
+      }
+      
+      // Mostrar u ocultar según ambos filtros
+      if (cumpleBusqueda && cumpleTipo) {
         animal.classList.remove('hidden');
+        animalesVisibles++;
       } else {
         animal.classList.add('hidden');
       }
     });
+    
+    // Actualizar contador
+    actualizarContador(animalesVisibles);
+  }
+
+  // Función para actualizar el contador de resultados
+  function actualizarContador(cantidad) {
+    const contador = document.getElementById('contadorResultados');
+    if (cantidad === 0) {
+      contador.textContent = 'No se encontraron animales';
+      contador.className = 'text-sm text-red-500';
+    } else {
+      contador.textContent = `${cantidad} animal${cantidad !== 1 ? 'es' : ''} encontrado${cantidad !== 1 ? 's' : ''}`;
+      contador.className = 'text-sm text-green-600';
+    }
   }
 
   // Función para limpiar la búsqueda
   function limpiarBusqueda() {
     document.getElementById('buscadorAnimales').value = '';
-    filtrarAnimales();
+    aplicarFiltros();
+  }
+
+  // Función para limpiar todos los filtros
+  function limpiarTodosFiltros() {
+    document.getElementById('buscadorAnimales').value = '';
+    filtrarPorTipo('');
   }
 
   // Escuchar cambios en el input de búsqueda
   document.getElementById('buscadorAnimales').addEventListener('input', filtrarAnimales);
+
+  // Inicializar contador al cargar la página
+  document.addEventListener('DOMContentLoaded', function() {
+    aplicarFiltros();
+  });
+
+  // Cerrar modal al hacer clic fuera de él
+  document.getElementById('authModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      cerrarModal();
+    }
+  });
 </script>
 
 </body>

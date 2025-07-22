@@ -7,13 +7,15 @@ from django.contrib.auth.decorators import login_required # Para exigir el login
 from functools import wraps
 from .forms import RegistroAsociacionForm, LoginForm, CreacionAnimalesForm
 from .models import RegistroAsociacion, CreacionAnimales
+from django.http import JsonResponse
+
 
 
 
 # Registro
 def registro_asociacion(request):
     if request.method == 'POST':
-        form = RegistroAsociacionForm(request.POST)
+        form = RegistroAsociacionForm(request.POST, request.FILES)
         if form.is_valid():
             asociacion = form.save(commit=False)
             password = form.cleaned_data['password']
@@ -32,11 +34,38 @@ def registro_asociacion(request):
                 fail_silently=False,
             )
             return redirect('Inicio')
+        else:
+            # Agregar esto para debuggear errores del formulario
+            print("Errores del formulario:", form.errors)
     else:
         form = RegistroAsociacionForm()
+
     return render(request, 'registro_asociacion.html', {'form': form})
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            try:
+                asociacion = RegistroAsociacion.objects.get(nombre=username)
+                if check_password(password, asociacion.password):
+                    response = redirect('Inicio')
+                    max_age = 86400  # 24 horas en segundos
+                    response.set_cookie('asociacion_id', asociacion.id, max_age=max_age)
+                    
+                    # Guardamos en la sesión
+                    request.session['esta_logueado'] = True
+                    request.session['asociacion_nombre'] = asociacion.nombre
+                    return response
+                else:
+                    form.add_error(None, 'Contraseña incorrecta.')
+            except RegistroAsociacion.DoesNotExist:
+                form.add_error(None, 'No existe una asociación con ese nombre.')
+    else:
+        form = LoginForm()
 
-
+    return render(request, 'login.html', {'form': form})
 
 
 # Login
@@ -135,6 +164,7 @@ def Inicio(request):
         'mis_animales': None
     })
 
+
 def session_login_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -214,7 +244,7 @@ def eliminar_animal(request, animal_id):
     
     if request.method == 'POST':
         animal.delete()
-        return redirect('Inicio')
+        return redirect('mis_animales')
     
     return render(request, 'confirmar_eliminar.html', {
         'animal': animal,

@@ -10,6 +10,7 @@ class RegistroAsociacion(models.Model):
     poblacion = models.CharField(max_length=50)
     provincia = models.CharField(max_length=50)
     codigo_postal = models.CharField(max_length=10)
+    logo = models.ImageField(upload_to='Fotos/', blank=True, null=True)
 
     class Meta:
         db_table = 'asociaciones' #Para asegurarte de que pone de nombre asociaciones
@@ -22,8 +23,8 @@ class CreacionAnimales(models.Model):
     nombre = models.CharField(max_length=100)
     tipo_de_animal = models.CharField(max_length=200)
     raza = models.CharField(max_length=50)
-    imagen = models.ImageField(upload_to='animales/imagenes/', blank=True, null=True)
-    video = models.FileField(upload_to='animales/videos/', blank=True, null=True)
+    imagen = models.ImageField(upload_to='Fotos/', blank=True, null=True)
+    video = models.FileField(upload_to='videos/', blank=True, null=True)
     email = models.EmailField()
     telefono = models.CharField(max_length=130)
     poblacion = models.CharField(max_length=50)

@@ -16,7 +16,14 @@
     </div>
 
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <form method="POST">
+        <!-- Mostrar errores del formulario -->
+        {% if form.non_field_errors %}
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="space-y-12">
             
@@ -29,6 +36,9 @@
                             <label for="name" class="block text-sm/6 font-medium text-gray-900">Nombre</label>
                             <div class="mt-2">
                                 {{form.nombre}}
+                                {% if form.nombre.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>
             
@@ -36,6 +46,9 @@
                             <label for="password" class="block text-sm/6 font-medium text-gray-900">Contraseña</label>
                             <div class="mt-2">
                                 {{form.password}}
+                                {% if form.password.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>
             
@@ -43,6 +56,9 @@
                             <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
                             <div class="mt-2">
                                 {{form.email}}
+                                {% if form.email.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>  
                         
@@ -50,6 +66,19 @@
                             <label for="phone" class="block text-sm/6 font-medium text-gray-900">Teléfono</label>
                             <div class="mt-2">
                                 {{form.telefono}}
+                                {% if form.telefono.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.telefono.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="logo" class="block text-sm/6 font-medium text-gray-900">Logo (opcional)</label>
+                            <div class="mt-2">
+                                {{form.logo}}
+                                {% if form.logo.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.logo.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>
             
@@ -57,6 +86,9 @@
                             <label for="direccion" class="block text-sm/6 font-medium text-gray-900">Dirección</label>
                             <div class="mt-2">
                                 {{form.direccion}}
+                                {% if form.direccion.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.direccion.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>
             
@@ -64,6 +96,9 @@
                             <label for="poblacion" class="block text-sm/6 font-medium text-gray-900">Población</label>
                             <div class="mt-2">
                                 {{form.poblacion}}
+                                {% if form.poblacion.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.poblacion.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>
             
@@ -71,6 +106,9 @@
                             <label for="provincia" class="block text-sm/6 font-medium text-gray-900">Provincia</label>
                             <div class="mt-2">
                                 {{form.provincia}}
+                                {% if form.provincia.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.provincia.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>
             
@@ -78,6 +116,9 @@
                             <label for="codigo_postal" class="block text-sm/6 font-medium text-gray-900">Código Postal</label>
                             <div class="mt-2">
                                 {{form.codigo_postal}}
+                                {% if form.codigo_postal.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.codigo_postal.errors.0 }}</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

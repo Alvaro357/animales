@@ -31,6 +31,56 @@
     </div>
 </nav>
 
+<!-- Filtros de animales -->
+<div class="fixed top-16 md:top-20 left-0 w-full z-40 flex justify-center px-4">
+  <div class="bg-white rounded-full shadow-lg px-4 py-2 flex gap-3 overflow-x-auto no-scrollbar">
+    <div class="flex justify-center gap-4 bg-gray-100 rounded-full shadow-inner p-1 mx-2 overflow-x-auto no-scrollbar">
+
+      <!-- Botón para mostrar todos -->
+      <button onclick="filtrarPorTipo('')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition active whitespace-nowrap" 
+              id="btn-todos">
+        ✨ Todos
+      </button>
+      
+      <!-- Botón para perros -->
+      <button onclick="filtrarPorTipo('perro')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-perro">
+        🐶 Perros
+      </button>
+      
+      <!-- Botón para gatos -->
+      <button onclick="filtrarPorTipo('gato')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-gato">
+        😺 Gatos
+      </button>
+      
+      <!-- Botón para conejos -->
+      <button onclick="filtrarPorTipo('conejo')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-conejo">
+        🐰 Conejos
+      </button>
+      
+      <!-- Botón para pájaros -->
+      <button onclick="filtrarPorTipo('pájaro')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-pájaro">
+        🐦 Pájaros
+      </button>
+      
+      <!-- Botón para otros -->
+      <button onclick="filtrarPorTipo('otros')" 
+              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
+              id="btn-otros">
+        🐾 Otros
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Contenido Principal -->
 <main class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold text-gray-800 mb-8">Mis Animales</h1>
@@ -137,6 +187,71 @@
 
     // Escuchar cambios en el input de búsqueda
     document.getElementById('buscadorAnimales').addEventListener('input', filtrarAnimales);
+    
+    // Función principal que aplica todos los filtros
+    function aplicarFiltros() {
+    
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+         const busqueda = document.getElementById('buscadorAnimales').  value.toLowerCase();
+         const animales = document.querySelectorAll('.animal-card');
+         let animalesVisibles = 0;
+        
+        animales.forEach(animal => {
+          const nombre = animal.getAttribute('data-nombre');
+          const tipo = animal.getAttribute('data-tipo');
+          const raza = animal.getAttribute('data-raza');
+          const provincia = animal.getAttribute('data-provincia');
+        
+          // Verificar filtro de texto
+          const cumpleBusqueda = !busqueda || 
+                               nombre.includes(busqueda) || 
+                               tipo.includes(busqueda) || 
+                               raza.includes(busqueda) || 
+                               provincia.includes(busqueda);
+        
+          // Verificar filtro de tipo
+          let cumpleTipo = true;
+          if (filtroActual !== '') {
+            if (filtroActual === 'otros') {
+              // Para "otros", mostrar todo lo que no sea perro, gato,  conejo o pájaro
+              cumpleTipo = !tipo.includes('perro') && 
+                          !tipo.includes('gato') && 
+                          !tipo.includes('conejo') && 
+                          !tipo.includes('pájaro');
+            } else {
+              cumpleTipo = tipo.includes(filtroActual);
+            }
+          }
+
+          // Mostrar u ocultar según ambos filtros
+          if (cumpleBusqueda && cumpleTipo) {
+            animal.classList.remove('hidden');
+            animalesVisibles++;
+          } else {
+            animal.classList.add('hidden');
+          }
+        });
+
+        // Actualizar contador
+        actualizarContador(animalesVisibles);
+    }
+    
+
+    // Variable global para el filtro actual
+let filtroActual = '';
+
+// Función llamada por los botones para cambiar el filtro por tipo
+function filtrarPorTipo(tipo) {
+    filtroActual = tipo;
+    aplicarFiltros();
+}
+
+// Opcional: función que actualiza un contador visible (si lo tienes)
+function actualizarContador(cantidad) {
+    console.log(`Animales visibles: ${cantidad}`); // O actualiza algún elemento HTML
+}
+
 </script>
 
 </body>

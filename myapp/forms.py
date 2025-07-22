@@ -7,7 +7,7 @@ from .models import CreacionAnimales
 class RegistroAsociacionForm(forms.ModelForm):
     class Meta:
         model = RegistroAsociacion
-        fields = '__all__'
+        fields = ['nombre', 'password', 'email', 'telefono', 'direccion', 'poblacion', 'provincia', 'codigo_postal', 'logo']
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
@@ -15,40 +15,44 @@ class RegistroAsociacionForm(forms.ModelForm):
                 'id': 'name',
             }),
             'password': forms.PasswordInput(attrs={
-                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900  outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm',
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
                 'autocomplete': 'new-password',
                 'id': 'password'
-
             }),
             'email': forms.EmailInput(attrs={
-                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm/6',
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
                 'autocomplete': 'email',
                 'id': 'email',
             }),
             'telefono': forms.TextInput(attrs={
-                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm/6',
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
                 'autocomplete': 'phone',
                 'id': 'phone',
             }),
             'direccion': forms.TextInput(attrs={
-                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm/6',
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
                 'autocomplete': 'street-address',
                 'id': 'direccion',
             }),
             'poblacion': forms.TextInput(attrs={
-                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm/6',
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
                 'autocomplete': 'address-level2',
                 'id': 'poblacion',
             }),
             'provincia': forms.TextInput(attrs={
-                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm/6',
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
                 'autocomplete': 'address-level1',
                 'id': 'provincia',
             }),
             'codigo_postal': forms.TextInput(attrs={
-                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm/6',
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
                 'autocomplete': 'postal-code',
                 'id': 'codigo_postal',
+            }),
+            'logo': forms.FileInput(attrs={
+                'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none',
+                'id': 'logo',
+                'accept': 'image/*',
             }),
         }
 
