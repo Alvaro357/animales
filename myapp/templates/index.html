@@ -52,6 +52,46 @@
             color: white;
             box-shadow: 0 0 15px rgba(3,233,244,0.5);
         }
+        
+        /* Estilos para lazy loading */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .lazy-image.loaded {
+            opacity: 1;
+        }
+        
+        .image-placeholder {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -196,20 +236,46 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
     {% for animal in animales %}
-    <div class="animal-card flex flex-col h-full" 
+    <div class="animal-card flex flex-col h-full fade-in" 
          data-nombre="{{ animal.nombre|lower }}" 
          data-tipo="{{ animal.tipo_de_animal|lower }}"
          data-raza="{{ animal.raza|lower }}"
          data-provincia="{{ animal.provincia|lower }}">
       <a href="{% url 'vista_animal' animal.id %}" class="block hover:opacity-100 flex flex-col h-full">
         <div class="bg-white rounded-2xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_15px_50px_rgba(3,233,244,0.4)] flex flex-col h-full">
-          {% if animal.imagen %}
-            <img src="{{ animal.imagen.url }}" alt="Imagen de {{ animal.nombre }}" class="w-full h-64 object-cover">
-          {% else %}
-            <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
-              Sin imagen
-            </div>
-          {% endif %}
+          
+          <!-- Contenedor de imagen con lazy loading -->
+          <div class="w-full h-64 relative overflow-hidden">
+            {% if animal.imagen %}
+              <!-- Placeholder con efecto de carga -->
+              <div class="image-placeholder w-full h-full absolute inset-0 flex items-center justify-center bg-gray-100">
+                <div class="text-gray-400 text-sm flex flex-col items-center">
+                  <svg class="animate-spin h-8 w-8 text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Cargando...
+                </div>
+              </div>
+              
+              <!-- Imagen real con lazy loading -->
+              <img 
+                data-src="{{ animal.imagen.url }}" 
+                alt="Imagen de {{ animal.nombre }}" 
+                class="lazy-image w-full h-64 object-cover absolute inset-0"
+                loading="lazy"
+              >
+            {% else %}
+              <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
+                <div class="flex flex-col items-center">
+                  <svg class="h-12 w-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  Sin imagen
+                </div>
+              </div>
+            {% endif %}
+          </div>
           
           <div class="p-6 flex-grow">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ animal.nombre }}</h3>
@@ -239,9 +305,62 @@
   </div>
 </div>
 
-<!-- Script del modal y filtros -->
+<!-- Script del modal, filtros y lazy loading -->
 <script>
   let filtroActual = '';
+
+  // Intersection Observer para lazy loading
+  const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        const placeholder = img.previousElementSibling;
+        
+        // Cargar la imagen
+        img.src = img.dataset.src;
+        
+        // Cuando la imagen se carga
+        img.onload = () => {
+          img.classList.add('loaded');
+          if (placeholder && placeholder.classList.contains('image-placeholder')) {
+            placeholder.style.opacity = '0';
+            setTimeout(() => {
+              placeholder.remove();
+            }, 300);
+          }
+        };
+        
+        // Error al cargar la imagen
+        img.onerror = () => {
+          if (placeholder && placeholder.classList.contains('image-placeholder')) {
+            placeholder.innerHTML = `
+              <div class="text-gray-400 text-sm flex flex-col items-center">
+                <svg class="h-8 w-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Error al cargar
+              </div>
+            `;
+          }
+        };
+        
+        // Dejar de observar esta imagen
+        observer.unobserve(img);
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: '50px',
+    threshold: 0.1
+  });
+
+  // Función para inicializar lazy loading
+  function inicializarLazyLoading() {
+    const lazyImages = document.querySelectorAll('.lazy-image');
+    lazyImages.forEach(img => {
+      imageObserver.observe(img);
+    });
+  }
 
   function abrirLogin() {
     const modal = document.getElementById('authModal');
@@ -336,6 +455,11 @@
     
     // Actualizar contador
     actualizarContador(animalesVisibles);
+    
+    // Reinicializar lazy loading para imágenes visibles
+    setTimeout(() => {
+      inicializarLazyLoading();
+    }, 100);
   }
 
   // Función para actualizar el contador de resultados
@@ -365,9 +489,10 @@
   // Escuchar cambios en el input de búsqueda
   document.getElementById('buscadorAnimales').addEventListener('input', filtrarAnimales);
 
-  // Inicializar contador al cargar la página
+  // Inicializar al cargar la página
   document.addEventListener('DOMContentLoaded', function() {
     aplicarFiltros();
+    inicializarLazyLoading();
   });
 
   // Cerrar modal al hacer clic fuera de él

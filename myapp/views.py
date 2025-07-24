@@ -184,7 +184,7 @@ def crear_animal(request):
             animal = form.save(commit=False)
             animal.asociacion = asociacion  # Asignar la asociación
             animal.save()
-            return redirect('Inicio')
+            return redirect('mis_animales')
     else:
         form = CreacionAnimalesForm(asociacion=asociacion)
     
@@ -226,7 +226,7 @@ def editar_animal(request, animal_id):
         form = CreacionAnimalesForm(request.POST, request.FILES, instance=animal)
         if form.is_valid():
             form.save()
-            return redirect('Inicio')
+            return redirect('mis_animales')
     else:
         form = CreacionAnimalesForm(instance=animal)
     

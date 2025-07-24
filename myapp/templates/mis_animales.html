@@ -12,6 +12,36 @@
         body { font-family: sans-serif; background-color: #f5f5f5; }
         .hidden { display: none; }
         .animal-card { transition: all 0.3s ease; }
+        
+        /* Estilos para lazy loading */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .lazy-image.loaded {
+            opacity: 1;
+        }
+        
+        .lazy-placeholder {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="pt-20"> <!-- Padding top para el navbar fijo -->
@@ -102,7 +132,7 @@
     
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
         {% for animal in mis_animales %}
-        <div class="animal-card flex flex-col h-full" 
+        <div class="animal-card flex flex-col h-full fade-in" 
              data-nombre="{{ animal.nombre|lower }}" 
              data-tipo="{{ animal.tipo_de_animal|lower }}"
              data-raza="{{ animal.raza|lower }}">
@@ -124,7 +154,26 @@
                 </div>
                 
                 {% if animal.imagen %}
-                    <img src="{{ animal.imagen.url }}" alt="Imagen de {{ animal.nombre }}" class="w-full h-64 object-cover">
+                    <!-- Contenedor de imagen con lazy loading -->
+                    <div class="w-full h-64 relative overflow-hidden">
+                        <!-- Placeholder animado mientras carga -->
+                        <div class="lazy-placeholder w-full h-full absolute inset-0 flex items-center justify-center text-gray-400">
+                            <div class="text-center">
+                                <svg class="animate-spin h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="text-sm">Cargando...</p>
+                            </div>
+                        </div>
+                        <!-- Imagen lazy -->
+                        <img 
+                            data-src="{{ animal.imagen.url }}" 
+                            alt="Imagen de {{ animal.nombre }}" 
+                            class="lazy-image w-full h-64 object-cover absolute inset-0"
+                            loading="lazy"
+                        >
+                    </div>
                 {% else %}
                     <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
                         Sin imagen
@@ -161,6 +210,110 @@
 </main>
 
 <script>
+    // ========== LAZY LOADING IMPLEMENTATION ==========
+    class LazyImageLoader {
+        constructor() {
+            this.imageObserver = null;
+            this.init();
+        }
+
+        init() {
+            // Verificar si el navegador soporta IntersectionObserver
+            if ('IntersectionObserver' in window) {
+                this.imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            this.loadImage(img);
+                            observer.unobserve(img);
+                        }
+                    });
+                }, {
+                    // Cargar imagen cuando esté a 50px de ser visible
+                    rootMargin: '50px 0px',
+                    threshold: 0.01
+                });
+
+                this.observeImages();
+            } else {
+                // Fallback para navegadores antiguos - cargar todas las imágenes
+                this.loadAllImages();
+            }
+        }
+
+        observeImages() {
+            const lazyImages = document.querySelectorAll('.lazy-image[data-src]');
+            lazyImages.forEach(img => {
+                this.imageObserver.observe(img);
+            });
+        }
+
+        loadImage(img) {
+            const placeholder = img.parentElement.querySelector('.lazy-placeholder');
+            
+            // Crear una nueva imagen para precargar
+            const imageLoader = new Image();
+            
+            imageLoader.onload = () => {
+                // Una vez cargada la imagen
+                img.src = img.dataset.src;
+                img.classList.add('loaded');
+                
+                // Ocultar placeholder con animación
+                if (placeholder) {
+                    placeholder.style.opacity = '0';
+                    setTimeout(() => {
+                        placeholder.style.display = 'none';
+                    }, 300);
+                }
+                
+                // Remover data-src para indicar que ya está cargada
+                img.removeAttribute('data-src');
+            };
+            
+            imageLoader.onerror = () => {
+                // Si hay error al cargar la imagen
+                if (placeholder) {
+                    placeholder.innerHTML = `
+                        <div class="text-center text-gray-400">
+                            <svg class="h-12 w-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p class="text-sm">Error al cargar imagen</p>
+                        </div>
+                    `;
+                }
+                img.removeAttribute('data-src');
+            };
+            
+            // Iniciar la carga de la imagen
+            imageLoader.src = img.dataset.src;
+        }
+
+        loadAllImages() {
+            // Fallback para navegadores sin IntersectionObserver
+            const lazyImages = document.querySelectorAll('.lazy-image[data-src]');
+            lazyImages.forEach(img => {
+                this.loadImage(img);
+            });
+        }
+
+        // Método para re-observar nuevas imágenes después de filtrar
+        refreshObserver() {
+            if (this.imageObserver) {
+                this.observeImages();
+            }
+        }
+    }
+
+    // Inicializar lazy loading
+    let lazyLoader;
+    document.addEventListener('DOMContentLoaded', () => {
+        lazyLoader = new LazyImageLoader();
+    });
+
+    // ========== FUNCIONES ORIGINALES DE FILTRADO ==========
+    
     // Función para filtrar animales
     function filtrarAnimales() {
         const busqueda = document.getElementById('buscadorAnimales').value.toLowerCase();
@@ -177,6 +330,11 @@
                 animal.classList.add('hidden');
             }
         });
+        
+        // Refrescar observer después de filtrar
+        if (lazyLoader) {
+            setTimeout(() => lazyLoader.refreshObserver(), 100);
+        }
     }
 
     // Función para limpiar la búsqueda
@@ -190,68 +348,89 @@
     
     // Función principal que aplica todos los filtros
     function aplicarFiltros() {
-    
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-         const busqueda = document.getElementById('buscadorAnimales').  value.toLowerCase();
-         const animales = document.querySelectorAll('.animal-card');
-         let animalesVisibles = 0;
+        const busqueda = document.getElementById('buscadorAnimales').value.toLowerCase();
+        const animales = document.querySelectorAll('.animal-card');
+        let animalesVisibles = 0;
         
         animales.forEach(animal => {
-          const nombre = animal.getAttribute('data-nombre');
-          const tipo = animal.getAttribute('data-tipo');
-          const raza = animal.getAttribute('data-raza');
-          const provincia = animal.getAttribute('data-provincia');
+            const nombre = animal.getAttribute('data-nombre');
+            const tipo = animal.getAttribute('data-tipo');
+            const raza = animal.getAttribute('data-raza');
+            const provincia = animal.getAttribute('data-provincia');
         
-          // Verificar filtro de texto
-          const cumpleBusqueda = !busqueda || 
-                               nombre.includes(busqueda) || 
-                               tipo.includes(busqueda) || 
-                               raza.includes(busqueda) || 
-                               provincia.includes(busqueda);
+            // Verificar filtro de texto
+            const cumpleBusqueda = !busqueda || 
+                                   nombre.includes(busqueda) || 
+                                   tipo.includes(busqueda) || 
+                                   raza.includes(busqueda) || 
+                                   (provincia && provincia.includes(busqueda));
         
-          // Verificar filtro de tipo
-          let cumpleTipo = true;
-          if (filtroActual !== '') {
-            if (filtroActual === 'otros') {
-              // Para "otros", mostrar todo lo que no sea perro, gato,  conejo o pájaro
-              cumpleTipo = !tipo.includes('perro') && 
-                          !tipo.includes('gato') && 
-                          !tipo.includes('conejo') && 
-                          !tipo.includes('pájaro');
-            } else {
-              cumpleTipo = tipo.includes(filtroActual);
+            // Verificar filtro de tipo
+            let cumpleTipo = true;
+            if (filtroActual !== '') {
+                if (filtroActual === 'otros') {
+                    // Para "otros", mostrar todo lo que no sea perro, gato, conejo o pájaro
+                    cumpleTipo = !tipo.includes('perro') && 
+                                !tipo.includes('gato') && 
+                                !tipo.includes('conejo') && 
+                                !tipo.includes('pájaro');
+                } else {
+                    cumpleTipo = tipo.includes(filtroActual);
+                }
             }
-          }
 
-          // Mostrar u ocultar según ambos filtros
-          if (cumpleBusqueda && cumpleTipo) {
-            animal.classList.remove('hidden');
-            animalesVisibles++;
-          } else {
-            animal.classList.add('hidden');
-          }
+            // Mostrar u ocultar según ambos filtros
+            if (cumpleBusqueda && cumpleTipo) {
+                animal.classList.remove('hidden');
+                animalesVisibles++;
+            } else {
+                animal.classList.add('hidden');
+            }
         });
 
         // Actualizar contador
         actualizarContador(animalesVisibles);
+        
+        // Refrescar observer después de filtrar
+        if (lazyLoader) {
+            setTimeout(() => lazyLoader.refreshObserver(), 100);
+        }
     }
-    
 
     // Variable global para el filtro actual
-let filtroActual = '';
+    let filtroActual = '';
 
-// Función llamada por los botones para cambiar el filtro por tipo
-function filtrarPorTipo(tipo) {
-    filtroActual = tipo;
-    aplicarFiltros();
-}
+    // Función llamada por los botones para cambiar el filtro por tipo
+    function filtrarPorTipo(tipo) {
+        filtroActual = tipo;
+        aplicarFiltros();
+    }
 
-// Opcional: función que actualiza un contador visible (si lo tienes)
-function actualizarContador(cantidad) {
-    console.log(`Animales visibles: ${cantidad}`); // O actualiza algún elemento HTML
-}
+    // Función que actualiza un contador visible
+    function actualizarContador(cantidad) {
+        console.log(`Animales visibles: ${cantidad}`);
+    }
 
+    // ========== PERFORMANCE OPTIMIZATIONS ==========
+    
+    // Debounce para el buscador
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Aplicar debounce al buscador
+    document.getElementById('buscadorAnimales').removeEventListener('input', filtrarAnimales);
+    document.getElementById('buscadorAnimales').addEventListener('input', debounce(filtrarAnimales, 300));
 </script>
 
 </body>
