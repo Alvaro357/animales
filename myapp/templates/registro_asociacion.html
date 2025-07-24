@@ -8,6 +8,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Registro de Asociación</title>
+    
+    <!-- ESTILOS PARA LOADING -->
+    <style>
+        .custom-spinner-small {
+            border: 2px solid rgba(3, 233, 244, 0.3);
+            border-left: 2px solid #03e9f4;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Overlay para bloquear formulario durante carga */
+        .form-loading-overlay {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(2px);
+            z-index: 50;
+        }
+    </style>
 </head>
 <body>
 
@@ -23,111 +59,212 @@
             </div>
         {% endif %}
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="space-y-12">
-            
-                <div class="border-b border-gray-900/10 pb-12">
-                    <h2 class="text-base/7 font-semibold text-gray-900">Información de la asociación</h2>
-                    <p class="mt-1 text-sm/6 text-gray-600">Usa un email para que contactemos con la asociación</p>
-            
-                    <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                        <div class="sm:col-span-3">
-                            <label for="name" class="block text-sm/6 font-medium text-gray-900">Nombre</label>
-                            <div class="mt-2">
-                                {{form.nombre}}
-                                {% if form.nombre.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-            
-                        <div class="sm:col-span-3">
-                            <label for="password" class="block text-sm/6 font-medium text-gray-900">Contraseña</label>
-                            <div class="mt-2">
-                                {{form.password}}
-                                {% if form.password.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.password.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-            
-                        <div class="sm:col-span-4">
-                            <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
-                            <div class="mt-2">
-                                {{form.email}}
-                                {% if form.email.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>  
-                        
-                        <div class="sm:col-span-3">
-                            <label for="phone" class="block text-sm/6 font-medium text-gray-900">Teléfono</label>
-                            <div class="mt-2">
-                                {{form.telefono}}
-                                {% if form.telefono.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.telefono.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
+        <!-- CONTENEDOR DEL FORMULARIO CON OVERLAY DE LOADING -->
+        <div class="relative">
+            <!-- Overlay de loading que aparece durante el envío -->
+            <div id="formLoadingOverlay" class="form-loading-overlay absolute inset-0 flex items-center justify-center hidden rounded-lg">
+                <div class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+                    <div class="custom-spinner-small mb-3"></div>
+                    <p class="text-gray-700 font-medium">Registrando asociación...</p>
+                    <p class="text-sm text-gray-500 mt-1">Por favor, no cierres esta ventana</p>
+                </div>
+            </div>
 
-                        <div class="sm:col-span-3">
-                            <label for="logo" class="block text-sm/6 font-medium text-gray-900">Logo (opcional)</label>
-                            <div class="mt-2">
-                                {{form.logo}}
-                                {% if form.logo.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.logo.errors.0 }}</p>
-                                {% endif %}
+            <form method="POST" enctype="multipart/form-data" id="registroForm">
+                {% csrf_token %}
+                <div class="space-y-12">
+                
+                    <div class="border-b border-gray-900/10 pb-12">
+                        <h2 class="text-base/7 font-semibold text-gray-900">Información de la asociación</h2>
+                        <p class="mt-1 text-sm/6 text-gray-600">Usa un email para que contactemos con la asociación</p>
+                
+                        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                            <div class="sm:col-span-3">
+                                <label for="name" class="block text-sm/6 font-medium text-gray-900">Nombre</label>
+                                <div class="mt-2">
+                                    {{form.nombre}}
+                                    {% if form.nombre.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-            
-                        <div class="col-span-full">
-                            <label for="direccion" class="block text-sm/6 font-medium text-gray-900">Dirección</label>
-                            <div class="mt-2">
-                                {{form.direccion}}
-                                {% if form.direccion.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.direccion.errors.0 }}</p>
-                                {% endif %}
+                
+                            <div class="sm:col-span-3">
+                                <label for="password" class="block text-sm/6 font-medium text-gray-900">Contraseña</label>
+                                <div class="mt-2">
+                                    {{form.password}}
+                                    {% if form.password.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-            
-                        <div class="sm:col-span-2 sm:col-start-1">
-                            <label for="poblacion" class="block text-sm/6 font-medium text-gray-900">Población</label>
-                            <div class="mt-2">
-                                {{form.poblacion}}
-                                {% if form.poblacion.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.poblacion.errors.0 }}</p>
-                                {% endif %}
+                
+                            <div class="sm:col-span-4">
+                                <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
+                                <div class="mt-2">
+                                    {{form.email}}
+                                    {% if form.email.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>  
+                            
+                            <div class="sm:col-span-3">
+                                <label for="phone" class="block text-sm/6 font-medium text-gray-900">Teléfono</label>
+                                <div class="mt-2">
+                                    {{form.telefono}}
+                                    {% if form.telefono.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.telefono.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-            
-                        <div class="sm:col-span-2">
-                            <label for="provincia" class="block text-sm/6 font-medium text-gray-900">Provincia</label>
-                            <div class="mt-2">
-                                {{form.provincia}}
-                                {% if form.provincia.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.provincia.errors.0 }}</p>
-                                {% endif %}
+
+                            <div class="sm:col-span-3">
+                                <label for="logo" class="block text-sm/6 font-medium text-gray-900">Logo (opcional)</label>
+                                <div class="mt-2">
+                                    {{form.logo}}
+                                    {% if form.logo.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.logo.errors.0 }}</p>
+                                    {% endif %}
+                                    <!-- Indicador de archivo seleccionado -->
+                                    <div id="logoStatus" class="mt-2 text-sm text-gray-500 hidden">
+                                        <span class="text-green-600">✓ Archivo seleccionado</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-            
-                        <div class="sm:col-span-2">
-                            <label for="codigo_postal" class="block text-sm/6 font-medium text-gray-900">Código Postal</label>
-                            <div class="mt-2">
-                                {{form.codigo_postal}}
-                                {% if form.codigo_postal.errors %}
-                                    <p class="mt-1 text-sm text-red-600">{{ form.codigo_postal.errors.0 }}</p>
-                                {% endif %}
+                
+                            <div class="col-span-full">
+                                <label for="direccion" class="block text-sm/6 font-medium text-gray-900">Dirección</label>
+                                <div class="mt-2">
+                                    {{form.direccion}}
+                                    {% if form.direccion.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.direccion.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                
+                            <div class="sm:col-span-2 sm:col-start-1">
+                                <label for="poblacion" class="block text-sm/6 font-medium text-gray-900">Población</label>
+                                <div class="mt-2">
+                                    {{form.poblacion}}
+                                    {% if form.poblacion.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.poblacion.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                
+                            <div class="sm:col-span-2">
+                                <label for="provincia" class="block text-sm/6 font-medium text-gray-900">Provincia</label>
+                                <div class="mt-2">
+                                    {{form.provincia}}
+                                    {% if form.provincia.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.provincia.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                
+                            <div class="sm:col-span-2">
+                                <label for="codigo_postal" class="block text-sm/6 font-medium text-gray-900">Código Postal</label>
+                                <div class="mt-2">
+                                    {{form.codigo_postal}}
+                                    {% if form.codigo_postal.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.codigo_postal.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <button type="submit" class="text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
-                Registrar
-            </button>
-        </form>
+                
+                <!-- BOTÓN MODIFICADO CON LOADING -->
+                <button type="submit" id="registroSubmitBtn" class="text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+                    <span class="button-text">Registrar</span>
+                    <span class="button-loading hidden flex items-center">
+                        <div class="custom-spinner-small mr-2"></div>
+                        <span class="loading-dots">Procesando</span>
+                    </span>
+                </button>
+            </form>
+        </div>
     </div>
+
+    <!-- JAVASCRIPT PARA MANEJAR EL LOADING -->
+    <script>
+        // Función para manejar el estado de loading del botón
+        function setButtonLoading(button, loading = true) {
+            if (!button) return;
+            
+            const textSpan = button.querySelector('.button-text');
+            const loadingSpan = button.querySelector('.button-loading');
+            
+            if (loading) {
+                if (textSpan) textSpan.classList.add('hidden');
+                if (loadingSpan) loadingSpan.classList.remove('hidden');
+                button.disabled = true;
+                button.classList.add('opacity-75', 'cursor-not-allowed');
+            } else {
+                if (textSpan) textSpan.classList.remove('hidden');
+                if (loadingSpan) loadingSpan.classList.add('hidden');
+                button.disabled = false;
+                button.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        // Función para mostrar/ocultar overlay del formulario
+        function showFormOverlay(show = true) {
+            const overlay = document.getElementById('formLoadingOverlay');
+            if (overlay) {
+                if (show) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+
+        // Cuando el documento esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registroForm');
+            const submitBtn = document.getElementById('registroSubmitBtn');
+            const logoInput = document.querySelector('input[type="file"]');
+
+            // Manejar envío del formulario
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Mostrar indicadores de carga
+                    setButtonLoading(submitBtn, true);
+                    showFormOverlay(true);
+                    
+                    // El formulario se enviará normalmente
+                    // Si hay errores, Django recargará la página y el loading desaparecerá
+                    // Si es exitoso, redirigirá a otra página
+                });
+            }
+
+            // Manejar selección de archivo logo
+            if (logoInput) {
+                logoInput.addEventListener('change', function(e) {
+                    const statusDiv = document.getElementById('logoStatus');
+                    if (e.target.files.length > 0) {
+                        const fileName = e.target.files[0].name;
+                        if (statusDiv) {
+                            statusDiv.innerHTML = `<span class="text-green-600">✓ ${fileName} seleccionado</span>`;
+                            statusDiv.classList.remove('hidden');
+                        }
+                    } else {
+                        if (statusDiv) {
+                            statusDiv.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+
+            // Si hay errores en el formulario (página recargada), asegurar que no hay loading
+            if (document.querySelector('.text-red-600')) {
+                setButtonLoading(submitBtn, false);
+                showFormOverlay(false);
+            }
+        });
+    </script>
 </body>
 </html>
