@@ -11,15 +11,61 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f8fafc;
         }
+        
+        /* Animaciones suaves para el modal */
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: scale(0.7);
+            opacity: 0;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        /* Cursor pointer para indicar que la imagen es clickeable */
+        .clickable-image {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .clickable-image:hover {
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
 
     <!-- Botón de volver más destacado -->
-    <div class="fixed top-10 right-10 z-50">
+    <div class="fixed top-10 right-10 z-40">
         <a href="/" class="text-white uppercase tracking-wider text-sm font-semibold bg-sky-600 px-6 py-3 rounded-lg hover:bg-sky-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             ← Volver al inicio
         </a>
+    </div>
+
+    <!-- Modal para ver imagen en grande -->
+    <div id="imageModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+        <div class="modal-content relative max-w-6xl max-h-full">
+            <!-- Botón cerrar -->
+            <button onclick="closeModal()" class="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors duration-200">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <!-- Imagen en el modal -->
+            <img id="modalImage" src="" alt="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl">
+            
+            <!-- Información adicional sobre la imagen -->
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white p-6 rounded-b-xl">
+                <p id="modalImageInfo" class="text-lg font-medium"></p>
+            </div>
+        </div>
     </div>
 
     <!-- Contenedor principal ampliado -->
@@ -31,11 +77,19 @@
         
         <!-- Tarjeta contenedora más grande -->
         <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-            <!-- Imagen más grande -->
+            <!-- Imagen más grande y clickeable -->
             {% if animal.imagen %}
-            <div class="border-b border-gray-200">
-                <img src="{{ animal.imagen.url }}" alt="Imagen de {{ animal.nombre }}" 
-                     class="w-full h-96 object-cover">
+            <div class="border-b border-gray-200 relative">
+                <img src="{{ animal.imagen.url }}" 
+                     alt="Imagen de {{ animal.nombre }}" 
+                     class="w-full h-96 object-cover clickable-image"
+                     onclick="openModal('{{ animal.imagen.url }}', '{{ animal.nombre }}')"
+                     title="Haz clic para ver en grande">
+                
+                <!-- Indicador visual de que es clickeable -->
+                <div class="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                    🔍 Ver en grande
+                </div>
             </div>
             {% endif %}
 
@@ -108,5 +162,53 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Función para abrir el modal
+        function openModal(imageSrc, animalName) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalImageInfo = document.getElementById('modalImageInfo');
+            
+            modalImage.src = imageSrc;
+            modalImage.alt = `Imagen de ${animalName}`;
+            modalImageInfo.textContent = animalName;
+            
+            modal.classList.remove('hidden');
+            // Pequeño delay para la animación
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+            
+            // Prevenir scroll del body cuando el modal está abierto
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Función para cerrar el modal
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            
+            // Esperar a que termine la animación antes de ocultar
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+        
+        // Cerrar modal al hacer clic fuera de la imagen
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Cerrar modal con la tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>

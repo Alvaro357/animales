@@ -4,7 +4,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Inicio</title>
+    <title>Inicio</title>  
     <script src="https://cdn.tailwindcss.com"></script>
     <style type="text/tailwindcss">
         html {
@@ -12,13 +12,52 @@
         }
         body {
             font-family: sans-serif;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8f4f8 100%);
             text-align: center;
-            padding-top: 160px; /* Ajustado para móvil */
+            padding-top: 160px;
+            position: relative;
+            overflow-x: hidden;
         }
+        
+        /* Partículas flotantes de fondo */
+        .floating-paws {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .paw {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+            font-size: 20px;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
         @media (min-width: 768px) {
             body {
-                padding-top: 180px; /* Más espacio en desktop */
+                padding-top: 180px;
             }
         }
         .card {
@@ -39,11 +78,69 @@
         }
         .animal-card {
             transition: all 0.3s ease;
+            position: relative;
         }
+        
+        /* Efecto corazón al hacer hover */
+        .animal-card::before {
+            content: '💖';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .animal-card:hover::before {
+            font-size: 24px;
+            opacity: 1;
+            animation: heartBeat 0.6s ease-in-out;
+        }
+        
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* Efecto ondas en los botones - solo para login */
+        .wave-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wave-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(3, 233, 244, 0.3);
+            transition: width 0.6s, height 0.6s;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+        
+        .wave-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .wave-btn > * {
+            position: relative;
+            z-index: 1;
+        }
+        
         .filter-btn {
             transition: all 0.3s ease;
             transform: scale(1);
+            position: relative;
         }
+        
         .filter-btn:hover {
             transform: scale(1.05);
         }
@@ -51,22 +148,42 @@
             background: linear-gradient(135deg, #03e9f4, #a403b6);
             color: white;
             box-shadow: 0 0 15px rgba(3,233,244,0.5);
+            transform: scale(1.1);
         }
         
-        /* Estilos para lazy loading */
-        .lazy-image {
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+        /* Efecto de typing en el título */
+        .typing-title {
+            border-right: 3px solid #03e9f4;
+            animation: blink-caret 0.75s step-end infinite;
         }
         
-        .lazy-image.loaded {
-            opacity: 1;
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #03e9f4; }
         }
         
-        .image-placeholder {
+        /* Efecto parallax suave en el navbar */
+        .navbar-parallax {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Estilos para lazy loading de tarjetas */
+        .card-placeholder {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
+            border-radius: 1rem;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-loaded {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardFadeIn 0.6s ease-out forwards;
         }
         
         @keyframes loading {
@@ -76,6 +193,29 @@
             100% {
                 background-position: -200% 0;
             }
+        }
+        
+        @keyframes cardFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Placeholder para imagen dentro de la tarjeta */
+        .image-placeholder {
+            background: linear-gradient(90deg, #f8f8f8 25%, #e8e8e8 50%, #f8f8f8 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .lazy-image.loaded {
+            opacity: 1;
         }
         
         .fade-in {
@@ -92,9 +232,29 @@
                 transform: translateY(0);
             }
         }
+        
+        /* Efecto de brillo en el buscador */
+        .search-glow:focus {
+            box-shadow: 0 0 20px rgba(3, 233, 244, 0.3);
+            border-color: #03e9f4;
+        }
+        
+        /* Contador con efecto de número que cambia */
+        .counter-bounce {
+            animation: counterBounce 0.4s ease-out;
+        }
+        
+        @keyframes counterBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
+
+<!-- Partículas flotantes de fondo -->
+<div class="floating-paws" id="floatingPaws"></div>
 
 <!-- Modal de Login SOLAMENTE -->
 <div id="authModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
@@ -119,7 +279,7 @@
               <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
               <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#03e9f4]" required>
           </div>
-          <button type="submit" class="w-full text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+          <button type="submit" class="wave-btn w-full text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
               Iniciar sesión
           </button>
       </form>
@@ -127,7 +287,7 @@
       <!-- Enlace para ir a la página de registro -->
       <div class="mt-4 pt-4 border-t border-gray-200 text-center">
           <p class="text-sm text-gray-600 mb-3">¿No tienes cuenta?</p>
-          <a href="/registro/" class="inline-block text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+          <a href="/registro/" class="wave-btn inline-block text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
               Regístrate
           </a>
       </div>
@@ -136,7 +296,7 @@
 </div>
 
 <!-- Navbar -->
-<nav class="fixed top-0 left-0 w-full bg-white shadow-md flex items-center justify-between gap-4 px-6 py-3 z-50 min-h-[64px]">
+<nav class="navbar-parallax fixed top-0 left-0 w-full shadow-md flex items-center justify-between gap-4 px-6 py-3 z-50 min-h-[64px]">
     <div class="text-left text-xl font-bold text-[#03e9f4]">
         {% if request.session.esta_logueado %}
             <p>Bienvenid@ {{ request.session.asociacion_nombre }}</p>
@@ -151,7 +311,7 @@
         </div>
     {% else %}
         <div class="flex items-center gap-2 md:gap-4 justify-center flex-1 max-w-xs mx-auto">
-            <button onclick="abrirLogin()" class="text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
+            <button onclick="abrirLogin()" class="wave-btn text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
                 Iniciar sesión
             </button>
         </div>
@@ -160,7 +320,7 @@
 
 <!-- Filtros de animales -->
 <div class="fixed top-16 md:top-20 left-0 w-full z-40 flex justify-center px-4">
-  <div class="bg-white rounded-full shadow-lg px-4 py-2 flex gap-3 overflow-x-auto no-scrollbar">
+  <div class="navbar-parallax rounded-full shadow-lg px-4 py-2 flex gap-3 overflow-x-auto no-scrollbar">
     <div class="flex justify-center gap-4 bg-gray-100 rounded-full shadow-inner p-1 mx-2 overflow-x-auto no-scrollbar">
 
       <!-- Botón para mostrar todos -->
@@ -211,17 +371,17 @@
 <!-- Animales disponibles -->
 <div class="max-w-7xl mx-auto px-4 py-12">
   <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-    <h2 class="text-3xl font-bold text-gray-800">Animales disponibles</h2>
+    <h2 class="typing-title text-3xl font-bold text-gray-800 inline-block">Animales disponibles</h2>
     
     <!-- Buscador -->
     <div class="relative w-full md:w-1/3">
       <input 
         type="text" 
         id="buscadorAnimales" 
-        placeholder="Buscar por nombre, tipo, raza o provincia" 
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#03e9f4] transition"
+        placeholder="🔍 Buscar por nombre, tipo, raza o provincia" 
+        class="search-glow w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#03e9f4] transition"
       >
-      <button onclick="limpiarBusqueda()" class="absolute right-3 top-2 text-gray-400 hover:text-gray-600">
+      <button onclick="limpiarBusqueda()" class="absolute right-3 top-2 text-gray-400 hover:text-gray-600 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
         </svg>
@@ -231,85 +391,184 @@
 
   <!-- Contador de resultados -->
   <div class="mb-4 text-center">
-    <span id="contadorResultados" class="text-sm text-gray-600"></span>
+    <span id="contadorResultados" class="text-sm text-gray-600 px-4 py-2 bg-white/50 rounded-full backdrop-blur-sm"></span>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
-    {% for animal in animales %}
-    <div class="animal-card flex flex-col h-full fade-in" 
-         data-nombre="{{ animal.nombre|lower }}" 
-         data-tipo="{{ animal.tipo_de_animal|lower }}"
-         data-raza="{{ animal.raza|lower }}"
-         data-provincia="{{ animal.provincia|lower }}">
-      <a href="{% url 'vista_animal' animal.id %}" class="block hover:opacity-100 flex flex-col h-full">
-        <div class="bg-white rounded-2xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_15px_50px_rgba(3,233,244,0.4)] flex flex-col h-full">
-          
-          <!-- Contenedor de imagen con lazy loading -->
-          <div class="w-full h-64 relative overflow-hidden">
-            {% if animal.imagen %}
-              <!-- Placeholder con efecto de carga -->
-              <div class="image-placeholder w-full h-full absolute inset-0 flex items-center justify-center bg-gray-100">
-                <div class="text-gray-400 text-sm flex flex-col items-center">
-                  <svg class="animate-spin h-8 w-8 text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Cargando...
-                </div>
-              </div>
-              
-              <!-- Imagen real con lazy loading -->
-              <img 
-                data-src="{{ animal.imagen.url }}" 
-                alt="Imagen de {{ animal.nombre }}" 
-                class="lazy-image w-full h-64 object-cover absolute inset-0"
-                loading="lazy"
-              >
-            {% else %}
-              <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
-                <div class="flex flex-col items-center">
-                  <svg class="h-12 w-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                  Sin imagen
-                </div>
-              </div>
-            {% endif %}
-          </div>
-          
-          <div class="p-6 flex-grow">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ animal.nombre }}</h3>
-            <p class="text-sm text-gray-600 mb-1">
-              
-              {% if animal.tipo_de_animal == 'Perro' %}
-                🐶 
-              {% elif animal.tipo_de_animal == 'Gato' %}
-                😺 
-              {% else %}
-                <strong>{{ animal.tipo_de_animal }}</strong>
-              {% endif %}
-            </p>
-            <p class="text-sm text-gray-600 mb-4"><strong>{{ animal.raza }}</strong> </p>
-            <p class="text-sm text-gray-600 mb-1"><strong>{{ animal.email }}</strong> </p>
-            <p class="text-sm text-gray-600 mb-1"><strong>{{ animal.telefono }}</strong> </p>
-            <p class="text-sm text-gray-600 mb-1"><strong>Población:</strong> {{ animal.poblacion }} </p>
-            <p class="text-sm text-gray-600 mb-1"><strong>Provincia:</strong> {{ animal.provincia }}</p>
-            
-          </div>
-        </div>
-      </a>
-    </div>
-    {% empty %}
-      <p class="col-span-full text-center text-gray-500 text-lg">No hay animales disponibles.</p>
-    {% endfor %}
+    <!-- Los placeholders se generarán dinámicamente -->
   </div>
 </div>
 
-<!-- Script del modal, filtros y lazy loading -->
+<!-- Script mejorado con lazy loading completo -->
 <script>
   let filtroActual = '';
+  let animalesData = [
+    {% for animal in animales %}
+    {
+      id: {{ animal.id }},
+      nombre: "{{ animal.nombre|escapejs }}",
+      tipo: "{{ animal.tipo_de_animal|escapejs }}",
+      raza: "{{ animal.raza|escapejs }}",
+      email: "{{ animal.email|escapejs }}",
+      telefono: "{{ animal.telefono|escapejs }}",
+      poblacion: "{{ animal.poblacion|escapejs }}",
+      provincia: "{{ animal.provincia|escapejs }}",
+      imagen: "{% if animal.imagen %}{{ animal.imagen.url }}{% endif %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
 
-  // Intersection Observer para lazy loading
+  // Crear partículas flotantes
+  function crearParticulasFlotantes() {
+    const container = document.getElementById('floatingPaws');
+    const emojis = ['🐾', '🐕', '🐈', '🐰', '🐦', '💖', '⭐'];
+    
+    setInterval(() => {
+      if (document.querySelectorAll('.paw').length < 8) {
+        const paw = document.createElement('div');
+        paw.className = 'paw';
+        paw.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        paw.style.left = Math.random() * 100 + '%';
+        paw.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        paw.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(paw);
+        
+        // Eliminar la partícula después de la animación
+        setTimeout(() => {
+          if (paw.parentNode) {
+            paw.remove();
+          }
+        }, 20000);
+      }
+    }, 3000);
+  }
+
+  // Función para normalizar texto eliminando acentos
+  function normalizarTexto(texto) {
+    return texto
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  // Crear placeholder para tarjeta
+  function crearPlaceholder(index) {
+    return `
+      <div class="card-placeholder" data-index="${index}">
+        <div class="text-gray-400 text-sm flex flex-col items-center">
+          <div class="animate-pulse flex flex-col items-center">
+            <div class="w-16 h-16 bg-gray-300 rounded-full mb-4"></div>
+            <div class="h-4 bg-gray-300 rounded w-32 mb-2"></div>
+            <div class="h-3 bg-gray-300 rounded w-24 mb-2"></div>
+            <div class="h-3 bg-gray-300 rounded w-28"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Crear tarjeta de animal completa
+  function crearTarjetaAnimal(animal) {
+    const tipoEmoji = {
+      'Perro': '🐶',
+      'Gato': '😺',
+      'Conejo': '🐰',
+      'Pájaro': '🐦'
+    };
+
+    return `
+      <div class="animal-card card-loaded flex flex-col h-full" 
+           data-nombre="${animal.nombre.toLowerCase()}" 
+           data-tipo="${animal.tipo.toLowerCase()}"
+           data-raza="${animal.raza.toLowerCase()}"
+           data-provincia="${animal.provincia.toLowerCase()}">
+        <a href="/ver_animal/${animal.id}/" class="block hover:opacity-100 flex flex-col h-full">
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_15px_50px_rgba(3,233,244,0.4)] flex flex-col h-full">
+            
+            <!-- Contenedor de imagen -->
+            <div class="w-full h-64 relative overflow-hidden">
+              ${animal.imagen ? `
+                <div class="image-placeholder w-full h-full absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <div class="text-gray-400 text-sm flex flex-col items-center">
+                    <svg class="animate-spin h-8 w-8 text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Cargando...
+                  </div>
+                </div>
+                <img 
+                  data-src="${animal.imagen}" 
+                  alt="Imagen de ${animal.nombre}" 
+                  class="lazy-image w-full h-64 object-cover absolute inset-0"
+                  loading="lazy"
+                >
+              ` : `
+                <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
+                  <div class="flex flex-col items-center">
+                    <svg class="h-12 w-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Sin imagen
+                  </div>
+                </div>
+              `}
+            </div>
+            
+            <div class="p-6 flex-grow">
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">${animal.nombre}</h3>
+              <p class="text-sm text-gray-600 mb-1">
+                ${tipoEmoji[animal.tipo] || animal.tipo}
+              </p>
+              <p class="text-sm text-gray-600 mb-4"><strong>${animal.raza}</strong></p>
+              <p class="text-sm text-gray-600 mb-1"><strong>${animal.email}</strong></p>
+              <p class="text-sm text-gray-600 mb-1"><strong>${animal.telefono}</strong></p>
+              <p class="text-sm text-gray-600 mb-1"><strong>Población:</strong> ${animal.poblacion}</p>
+              <p class="text-sm text-gray-600 mb-1"><strong>Provincia:</strong> ${animal.provincia}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    `;
+  }
+
+  // Intersection Observer para lazy loading de tarjetas completas
+  const cardObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const placeholder = entry.target;
+        const index = parseInt(placeholder.dataset.index);
+        const animal = animalesData[index];
+        
+        if (animal) {
+          // Crear la tarjeta real
+          const tarjetaHTML = crearTarjetaAnimal(animal);
+          placeholder.outerHTML = tarjetaHTML;
+          
+          // Inicializar lazy loading de imágenes para esta tarjeta
+          setTimeout(() => {
+            const nuevaTarjeta = document.querySelector(`[data-nombre="${animal.nombre.toLowerCase()}"]`);
+            if (nuevaTarjeta) {
+              const lazyImage = nuevaTarjeta.querySelector('.lazy-image');
+              if (lazyImage) {
+                imageObserver.observe(lazyImage);
+              }
+            }
+          }, 100);
+        }
+        
+        // Dejar de observar este placeholder
+        observer.unobserve(placeholder);
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: '100px', // Cargar tarjetas 100px antes de que sean visibles
+    threshold: 0.1
+  });
+
+  // Intersection Observer para lazy loading de imágenes
   const imageObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -325,7 +584,9 @@
           if (placeholder && placeholder.classList.contains('image-placeholder')) {
             placeholder.style.opacity = '0';
             setTimeout(() => {
-              placeholder.remove();
+              if (placeholder.parentNode) {
+                placeholder.remove();
+              }
             }, 300);
           }
         };
@@ -354,11 +615,19 @@
     threshold: 0.1
   });
 
-  // Función para inicializar lazy loading
-  function inicializarLazyLoading() {
-    const lazyImages = document.querySelectorAll('.lazy-image');
-    lazyImages.forEach(img => {
-      imageObserver.observe(img);
+  // Función para inicializar placeholders
+  function inicializarPlaceholders() {
+    const contenedor = document.getElementById('contenedorAnimales');
+    contenedor.innerHTML = '';
+    
+    // Crear placeholders para todos los animales
+    animalesData.forEach((animal, index) => {
+      contenedor.innerHTML += crearPlaceholder(index);
+    });
+    
+    // Observar todos los placeholders
+    document.querySelectorAll('.card-placeholder').forEach(placeholder => {
+      cardObserver.observe(placeholder);
     });
   }
 
@@ -410,18 +679,17 @@
 
   // Función principal que aplica todos los filtros
   function aplicarFiltros() {
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    const busqueda = document.getElementById('buscadorAnimales').value.toLowerCase();
+    const busqueda = normalizarTexto(document.getElementById('buscadorAnimales').value);
     const animales = document.querySelectorAll('.animal-card');
     let animalesVisibles = 0;
     
     animales.forEach(animal => {
-      const nombre = animal.getAttribute('data-nombre');
-      const tipo = animal.getAttribute('data-tipo');
-      const raza = animal.getAttribute('data-raza');
-      const provincia = animal.getAttribute('data-provincia');
+      const nombre = normalizarTexto(animal.getAttribute('data-nombre'));
+      const tipo = normalizarTexto(animal.getAttribute('data-tipo'));
+      const raza = normalizarTexto(animal.getAttribute('data-raza'));
+      const provincia = normalizarTexto(animal.getAttribute('data-provincia'));
       
       // Verificar filtro de texto
       const cumpleBusqueda = !busqueda || 
@@ -434,7 +702,6 @@
       let cumpleTipo = true;
       if (filtroActual !== '') {
         if (filtroActual === 'otros') {
-          // Para "otros", mostrar todo lo que no sea perro, gato, conejo o pájaro
           cumpleTipo = !tipo.includes('perro') && 
                       !tipo.includes('gato') && 
                       !tipo.includes('conejo') && 
@@ -455,22 +722,23 @@
     
     // Actualizar contador
     actualizarContador(animalesVisibles);
-    
-    // Reinicializar lazy loading para imágenes visibles
-    setTimeout(() => {
-      inicializarLazyLoading();
-    }, 100);
   }
 
-  // Función para actualizar el contador de resultados
+  // Función para actualizar el contador de resultados con animación
   function actualizarContador(cantidad) {
     const contador = document.getElementById('contadorResultados');
+    contador.classList.add('counter-bounce');
+    
+    setTimeout(() => {
+      contador.classList.remove('counter-bounce');
+    }, 400);
+    
     if (cantidad === 0) {
-      contador.textContent = 'No se encontraron animales';
-      contador.className = 'text-sm text-red-500';
+      contador.textContent = '😿 No se encontraron animales';
+      contador.className = 'text-sm text-red-500 px-4 py-2 bg-red-50 rounded-full backdrop-blur-sm counter-bounce';
     } else {
-      contador.textContent = `${cantidad} animal${cantidad !== 1 ? 'es' : ''} encontrado${cantidad !== 1 ? 's' : ''}`;
-      contador.className = 'text-sm text-green-600';
+      contador.textContent = `🐾 ${cantidad} animal${cantidad !== 1 ? 'es' : ''} encontrado${cantidad !== 1 ? 's' : ''}`;
+      contador.className = 'text-sm text-green-600 px-4 py-2 bg-green-50 rounded-full backdrop-blur-sm counter-bounce';
     }
   }
 
@@ -480,25 +748,42 @@
     aplicarFiltros();
   }
 
-  // Función para limpiar todos los filtros
-  function limpiarTodosFiltros() {
-    document.getElementById('buscadorAnimales').value = '';
-    filtrarPorTipo('');
-  }
-
   // Escuchar cambios en el input de búsqueda
   document.getElementById('buscadorAnimales').addEventListener('input', filtrarAnimales);
 
   // Inicializar al cargar la página
   document.addEventListener('DOMContentLoaded', function() {
-    aplicarFiltros();
-    inicializarLazyLoading();
+    inicializarPlaceholders();
+    actualizarContador(animalesData.length);
+    crearParticulasFlotantes();
   });
 
   // Cerrar modal al hacer clic fuera de él
   document.getElementById('authModal').addEventListener('click', function(e) {
     if (e.target === this) {
       cerrarModal();
+    }
+  });
+
+  // Efecto parallax suave en el scroll
+  let ticking = false;
+  
+  function updateParallax() {
+    const scrolled = window.pageYOffset;
+    const navbar = document.querySelector('.navbar-parallax');
+    
+    if (navbar) {
+      const opacity = Math.min(1, scrolled / 100);
+      navbar.style.background = `rgba(255, 255, 255, ${0.95 + opacity * 0.05})`;
+    }
+    
+    ticking = false;
+  }
+  
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(updateParallax);
+      ticking = true;
     }
   });
 </script>

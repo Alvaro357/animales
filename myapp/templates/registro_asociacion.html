@@ -43,6 +43,12 @@
             backdrop-filter: blur(2px);
             z-index: 50;
         }
+
+        /* Estilos para asteriscos obligatorios */
+        .required-asterisk {
+            color: #dc2626;
+            margin-left: 2px;
+        }
     </style>
 </head>
 <body>
@@ -80,7 +86,10 @@
                 
                         <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div class="sm:col-span-3">
-                                <label for="name" class="block text-sm/6 font-medium text-gray-900">Nombre</label>
+                                <label for="name" class="block text-sm/6 font-medium text-gray-900">
+                                    Nombre
+                                    {% if form.nombre.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.nombre}}
                                     {% if form.nombre.errors %}
@@ -90,7 +99,10 @@
                             </div>
                 
                             <div class="sm:col-span-3">
-                                <label for="password" class="block text-sm/6 font-medium text-gray-900">Contraseña</label>
+                                <label for="password" class="block text-sm/6 font-medium text-gray-900">
+                                    Contraseña
+                                    {% if form.password.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.password}}
                                     {% if form.password.errors %}
@@ -100,7 +112,10 @@
                             </div>
                 
                             <div class="sm:col-span-4">
-                                <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
+                                <label for="email" class="block text-sm/6 font-medium text-gray-900">
+                                    Email
+                                    {% if form.email.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.email}}
                                     {% if form.email.errors %}
@@ -110,7 +125,10 @@
                             </div>  
                             
                             <div class="sm:col-span-3">
-                                <label for="phone" class="block text-sm/6 font-medium text-gray-900">Teléfono</label>
+                                <label for="phone" class="block text-sm/6 font-medium text-gray-900">
+                                    Teléfono
+                                    {% if form.telefono.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.telefono}}
                                     {% if form.telefono.errors %}
@@ -120,7 +138,10 @@
                             </div>
 
                             <div class="sm:col-span-3">
-                                <label for="logo" class="block text-sm/6 font-medium text-gray-900">Logo (opcional)</label>
+                                <label for="logo" class="block text-sm/6 font-medium text-gray-900">
+                                    Logo (opcional)
+                                    {% if form.logo.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.logo}}
                                     {% if form.logo.errors %}
@@ -134,7 +155,10 @@
                             </div>
                 
                             <div class="col-span-full">
-                                <label for="direccion" class="block text-sm/6 font-medium text-gray-900">Dirección</label>
+                                <label for="direccion" class="block text-sm/6 font-medium text-gray-900">
+                                    Dirección
+                                    {% if form.direccion.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.direccion}}
                                     {% if form.direccion.errors %}
@@ -144,7 +168,10 @@
                             </div>
                 
                             <div class="sm:col-span-2 sm:col-start-1">
-                                <label for="poblacion" class="block text-sm/6 font-medium text-gray-900">Población</label>
+                                <label for="poblacion" class="block text-sm/6 font-medium text-gray-900">
+                                    Población
+                                    {% if form.poblacion.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.poblacion}}
                                     {% if form.poblacion.errors %}
@@ -154,7 +181,10 @@
                             </div>
                 
                             <div class="sm:col-span-2">
-                                <label for="provincia" class="block text-sm/6 font-medium text-gray-900">Provincia</label>
+                                <label for="provincia" class="block text-sm/6 font-medium text-gray-900">
+                                    Provincia
+                                    {% if form.provincia.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.provincia}}
                                     {% if form.provincia.errors %}
@@ -164,7 +194,10 @@
                             </div>
                 
                             <div class="sm:col-span-2">
-                                <label for="codigo_postal" class="block text-sm/6 font-medium text-gray-900">Código Postal</label>
+                                <label for="codigo_postal" class="block text-sm/6 font-medium text-gray-900">
+                                    Código Postal
+                                    {% if form.codigo_postal.field.required %}<span class="required-asterisk">*</span>{% endif %}
+                                </label>
                                 <div class="mt-2">
                                     {{form.codigo_postal}}
                                     {% if form.codigo_postal.errors %}
