@@ -7,3 +7,5 @@ db.sqlite3
 # Archivos compilados
 __pycache__/
 *.pyc
+
+/media/videos/*.mp4
