@@ -4,16 +4,6 @@ venv/
 # Base de datos
 db.sqlite3
 
-# Archivos de usuario
-.vscode/
-
-# Archivos multimedia subidos
-media/
-
-# Node
-node_modules/
-package-lock.json
-
 # Archivos compilados
 __pycache__/
 *.pyc
