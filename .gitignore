@@ -8,4 +8,5 @@ db.sqlite3
 __pycache__/
 *.pyc
 
+#Media
 /media/videos/*.mp4
