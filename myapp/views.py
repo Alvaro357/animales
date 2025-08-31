@@ -8,8 +8,40 @@ from functools import wraps
 from .forms import RegistroAsociacionForm, LoginForm, CreacionAnimalesForm
 from .models import RegistroAsociacion, CreacionAnimales
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
 
 
+def session_login_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if request.session.get('esta_logueado'):
+            return view_func(request, *args, **kwargs)
+        return redirect('login')
+    return wrapper
+
+
+# Toggle de adopción AJAX
+@session_login_required
+def toggle_adopcion_ajax(request, animal_id):
+    if request.method == 'POST':
+        try:
+            # Obtener la asociación logueada
+            asociacion_id = request.COOKIES.get('asociacion_id')
+            asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
+            
+            # Buscar el animal que pertenece a esta asociación
+            animal = CreacionAnimales.objects.get(id=animal_id, asociacion=asociacion)
+            animal.adoptado = not animal.adoptado
+            animal.save()
+            
+            return JsonResponse({'adoptado': animal.adoptado})
+        except CreacionAnimales.DoesNotExist:
+            return JsonResponse({'error': 'Animal no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 # Registro
@@ -41,31 +73,6 @@ def registro_asociacion(request):
         form = RegistroAsociacionForm()
 
     return render(request, 'registro_asociacion.html', {'form': form})
-def login_view(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            try:
-                asociacion = RegistroAsociacion.objects.get(nombre=username)
-                if check_password(password, asociacion.password):
-                    response = redirect('Inicio')
-                    max_age = 86400  # 24 horas en segundos
-                    response.set_cookie('asociacion_id', asociacion.id, max_age=max_age)
-                    
-                    # Guardamos en la sesión
-                    request.session['esta_logueado'] = True
-                    request.session['asociacion_nombre'] = asociacion.nombre
-                    return response
-                else:
-                    form.add_error(None, 'Contraseña incorrecta.')
-            except RegistroAsociacion.DoesNotExist:
-                form.add_error(None, 'No existe una asociación con ese nombre.')
-    else:
-        form = LoginForm()
-
-    return render(request, 'login.html', {'form': form})
 
 
 # Login
@@ -87,7 +94,6 @@ def login_view(request):
                     max_age = 86400  # 24 horas en segundos
                     response.set_cookie('asociacion_id', asociacion.id, max_age=max_age)
                    
-
                     # Guardamos en la sesión
                     request.session['esta_logueado'] = True
                     request.session['asociacion_nombre'] = asociacion.nombre
@@ -101,6 +107,7 @@ def login_view(request):
         form = LoginForm()
 
     return render(request, 'login.html', {'form': form})
+
 
 #Comprobación
 def comprobacion(request):
@@ -125,6 +132,7 @@ def comprobacion(request):
     request.session.flush()
     return redirect('login')
 
+
 #logout
 def logout_view(request):
     response = redirect('Inicio')
@@ -136,6 +144,7 @@ def logout_view(request):
     request.session.flush()
 
     return response
+
 
 #Inicio
 def Inicio(request):
@@ -165,14 +174,6 @@ def Inicio(request):
     })
 
 
-def session_login_required(view_func):
-    @wraps(view_func)
-    def wrapper(request, *args, **kwargs):
-        if request.session.get('esta_logueado'):
-            return view_func(request, *args, **kwargs)
-        return redirect('login')  # o la URL que uses para login
-    return wrapper
-
 @session_login_required
 def crear_animal(request):
     asociacion_id = request.COOKIES.get('asociacion_id')
@@ -193,13 +194,16 @@ def crear_animal(request):
         'asociacion': asociacion
     })
 
+
 def pagina_inicio(request):
     animales = CreacionAnimales.objects.all()
     return render(request, 'inicio.html', {'animales': animales})
 
+
 def vista_animal(request, animal_id):
     animal = get_object_or_404(CreacionAnimales, id=animal_id)
     return render(request, 'vista_animal.html', {'animal': animal})
+
 
 @session_login_required
 def lista_animales_asociacion(request):
@@ -226,7 +230,7 @@ def editar_animal(request, animal_id):
         form = CreacionAnimalesForm(request.POST, request.FILES, instance=animal)
         if form.is_valid():
             form.save()
-            return redirect('mis_animales')
+            return redirect('mis_animales')  # Cambiado para redirigir a mis_animales
     else:
         form = CreacionAnimalesForm(instance=animal)
     
@@ -235,6 +239,7 @@ def editar_animal(request, animal_id):
         'animal': animal,
         'asociacion': asociacion
     })
+
 
 @session_login_required
 def eliminar_animal(request, animal_id):
@@ -251,6 +256,7 @@ def eliminar_animal(request, animal_id):
         'asociacion': asociacion
     })
 
+
 @session_login_required
 def toggle_adopcion(request, animal_id):
     asociacion_id = request.COOKIES.get('asociacion_id')
@@ -260,7 +266,7 @@ def toggle_adopcion(request, animal_id):
     animal.adoptado = not animal.adoptado
     animal.save()
     
-    return redirect('Inicio')
+    return redirect('mis_animales')  # Cambiado para que redirija a mis_animales
 
 
 def mis_animales(request):

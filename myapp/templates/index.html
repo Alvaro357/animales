@@ -4,228 +4,405 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Inicio</title>  
+    <title>Adopta - Encuentra tu compañero perfecto</title>  
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style type="text/tailwindcss">
         html {
-            font-size: 22px;
-        }
-        body {
-            font-family: sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8f4f8 100%);
-            text-align: center;
-            padding-top: 160px;
-            position: relative;
-            overflow-x: hidden;
+            font-size: 16px;
         }
         
-        /* Partículas flotantes de fondo */
-        .floating-paws {
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            text-align: center;
+            padding-top: 100px;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Fondo de estrellas interactivas */
+        #starfield {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 0;
             pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
         }
         
-        .paw {
+        .star {
             position: absolute;
-            opacity: 0.1;
-            animation: float 15s infinite linear;
-            font-size: 20px;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s infinite;
         }
         
-        @keyframes float {
+        .star.large {
+            width: 3px;
+            height: 3px;
+            animation: twinkle 4s infinite;
+        }
+        
+        .star.bright {
+            background: #60a5fa;
+            box-shadow: 0 0 4px #60a5fa;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        /* Efecto de movimiento de estrellas */
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #60a5fa, transparent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: shoot 2s linear infinite;
+        }
+        
+        @keyframes shoot {
             0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.1;
-            }
-            90% {
-                opacity: 0.1;
+                opacity: 1;
+                transform: translateX(-100px) translateY(100px);
             }
             100% {
-                transform: translateY(-100px) rotate(360deg);
                 opacity: 0;
+                transform: translateX(100px) translateY(-100px);
             }
         }
         
-        @media (min-width: 768px) {
-            body {
-                padding-top: 180px;
-            }
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            margin: auto;
-            width: 50%;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-            margin: 10px;
-        }
-        .hidden {
-            display: none;
-        }
-        .animal-card {
-            transition: all 0.3s ease;
+        /* Contenedor principal con z-index alto */
+        .content-wrapper {
             position: relative;
-        }
-        
-        /* Efecto corazón al hacer hover */
-        .animal-card::before {
-            content: '💖';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 0;
-            opacity: 0;
-            transition: all 0.3s ease;
             z-index: 10;
-            pointer-events: none;
         }
         
-        .animal-card:hover::before {
-            font-size: 24px;
-            opacity: 1;
-            animation: heartBeat 0.6s ease-in-out;
+        /* Navbar glassmorphism */
+        .navbar-glass {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        @keyframes heartBeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        
-        /* Efecto ondas en los botones - solo para login */
-        .wave-btn {
+        /* Botones con efectos modernos */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
         
-        .wave-btn::before {
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(3, 233, 244, 0.3);
-            transition: width 0.6s, height 0.6s;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Cards modernas */
+        .animal-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .animal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
             z-index: 0;
         }
         
-        .wave-btn:hover::before {
-            width: 300px;
-            height: 300px;
+        .animal-card:hover::before {
+            opacity: 1;
         }
         
-        .wave-btn > * {
+        .animal-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
+                        0 0 0 1px rgba(59, 130, 246, 0.1);
+        }
+        
+        .card-content {
             position: relative;
             z-index: 1;
         }
         
+        /* Filtros */
+        .filter-container {
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
         .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
             transition: all 0.3s ease;
-            transform: scale(1);
             position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            font-size: 16px;
         }
         
-        .filter-btn:hover {
-            transform: scale(1.05);
-        }
         .filter-btn.active {
-            background: linear-gradient(135deg, #03e9f4, #a403b6);
-            color: white;
-            box-shadow: 0 0 15px rgba(3,233,244,0.5);
-            transform: scale(1.1);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
         }
         
-        /* Efecto de typing en el título */
-        .typing-title {
-            border-right: 3px solid #03e9f4;
-            animation: blink-caret 0.75s step-end infinite;
+        .filter-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
         }
         
-        @keyframes blink-caret {
-            from, to { border-color: transparent; }
-            50% { border-color: #03e9f4; }
+        /* Responsive para filtros */
+        @media (max-width: 768px) {
+            .filter-btn {
+                padding: 24px 32px;
+                font-size: 20px;
+                min-width: 140px;
+                min-height: 60px;
+                font-weight: 600;
+                border-width: 2px;
+            }
+            
+            .filter-container {
+                padding: 12px;
+                margin: 0 -0.5rem;
+            }
+            
+            .filter-container .flex {
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+            
+            .search-input {
+                padding: 20px 24px;
+                font-size: 18px;
+                min-height: 60px;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 16px 24px;
+                font-size: 18px;
+                min-height: 54px;
+            }
         }
         
-        /* Efecto parallax suave en el navbar */
-        .navbar-parallax {
+        /* Buscador */
+        .search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
+            color: #ffffff;
         }
         
-        /* Estilos para lazy loading de tarjetas */
-        .card-placeholder {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Título principal */
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            body {
+                padding-top: 80px;
+            }
+            
+            .filter-container {
+                margin: 0 -1rem;
+                border-radius: 1rem;
+            }
+            
+            .animal-card {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* Contador de resultados */
+        .results-counter {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .results-counter.no-results {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        /* Placeholders de carga */
+        .loading-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.8; }
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.05) 25%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 75%
+            );
             background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 1rem;
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            animation: shimmer 2s infinite;
         }
         
-        .card-loaded {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: cardFadeIn 0.6s ease-out forwards;
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
         
-        @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
+        /* Modal moderno */
+        .modal-backdrop {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.8);
         }
         
-        @keyframes cardFadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .modal-content {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* Placeholder para imagen dentro de la tarjeta */
-        .image-placeholder {
-            background: linear-gradient(90deg, #f8f8f8 25%, #e8e8e8 50%, #f8f8f8 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
+        /* Formularios */
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
         }
         
-        .lazy-image {
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
-        .lazy-image.loaded {
-            opacity: 1;
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
         }
         
+        /* Estilos para select en modo oscuro */
+        select.form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        /* Opciones del select */
+        select.form-input option {
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 8px 12px;
+        }
+
+        select.form-input option:checked,
+        select.form-input option:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Focus state para select */
+        select.form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Efectos de entrada */
         .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeInUp 0.6s ease-out;
         }
         
-        @keyframes fadeIn {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -233,559 +410,1158 @@
             }
         }
         
-        /* Efecto de brillo en el buscador */
-        .search-glow:focus {
-            box-shadow: 0 0 20px rgba(3, 233, 244, 0.3);
-            border-color: #03e9f4;
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
         
-        /* Contador con efecto de número que cambia */
-        .counter-bounce {
-            animation: counterBounce 0.4s ease-out;
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
         }
         
-        @keyframes counterBounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Ocultar scrollbar horizontal */
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Spinners para crear animal */
+        .create-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-left: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .create-spinner-small {
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-left: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+        
+        /* Estilos específicos para textarea */
+        textarea.form-input {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* Indicadores de archivo */
+        .file-indicator {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        /* Spinners de loading */
+        .register-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-left: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .register-spinner-small {
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-left: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        /* Transiciones suaves entre formularios */
+        .form-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .form-fade-out {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        
+        .form-fade-in {
+            opacity: 1;
+            transform: translateX(0);
         }
     </style>
 </head>
 <body>
 
-<!-- Partículas flotantes de fondo -->
-<div class="floating-paws" id="floatingPaws"></div>
+<!-- Fondo de estrellas -->
+<div id="starfield"></div>
 
-<!-- Modal de Login SOLAMENTE -->
-<div id="authModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-  <div id="modalContent" class="bg-white p-8 rounded-lg shadow-[0_25px_50px_rgba(0,0,0,0.3)] w-full max-w-md max-h-[90vh] overflow-y-auto relative transform scale-95 opacity-0 transition-all duration-1000 ease-in-out">
-    <button onclick="cerrarModal()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold z-10">&times;</button>
-    
-    <!-- Formulario de Login -->
-    <div id="loginForm">
-      <h2 class="text-2xl font-bold mb-6 text-center">Iniciar sesión</h2>
-      <form method="post" action="/login/">
-          {% csrf_token %}
-          {% if form.non_field_errors %}
-              <div class="mb-4 text-red-500 text-sm">
-                  {{ form.non_field_errors }}
-              </div>
-          {% endif %}
-          <div class="mb-4">
-              <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
-              <input type="text" id="username" name="username" class="mt-1 block w-full px-4 py-2 border rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#03e9f4]" required>
-          </div>
-          <div class="mb-4">
-              <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-              <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#03e9f4]" required>
-          </div>
-          <button type="submit" class="wave-btn w-full text-[#03e9f4] uppercase tracking-widest text-sm border border-[#03e9f4] px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
-              Iniciar sesión
-          </button>
-      </form>
-      
-      <!-- Enlace para ir a la página de registro -->
-      <div class="mt-4 pt-4 border-t border-gray-200 text-center">
-          <p class="text-sm text-gray-600 mb-3">¿No tienes cuenta?</p>
-          <a href="/registro/" class="wave-btn inline-block text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
-              Regístrate
-          </a>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Wrapper de contenido -->
+<div class="content-wrapper">
 
-<!-- Navbar -->
-<nav class="navbar-parallax fixed top-0 left-0 w-full shadow-md flex items-center justify-between gap-4 px-6 py-3 z-50 min-h-[64px]">
-    <div class="text-left text-xl font-bold text-[#03e9f4]">
-        {% if request.session.esta_logueado %}
-            <p>Bienvenid@ {{ request.session.asociacion_nombre }}</p>
-        {% endif %}
-    </div>
+    <!-- Modal de Login/Registro -->
+    <div id="authModal" class="fixed inset-0 flex items-center justify-center z-50 modal-backdrop hidden">
+        <div id="modalContent" class="modal-content p-8 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-500">
+            <button onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10">&times;</button>
+            
+            <!-- Formulario de Login -->
+            <div id="loginForm">
+                <h2 class="text-2xl font-semibold mb-6 text-center text-white">Iniciar sesión</h2>
+                <form method="post" action="/login/">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="mb-4 text-red-400 text-sm">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium form-label mb-2">Usuario</label>
+                        <input type="text" id="username" name="username" 
+                               class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium form-label mb-2">Contraseña</label>
+                        <input type="password" id="password" name="password" 
+                               class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full px-6 py-3 rounded-lg font-medium text-white">
+                        Iniciar sesión
+                    </button>
+                </form>
+                
+                <div class="mt-6 pt-6 border-t border-gray-700 text-center">
+                    <p class="text-gray-400 text-sm mb-3">¿No tienes cuenta?</p>
+                    <button onclick="mostrarRegistro()" class="btn-secondary inline-block px-6 py-2 rounded-lg text-sm font-medium text-white">
+                        Regístrate
+                    </button>
+                </div>
+            </div>
 
-    {% if request.session.esta_logueado %}
-        <div class="flex items-center gap-2 md:gap-4">
-          <a href="/mis_animales/" class="text-[#a403b6] uppercase tracking-widest text-xs md:text-sm border border-[#a403b6] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Mis Animales</a>  
-          <a href="/crear_animal/" class="text-[#a403b6] uppercase tracking-widest text-xs md:text-sm border border-[#a403b6] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#a403b6] hover:shadow-[0_0_5px_#a403b6,0_0_25px_#a403b6,0_0_50px_#a403b6,0_0_100px_#a403b6] transition">Crear Animal</a>
-            <a href="/logout/" class="text-red-600 uppercase tracking-widest text-xs md:text-sm border border-red-600 px-2 md:px-4 py-2 rounded hover:text-white hover:bg-red-600 hover:shadow-[0_0_5px_#f87171,0_0_25px_#f87171,0_0_50px_#f87171,0_0_100px_#f87171] transition">Cerrar sesión</a>
+            <!-- Formulario de Registro -->
+            <div id="registerForm" class="hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-center text-white">Registrar Asociación</h2>
+                
+                <!-- Overlay de loading para registro -->
+                <div id="registerLoadingOverlay" class="absolute inset-0 flex items-center justify-center hidden bg-black/80 backdrop-blur-sm rounded-2xl">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center border border-gray-600">
+                        <div class="register-spinner mb-3"></div>
+                        <p class="text-white font-medium">Registrando asociación...</p>
+                        <p class="text-sm text-gray-400 mt-1">Por favor, no cierres esta ventana</p>
+                    </div>
+                </div>
+
+                <form method="post" action="/registro/" enctype="multipart/form-data" id="registerFormElement">
+                    {% csrf_token %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="reg_nombre" class="block text-sm font-medium form-label mb-2">
+                                Nombre <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_nombre" name="nombre" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_password" class="block text-sm font-medium form-label mb-2">
+                                Contraseña <span class="text-red-400">*</span>
+                            </label>
+                            <input type="password" id="reg_password" name="password" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="reg_email" class="block text-sm font-medium form-label mb-2">
+                            Email <span class="text-red-400">*</span>
+                        </label>
+                        <input type="email" id="reg_email" name="email" 
+                               class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="reg_telefono" class="block text-sm font-medium form-label mb-2">
+                                Teléfono <span class="text-red-400">*</span>
+                            </label>
+                            <input type="tel" id="reg_telefono" name="telefono" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_logo" class="block text-sm font-medium form-label mb-2">
+                                Logo (opcional)
+                            </label>
+                            <input type="file" id="reg_logo" name="logo" accept="image/*"
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm">
+                            <div id="logoStatus" class="mt-1 text-sm text-gray-400 hidden"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="reg_direccion" class="block text-sm font-medium form-label mb-2">
+                            Dirección <span class="text-red-400">*</span>
+                        </label>
+                        <input type="text" id="reg_direccion" name="direccion" 
+                               class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label for="reg_poblacion" class="block text-sm font-medium form-label mb-2">
+                                Población <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_poblacion" name="poblacion" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_provincia" class="block text-sm font-medium form-label mb-2">
+                                Provincia <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_provincia" name="provincia" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_codigo_postal" class="block text-sm font-medium form-label mb-2">
+                                Código Postal <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_codigo_postal" name="codigo_postal" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="registerSubmitBtn" class="btn-primary w-full px-6 py-3 rounded-lg font-medium text-white mb-6">
+                        <span class="button-text">Registrar Asociación</span>
+                        <span class="button-loading hidden">
+                            <div class="register-spinner-small mr-2"></div>
+                            <span class="loading-dots">Procesando</span>
+                        </span>
+                    </button>
+                </form>
+                
+                <div class="pt-6 border-t border-gray-700 text-center">
+                    <p class="text-gray-400 text-sm mb-3">¿Ya tienes cuenta?</p>
+                    <button onclick="mostrarLogin()" class="btn-secondary inline-block px-6 py-2 rounded-lg text-sm font-medium text-white">
+                        Iniciar sesión
+                    </button>
+                </div>
+            </div>
         </div>
-    {% else %}
-        <div class="flex items-center gap-2 md:gap-4 justify-center flex-1 max-w-xs mx-auto">
-            <button onclick="abrirLogin()" class="wave-btn text-[#03e9f4] uppercase tracking-widest text-xs md:text-sm border border-[#03e9f4] px-2 md:px-4 py-2 rounded hover:text-white hover:bg-[#03e9f4] hover:shadow-[0_0_5px_#03e9f4,0_0_25px_#03e9f4,0_0_50px_#03e9f4,0_0_100px_#03e9f4] transition">
-                Iniciar sesión
-            </button>
+    </div>
+
+    <!-- Modal de Crear Animal -->
+    <div id="crearAnimalModal" class="fixed inset-0 flex items-center justify-center z-50 modal-backdrop hidden">
+        <div id="crearAnimalContent" class="modal-content p-8 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-500">
+            <button onclick="cerrarCrearAnimal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10">&times;</button>
+            
+            <div id="crearAnimalForm">
+                <h2 class="text-3xl font-semibold mb-8 text-center text-white">Registrar Nuevo Animal</h2>
+                
+                <!-- Overlay de loading -->
+                <div id="crearAnimalLoadingOverlay" class="absolute inset-0 flex items-center justify-center hidden bg-black/80 backdrop-blur-sm rounded-2xl">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center border border-gray-600">
+                        <div class="create-spinner mb-3"></div>
+                        <p class="text-white font-medium">Creando animal...</p>
+                        <p class="text-sm text-gray-400 mt-1">Por favor, no cierres esta ventana</p>
+                    </div>
+                </div>
+
+                <form method="post" action="/crear_animal/" enctype="multipart/form-data" id="crearAnimalFormElement">
+                    {% csrf_token %}
+                    
+                    <!-- Información básica -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Información Básica</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="animal_nombre" class="block text-sm font-medium form-label mb-2">
+                                    Nombre <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" id="animal_nombre" name="nombre" 
+                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                       placeholder="Nombre del animal">
+                            </div>
+                            
+                            <div>
+                                <label for="animal_tipo" class="block text-sm font-medium form-label mb-2">
+                                    Tipo de Animal <span class="text-red-400">*</span>
+                                </label>
+                                <select id="animal_tipo" name="tipo_de_animal" 
+                                        class="form-input w-full px-4 py-3 rounded-lg" required>
+                                    <option value="" class="bg-gray-800">Seleccionar tipo</option>
+                                    <option value="Perro" class="bg-gray-800">Perro</option>
+                                    <option value="Gato" class="bg-gray-800">Gato</option>
+                                    <option value="Conejo" class="bg-gray-800">Conejo</option>
+                                    <option value="Pájaro" class="bg-gray-800">Pájaro</option>
+                                    <option value="Otros" class="bg-gray-800">Otros</option>
+                                </select>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label for="animal_raza" class="block text-sm font-medium form-label mb-2">
+                                    Raza <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" id="animal_raza" name="raza" 
+                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                       placeholder="Raza del animal">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Multimedia -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Multimedia</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium form-label mb-2">Imagen</label>
+                                <div class="relative">
+                                    <input type="file" id="animal_imagen" name="imagen" accept="image/*" class="hidden">
+                                    <button type="button" onclick="document.getElementById('animal_imagen').click()" 
+                                            class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group">
+                                        <div class="flex flex-col items-center gap-3">
+                                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-white font-medium">Subir Imagen</p>
+                                                <p class="text-gray-400 text-sm">Haz clic para seleccionar</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                    <div id="imagenStatus" class="mt-2 hidden"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium form-label mb-2">Video</label>
+                                <div class="relative">
+                                    <input type="file" id="animal_video" name="video" accept="video/*" class="hidden">
+                                    <button type="button" onclick="document.getElementById('animal_video').click()" 
+                                            class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-purple-400 transition-all duration-300 group">
+                                        <div class="flex flex-col items-center gap-3">
+                                            <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                                                <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-white font-medium">Subir Video</p>
+                                                <p class="text-gray-400 text-sm">Haz clic para seleccionar</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                    <div id="videoStatus" class="mt-2 hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacto -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Información de Contacto</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="animal_email" class="block text-sm font-medium form-label mb-2">
+                                    Email <span class="text-red-400">*</span>
+                                </label>
+                                <input type="email" id="animal_email" name="email" 
+                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                       placeholder="email@ejemplo.com">
+                            </div>
+                            
+                            <div>
+                                <label for="animal_telefono" class="block text-sm font-medium form-label mb-2">
+                                    Teléfono <span class="text-red-400">*</span>
+                                </label>
+                                <input type="tel" id="animal_telefono" name="telefono" 
+                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                       placeholder="123456789">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ubicación -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Ubicación</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="animal_poblacion" class="block text-sm font-medium form-label mb-2">
+                                    Población <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" id="animal_poblacion" name="poblacion" 
+                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                       placeholder="Ciudad">
+                            </div>
+                            
+                            <div>
+                                <label for="animal_provincia" class="block text-sm font-medium form-label mb-2">
+                                    Provincia <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" id="animal_provincia" name="provincia" 
+                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                       placeholder="Provincia">
+                            </div>
+                            
+                            <div>
+                                <label for="animal_codigo_postal" class="block text-sm font-medium form-label mb-2">
+                                    Código Postal <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" id="animal_codigo_postal" name="codigo_postal" 
+                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                       placeholder="12345">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Descripción</h3>
+                        <div>
+                            <label for="animal_descripcion" class="block text-sm font-medium form-label mb-2">
+                                Descripción <span class="text-red-400">*</span>
+                            </label>
+                            <textarea id="animal_descripcion" name="descripcion" rows="4"
+                                      class="form-input w-full px-4 py-3 rounded-lg resize-none" required 
+                                      placeholder="Cuéntanos sobre este animal especial..."></textarea>
+                            <p class="text-gray-500 text-xs mt-1">Máximo 500 caracteres</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="crearAnimalSubmitBtn" class="btn-primary w-full px-6 py-4 rounded-lg font-semibold text-white text-lg">
+                        <span class="button-text">Crear Animal</span>
+                        <span class="button-loading hidden flex items-center justify-center">
+                            <div class="create-spinner-small mr-2"></div>
+                            <span class="loading-dots">Procesando</span>
+                        </span>
+                    </button>
+                </form>
+            </div>
         </div>
-    {% endif %}
-</nav>
-
-<!-- Filtros de animales -->
-<div class="fixed top-16 md:top-20 left-0 w-full z-40 flex justify-center px-4">
-  <div class="navbar-parallax rounded-full shadow-lg px-4 py-2 flex gap-3 overflow-x-auto no-scrollbar">
-    <div class="flex justify-center gap-4 bg-gray-100 rounded-full shadow-inner p-1 mx-2 overflow-x-auto no-scrollbar">
-
-      <!-- Botón para mostrar todos -->
-      <button onclick="filtrarPorTipo('')" 
-              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition active whitespace-nowrap" 
-              id="btn-todos">
-        ✨ Todos
-      </button>
-      
-      <!-- Botón para perros -->
-      <button onclick="filtrarPorTipo('perro')" 
-              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
-              id="btn-perro">
-        🐶 Perros
-      </button>
-      
-      <!-- Botón para gatos -->
-      <button onclick="filtrarPorTipo('gato')" 
-              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
-              id="btn-gato">
-        😺 Gatos
-      </button>
-      
-      <!-- Botón para conejos -->
-      <button onclick="filtrarPorTipo('conejo')" 
-              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
-              id="btn-conejo">
-        🐰 Conejos
-      </button>
-      
-      <!-- Botón para pájaros -->
-      <button onclick="filtrarPorTipo('pájaro')" 
-              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
-              id="btn-pájaro">
-        🐦 Pájaros
-      </button>
-      
-      <!-- Botón para otros -->
-      <button onclick="filtrarPorTipo('otros')" 
-              class="filter-btn px-2 md:px-4 py-1 md:py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs md:text-sm font-medium border transition whitespace-nowrap" 
-              id="btn-otros">
-        🐾 Otros
-      </button>
     </div>
-  </div>
+
+    <!-- Navbar -->
+    <nav class="navbar-glass fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40">
+        <div class="text-left">
+            <h1 class="text-xl font-bold text-white">Adopta</h1>
+            {% if request.session.esta_logueado %}
+                <p class="text-sm text-gray-400">Hola, {{ request.session.asociacion_nombre }}</p>
+            {% endif %}
+        </div>
+
+        <div class="flex items-center gap-4">
+            {% if request.session.esta_logueado %}
+                <a href="/mis_animales/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                    Mis Animales
+                </a>
+                <button onclick="abrirCrearAnimal()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                    Crear Animal
+                </button>
+                <a href="/logout/" class="text-red-400 hover:text-red-300 px-4 py-2 border border-red-400/30 hover:border-red-300 rounded-lg text-sm transition-all duration-300">
+                    Salir
+                </a>
+            {% else %}
+                <button onclick="abrirLogin()" class="btn-primary px-6 py-2 rounded-lg text-sm font-medium text-white">
+                    Iniciar sesión
+                </button>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="max-w-7xl mx-auto px-6 py-20">
+        
+        <!-- Título y descripción principal -->
+        <div class="text-center mb-16 fade-in">
+            <h1 class="main-title">
+                Encuentra tu compañero perfecto
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                Conectamos corazones. Cada animal merece una segunda oportunidad y un hogar lleno de amor.
+            </p>
+        </div>
+
+        <!-- Filtros y buscador -->
+        <div class="mb-12 fade-in">
+            <!-- Filtros -->
+            <div class="filter-container rounded-2xl p-6 mb-8">
+                <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <button onclick="filtrarPorTipo('')" 
+                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 active" 
+                            id="btn-todos">
+                        Todos
+                    </button>
+                    <button onclick="filtrarPorTipo('perro')" 
+                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
+                            id="btn-perro">
+                        Perros
+                    </button>
+                    <button onclick="filtrarPorTipo('gato')" 
+                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
+                            id="btn-gato">
+                        Gatos
+                    </button>
+                    <button onclick="filtrarPorTipo('conejo')" 
+                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
+                            id="btn-conejo">
+                        Conejos
+                    </button>
+                    <button onclick="filtrarPorTipo('pájaro')" 
+                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
+                            id="btn-pájaro">
+                        Pájaros
+                    </button>
+                    <button onclick="filtrarPorTipo('otros')" 
+                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
+                            id="btn-otros">
+                        Otros
+                    </button>
+                </div>
+                
+                <!-- Buscador -->
+                <div class="max-w-md mx-auto">
+                    <input 
+                        type="text" 
+                        id="buscadorAnimales" 
+                        placeholder="Buscar por nombre, raza o provincia..." 
+                        class="search-input w-full px-4 py-3 rounded-xl transition-all duration-300"
+                    >
+                </div>
+            </div>
+
+            <!-- Contador de resultados -->
+            <div class="text-center mb-8">
+                <span id="contadorResultados" class="results-counter inline-block px-4 py-2 rounded-full text-sm font-medium"></span>
+            </div>
+        </div>
+
+        <!-- Grid de animales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
+            <!-- Las tarjetas se generan dinámicamente -->
+        </div>
+    </div>
+
 </div>
 
-<!-- Animales disponibles -->
-<div class="max-w-7xl mx-auto px-4 py-12">
-  <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-    <h2 class="typing-title text-3xl font-bold text-gray-800 inline-block">Animales disponibles</h2>
-    
-    <!-- Buscador -->
-    <div class="relative w-full md:w-1/3">
-      <input 
-        type="text" 
-        id="buscadorAnimales" 
-        placeholder="🔍 Buscar por nombre, tipo, raza o provincia" 
-        class="search-glow w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#03e9f4] transition"
-      >
-      <button onclick="limpiarBusqueda()" class="absolute right-3 top-2 text-gray-400 hover:text-gray-600 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Contador de resultados -->
-  <div class="mb-4 text-center">
-    <span id="contadorResultados" class="text-sm text-gray-600 px-4 py-2 bg-white/50 rounded-full backdrop-blur-sm"></span>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
-    <!-- Los placeholders se generarán dinámicamente -->
-  </div>
-</div>
-
-<!-- Script mejorado con lazy loading completo -->
+<!-- JavaScript -->
 <script>
-  let filtroActual = '';
-  let animalesData = [
-    {% for animal in animales %}
-    {
-      id: {{ animal.id }},
-      nombre: "{{ animal.nombre|escapejs }}",
-      tipo: "{{ animal.tipo_de_animal|escapejs }}",
-      raza: "{{ animal.raza|escapejs }}",
-      email: "{{ animal.email|escapejs }}",
-      telefono: "{{ animal.telefono|escapejs }}",
-      poblacion: "{{ animal.poblacion|escapejs }}",
-      provincia: "{{ animal.provincia|escapejs }}",
-      imagen: "{% if animal.imagen %}{{ animal.imagen.url }}{% endif %}"
-    }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-  ];
+    // Datos de animales
+    let animalesData = [
+        {% for animal in animales %}
+        {
+            id: {{ animal.id }},
+            nombre: "{{ animal.nombre|escapejs }}",
+            tipo: "{{ animal.tipo_de_animal|escapejs }}",
+            raza: "{{ animal.raza|escapejs }}",
+            email: "{{ animal.email|escapejs }}",
+            telefono: "{{ animal.telefono|escapejs }}",
+            poblacion: "{{ animal.poblacion|escapejs }}",
+            provincia: "{{ animal.provincia|escapejs }}",
+            descripcion: "{{ animal.descripcion|escapejs }}",
+            imagen: "{% if animal.imagen %}{{ animal.imagen.url }}{% endif %}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
 
-  // Crear partículas flotantes
-  function crearParticulasFlotantes() {
-    const container = document.getElementById('floatingPaws');
-    const emojis = ['🐾', '🐕', '🐈', '🐰', '🐦', '💖', '⭐'];
-    
-    setInterval(() => {
-      if (document.querySelectorAll('.paw').length < 8) {
-        const paw = document.createElement('div');
-        paw.className = 'paw';
-        paw.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        paw.style.left = Math.random() * 100 + '%';
-        paw.style.animationDuration = (Math.random() * 10 + 10) + 's';
-        paw.style.animationDelay = Math.random() * 2 + 's';
-        container.appendChild(paw);
+    let filtroActual = '';
+
+    // Crear fondo de estrellas
+    function crearEstrellas() {
+        const starfield = document.getElementById('starfield');
+        const numStars = 150;
         
-        // Eliminar la partícula después de la animación
-        setTimeout(() => {
-          if (paw.parentNode) {
-            paw.remove();
-          }
-        }, 20000);
-      }
-    }, 3000);
-  }
-
-  // Función para normalizar texto eliminando acentos
-  function normalizarTexto(texto) {
-    return texto
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
-  }
-
-  // Crear placeholder para tarjeta
-  function crearPlaceholder(index) {
-    return `
-      <div class="card-placeholder" data-index="${index}">
-        <div class="text-gray-400 text-sm flex flex-col items-center">
-          <div class="animate-pulse flex flex-col items-center">
-            <div class="w-16 h-16 bg-gray-300 rounded-full mb-4"></div>
-            <div class="h-4 bg-gray-300 rounded w-32 mb-2"></div>
-            <div class="h-3 bg-gray-300 rounded w-24 mb-2"></div>
-            <div class="h-3 bg-gray-300 rounded w-28"></div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Crear tarjeta de animal completa
-  function crearTarjetaAnimal(animal) {
-    const tipoEmoji = {
-      'Perro': '🐶',
-      'Gato': '😺',
-      'Conejo': '🐰',
-      'Pájaro': '🐦'
-    };
-
-    return `
-      <div class="animal-card card-loaded flex flex-col h-full" 
-           data-nombre="${animal.nombre.toLowerCase()}" 
-           data-tipo="${animal.tipo.toLowerCase()}"
-           data-raza="${animal.raza.toLowerCase()}"
-           data-provincia="${animal.provincia.toLowerCase()}">
-        <a href="/ver_animal/${animal.id}/" class="block hover:opacity-100 flex flex-col h-full">
-          <div class="bg-white rounded-2xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_15px_50px_rgba(3,233,244,0.4)] flex flex-col h-full">
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
             
-            <!-- Contenedor de imagen -->
-            <div class="w-full h-64 relative overflow-hidden">
-              ${animal.imagen ? `
-                <div class="image-placeholder w-full h-full absolute inset-0 flex items-center justify-center bg-gray-100">
-                  <div class="text-gray-400 text-sm flex flex-col items-center">
-                    <svg class="animate-spin h-8 w-8 text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Cargando...
-                  </div>
-                </div>
-                <img 
-                  data-src="${animal.imagen}" 
-                  alt="Imagen de ${animal.nombre}" 
-                  class="lazy-image w-full h-64 object-cover absolute inset-0"
-                  loading="lazy"
-                >
-              ` : `
-                <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
-                  <div class="flex flex-col items-center">
-                    <svg class="h-12 w-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    Sin imagen
-                  </div>
-                </div>
-              `}
-            </div>
+            if (Math.random() < 0.1) star.classList.add('large');
+            if (Math.random() < 0.05) star.classList.add('bright');
             
-            <div class="p-6 flex-grow">
-              <h3 class="text-xl font-semibold text-gray-800 mb-2">${animal.nombre}</h3>
-              <p class="text-sm text-gray-600 mb-1">
-                ${tipoEmoji[animal.tipo] || animal.tipo}
-              </p>
-              <p class="text-sm text-gray-600 mb-4"><strong>${animal.raza}</strong></p>
-              <p class="text-sm text-gray-600 mb-1"><strong>${animal.email}</strong></p>
-              <p class="text-sm text-gray-600 mb-1"><strong>${animal.telefono}</strong></p>
-              <p class="text-sm text-gray-600 mb-1"><strong>Población:</strong> ${animal.poblacion}</p>
-              <p class="text-sm text-gray-600 mb-1"><strong>Provincia:</strong> ${animal.provincia}</p>
-            </div>
-          </div>
-        </a>
-      </div>
-    `;
-  }
-
-  // Intersection Observer para lazy loading de tarjetas completas
-  const cardObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const placeholder = entry.target;
-        const index = parseInt(placeholder.dataset.index);
-        const animal = animalesData[index];
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            
+            starfield.appendChild(star);
+        }
         
-        if (animal) {
-          // Crear la tarjeta real
-          const tarjetaHTML = crearTarjetaAnimal(animal);
-          placeholder.outerHTML = tarjetaHTML;
-          
-          // Inicializar lazy loading de imágenes para esta tarjeta
-          setTimeout(() => {
-            const nuevaTarjeta = document.querySelector(`[data-nombre="${animal.nombre.toLowerCase()}"]`);
-            if (nuevaTarjeta) {
-              const lazyImage = nuevaTarjeta.querySelector('.lazy-image');
-              if (lazyImage) {
-                imageObserver.observe(lazyImage);
-              }
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                shootingStar.style.left = Math.random() * 100 + '%';
+                shootingStar.style.top = Math.random() * 100 + '%';
+                
+                starfield.appendChild(shootingStar);
+                
+                setTimeout(() => {
+                    if (shootingStar.parentNode) {
+                        shootingStar.remove();
+                    }
+                }, 2000);
             }
-          }, 100);
-        }
-        
-        // Dejar de observar este placeholder
-        observer.unobserve(placeholder);
-      }
-    });
-  }, {
-    root: null,
-    rootMargin: '100px', // Cargar tarjetas 100px antes de que sean visibles
-    threshold: 0.1
-  });
-
-  // Intersection Observer para lazy loading de imágenes
-  const imageObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        const placeholder = img.previousElementSibling;
-        
-        // Cargar la imagen
-        img.src = img.dataset.src;
-        
-        // Cuando la imagen se carga
-        img.onload = () => {
-          img.classList.add('loaded');
-          if (placeholder && placeholder.classList.contains('image-placeholder')) {
-            placeholder.style.opacity = '0';
-            setTimeout(() => {
-              if (placeholder.parentNode) {
-                placeholder.remove();
-              }
-            }, 300);
-          }
-        };
-        
-        // Error al cargar la imagen
-        img.onerror = () => {
-          if (placeholder && placeholder.classList.contains('image-placeholder')) {
-            placeholder.innerHTML = `
-              <div class="text-gray-400 text-sm flex flex-col items-center">
-                <svg class="h-8 w-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Error al cargar
-              </div>
-            `;
-          }
-        };
-        
-        // Dejar de observar esta imagen
-        observer.unobserve(img);
-      }
-    });
-  }, {
-    root: null,
-    rootMargin: '50px',
-    threshold: 0.1
-  });
-
-  // Función para inicializar placeholders
-  function inicializarPlaceholders() {
-    const contenedor = document.getElementById('contenedorAnimales');
-    contenedor.innerHTML = '';
-    
-    // Crear placeholders para todos los animales
-    animalesData.forEach((animal, index) => {
-      contenedor.innerHTML += crearPlaceholder(index);
-    });
-    
-    // Observar todos los placeholders
-    document.querySelectorAll('.card-placeholder').forEach(placeholder => {
-      cardObserver.observe(placeholder);
-    });
-  }
-
-  function abrirLogin() {
-    const modal = document.getElementById('authModal');
-    const content = document.getElementById('modalContent');
-    
-    modal.classList.remove('hidden');
-    void content.offsetWidth;
-    content.classList.remove('scale-95', 'opacity-0');
-    content.classList.add('scale-100', 'opacity-100');
-  }
-
-  function cerrarModal() {
-    const modal = document.getElementById('authModal');
-    const content = document.getElementById('modalContent');
-
-    content.classList.remove('scale-100', 'opacity-100');
-    content.classList.add('scale-95', 'opacity-0');
-
-    setTimeout(() => {
-      modal.classList.add('hidden');
-    }, 1000);
-  }
-
-  // Función para filtrar por tipo de animal
-  function filtrarPorTipo(tipo) {
-    filtroActual = tipo;
-    
-    // Actualizar botones activos
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.classList.remove('active');
-    });
-    
-    if (tipo === '') {
-      document.getElementById('btn-todos').classList.add('active');
-    } else {
-      document.getElementById('btn-' + tipo).classList.add('active');
+        }, 3000);
     }
-    
-    // Aplicar filtros
-    aplicarFiltros();
-  }
 
-  // Función para filtrar animales (búsqueda de texto)
-  function filtrarAnimales() {
-    aplicarFiltros();
-  }
+    // Crear placeholder de carga
+    function crearPlaceholder(index) {
+        return `
+            <div class="loading-card rounded-2xl p-6 h-auto" data-index="${index}">
+                <div class="loading-shimmer aspect-square rounded-xl mb-4"></div>
+                <div class="loading-shimmer rounded h-6 mb-2"></div>
+                <div class="loading-shimmer rounded h-4 w-3/4 mb-2"></div>
+                <div class="loading-shimmer rounded h-4 w-1/2"></div>
+            </div>
+        `;
+    }
 
-  // Función principal que aplica todos los filtros
-  function aplicarFiltros() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Crear tarjeta de animal
+    function crearTarjetaAnimal(animal) {
+        return `
+            <div class="animal-card rounded-2xl overflow-hidden fade-in" 
+                 data-nombre="${animal.nombre.toLowerCase()}" 
+                 data-tipo="${animal.tipo.toLowerCase()}"
+                 data-raza="${animal.raza.toLowerCase()}"
+                 data-provincia="${animal.provincia.toLowerCase()}">
+                <a href="/ver_animal/${animal.id}/" class="block">
+                    <div class="card-content">
+                        <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative">
+                            ${animal.imagen ? `
+                                <img src="${animal.imagen}" 
+                                     alt="${animal.nombre}" 
+                                     class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110">
+                            ` : `
+                                <div class="w-full h-full flex items-center justify-center text-gray-500">
+                                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                            `}
+                        </div>
+                        
+                        <div class="p-6 text-center">
+                            <h3 class="text-2xl font-bold text-white mb-1 tracking-wide">${animal.nombre}</h3>
+                            <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-3 opacity-90">${animal.raza}</p>
+                            
+                            <div class="flex items-center justify-center text-gray-400 text-sm">
+                                <svg class="w-4 h-4 mr-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span class="font-medium">${animal.poblacion}, ${animal.provincia}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        `;
+    }
 
-    const busqueda = normalizarTexto(document.getElementById('buscadorAnimales').value);
-    const animales = document.querySelectorAll('.animal-card');
-    let animalesVisibles = 0;
-    
-    animales.forEach(animal => {
-      const nombre = normalizarTexto(animal.getAttribute('data-nombre'));
-      const tipo = normalizarTexto(animal.getAttribute('data-tipo'));
-      const raza = normalizarTexto(animal.getAttribute('data-raza'));
-      const provincia = normalizarTexto(animal.getAttribute('data-provincia'));
-      
-      // Verificar filtro de texto
-      const cumpleBusqueda = !busqueda || 
-       nombre.includes(busqueda) || 
-       tipo.includes(busqueda) || 
-       raza.includes(busqueda) || 
-       provincia.includes(busqueda);
-      
-      // Verificar filtro de tipo
-      let cumpleTipo = true;
-      if (filtroActual !== '') {
-        if (filtroActual === 'otros') {
-          cumpleTipo = !tipo.includes('perro') && 
-                      !tipo.includes('gato') && 
-                      !tipo.includes('conejo') && 
-                      !tipo.includes('pájaro');
+    // Intersection Observer para cargar tarjetas
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const placeholder = entry.target;
+                const index = parseInt(placeholder.dataset.index);
+                const animal = animalesData[index];
+                
+                if (animal) {
+                    placeholder.outerHTML = crearTarjetaAnimal(animal);
+                }
+                
+                observer.unobserve(placeholder);
+            }
+        });
+    }, { rootMargin: '100px' });
+
+    // Inicializar placeholders
+    function inicializarAnimales() {
+        const contenedor = document.getElementById('contenedorAnimales');
+        contenedor.innerHTML = '';
+        
+        animalesData.forEach((animal, index) => {
+            contenedor.innerHTML += crearPlaceholder(index);
+        });
+        
+        setTimeout(() => {
+            document.querySelectorAll('.loading-card').forEach(card => {
+                observer.observe(card);
+            });
+        }, 100);
+    }
+
+    // Normalizar texto para búsqueda
+    function normalizarTexto(texto) {
+        return texto.toLowerCase()
+                   .normalize('NFD')
+                   .replace(/[\u0300-\u036f]/g, '')
+                   .trim();
+    }
+
+    // Filtrar por tipo
+    function filtrarPorTipo(tipo) {
+        filtroActual = tipo;
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        if (tipo === '') {
+            document.getElementById('btn-todos').classList.add('active');
         } else {
-          cumpleTipo = tipo.includes(filtroActual);
+            document.getElementById('btn-' + tipo).classList.add('active');
         }
-      }
-      
-      // Mostrar u ocultar según ambos filtros
-      if (cumpleBusqueda && cumpleTipo) {
-        animal.classList.remove('hidden');
-        animalesVisibles++;
-      } else {
-        animal.classList.add('hidden');
-      }
-    });
-    
+        
+        aplicarFiltros();
+    }
+
+    // Aplicar filtros
+    function aplicarFiltros() {
+        const busqueda = normalizarTexto(document.getElementById('buscadorAnimales').value);
+        const tarjetas = document.querySelectorAll('.animal-card');
+        let contador = 0;
+        
+        tarjetas.forEach(tarjeta => {
+            const nombre = normalizarTexto(tarjeta.dataset.nombre);
+            const tipo = normalizarTexto(tarjeta.dataset.tipo);
+            const raza = normalizarTexto(tarjeta.dataset.raza);
+            const provincia = normalizarTexto(tarjeta.dataset.provincia);
+            
+            const cumpleBusqueda = !busqueda || 
+                nombre.includes(busqueda) || 
+                tipo.includes(busqueda) || 
+                raza.includes(busqueda) || 
+                provincia.includes(busqueda);
+            
+            let cumpleTipo = true;
+            if (filtroActual !== '') {
+                if (filtroActual === 'otros') {
+                    cumpleTipo = !tipo.includes('perro') && 
+                                !tipo.includes('gato') && 
+                                !tipo.includes('conejo') && 
+                                !tipo.includes('pájaro');
+                } else {
+                    cumpleTipo = tipo.includes(filtroActual);
+                }
+            }
+            
+            if (cumpleBusqueda && cumpleTipo) {
+                tarjeta.style.display = 'block';
+                contador++;
+            } else {
+                tarjeta.style.display = 'none';
+            }
+        });
+        
+        actualizarContador(contador);
+    }
+
     // Actualizar contador
-    actualizarContador(animalesVisibles);
-  }
-
-  // Función para actualizar el contador de resultados con animación
-  function actualizarContador(cantidad) {
-    const contador = document.getElementById('contadorResultados');
-    contador.classList.add('counter-bounce');
-    
-    setTimeout(() => {
-      contador.classList.remove('counter-bounce');
-    }, 400);
-    
-    if (cantidad === 0) {
-      contador.textContent = '😿 No se encontraron animales';
-      contador.className = 'text-sm text-red-500 px-4 py-2 bg-red-50 rounded-full backdrop-blur-sm counter-bounce';
-    } else {
-      contador.textContent = `🐾 ${cantidad} animal${cantidad !== 1 ? 'es' : ''} encontrado${cantidad !== 1 ? 's' : ''}`;
-      contador.className = 'text-sm text-green-600 px-4 py-2 bg-green-50 rounded-full backdrop-blur-sm counter-bounce';
+    function actualizarContador(cantidad) {
+        const contador = document.getElementById('contadorResultados');
+        
+        if (cantidad === 0) {
+            contador.textContent = 'No se encontraron animales';
+            contador.className = 'results-counter no-results inline-block px-4 py-2 rounded-full text-sm font-medium';
+        } else {
+            contador.textContent = `${cantidad} animal${cantidad !== 1 ? 'es' : ''} disponible${cantidad !== 1 ? 's' : ''}`;
+            contador.className = 'results-counter inline-block px-4 py-2 rounded-full text-sm font-medium';
+        }
     }
-  }
 
-  // Función para limpiar la búsqueda
-  function limpiarBusqueda() {
-    document.getElementById('buscadorAnimales').value = '';
-    aplicarFiltros();
-  }
-
-  // Escuchar cambios en el input de búsqueda
-  document.getElementById('buscadorAnimales').addEventListener('input', filtrarAnimales);
-
-  // Inicializar al cargar la página
-  document.addEventListener('DOMContentLoaded', function() {
-    inicializarPlaceholders();
-    actualizarContador(animalesData.length);
-    crearParticulasFlotantes();
-  });
-
-  // Cerrar modal al hacer clic fuera de él
-  document.getElementById('authModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      cerrarModal();
+    // Modal de crear animal
+    function abrirCrearAnimal() {
+        const modal = document.getElementById('crearAnimalModal');
+        const content = document.getElementById('crearAnimalContent');
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
     }
-  });
 
-  // Efecto parallax suave en el scroll
-  let ticking = false;
-  
-  function updateParallax() {
-    const scrolled = window.pageYOffset;
-    const navbar = document.querySelector('.navbar-parallax');
+    function cerrarCrearAnimal() {
+        const modal = document.getElementById('crearAnimalModal');
+        const content = document.getElementById('crearAnimalContent');
+        
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            resetCrearAnimalForm();
+        }, 500);
+    }
+
+    // Reset del formulario de crear animal
+    function resetCrearAnimalForm() {
+        const form = document.getElementById('crearAnimalFormElement');
+        if (form) form.reset();
+        
+        setCrearAnimalButtonLoading(false);
+        showCrearAnimalOverlay(false);
+        
+        quitarImagen();
+        quitarVideo();
+    }
+
+    // Loading states
+    function setCrearAnimalButtonLoading(loading = true) {
+        const button = document.getElementById('crearAnimalSubmitBtn');
+        if (!button) return;
+        
+        const textSpan = button.querySelector('.button-text');
+        const loadingSpan = button.querySelector('.button-loading');
+        
+        if (loading) {
+            if (textSpan) textSpan.classList.add('hidden');
+            if (loadingSpan) loadingSpan.classList.remove('hidden');
+            button.disabled = true;
+            button.classList.add('opacity-75', 'cursor-not-allowed');
+        } else {
+            if (textSpan) textSpan.classList.remove('hidden');
+            if (loadingSpan) loadingSpan.classList.add('hidden');
+            button.disabled = false;
+            button.classList.remove('opacity-75', 'cursor-not-allowed');
+        }
+    }
+
+    function showCrearAnimalOverlay(show = true) {
+        const overlay = document.getElementById('crearAnimalLoadingOverlay');
+        if (overlay) {
+            if (show) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+    }
+
+    // Indicadores de archivos con opción de quitar
+    function initFileIndicators() {
+        const imagenInput = document.getElementById('animal_imagen');
+        const videoInput = document.getElementById('animal_video');
+
+        if (imagenInput) {
+            imagenInput.addEventListener('change', function(e) {
+                const statusDiv = document.getElementById('imagenStatus');
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const fileName = file.name;
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                    
+                    if (statusDiv) {
+                        statusDiv.innerHTML = `
+                            <div class="file-indicator flex items-center justify-between">
+                                <div>
+                                    <span class="text-green-400">✓ Imagen: ${fileName}</span>
+                                    <span class="text-xs text-gray-400 block">${fileSize} MB</span>
+                                </div>
+                                <button type="button" onclick="quitarImagen()" 
+                                        class="ml-3 text-red-400 hover:text-red-300 transition-colors duration-200 text-sm font-medium flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    Quitar
+                                </button>
+                            </div>
+                        `;
+                        statusDiv.classList.remove('hidden');
+                    }
+                } else {
+                    if (statusDiv) {
+                        statusDiv.classList.add('hidden');
+                        statusDiv.innerHTML = '';
+                    }
+                }
+            });
+        }
+
+        if (videoInput) {
+            videoInput.addEventListener('change', function(e) {
+                const statusDiv = document.getElementById('videoStatus');
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const fileName = file.name;
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                    
+                    if (statusDiv) {
+                        statusDiv.innerHTML = `
+                            <div class="file-indicator flex items-center justify-between">
+                                <div>
+                                    <span class="text-green-400">✓ Video: ${fileName}</span>
+                                    <span class="text-xs text-gray-400 block">${fileSize} MB</span>
+                                </div>
+                                <button type="button" onclick="quitarVideo()" 
+                                        class="ml-3 text-red-400 hover:text-red-300 transition-colors duration-200 text-sm font-medium flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    Quitar
+                                </button>
+                            </div>
+                        `;
+                        statusDiv.classList.remove('hidden');
+                    }
+                } else {
+                    if (statusDiv) {
+                        statusDiv.classList.add('hidden');
+                        statusDiv.innerHTML = '';
+                    }
+                }
+            });
+        }
+    }
+
+    // Funciones para quitar archivos
+    function quitarImagen() {
+        const imagenInput = document.getElementById('animal_imagen');
+        const statusDiv = document.getElementById('imagenStatus');
+        
+        if (imagenInput) {
+            imagenInput.value = '';
+        }
+        
+        if (statusDiv) {
+            statusDiv.classList.add('hidden');
+            statusDiv.innerHTML = '';
+        }
+    }
+
+    function quitarVideo() {
+        const videoInput = document.getElementById('animal_video');
+        const statusDiv = document.getElementById('videoStatus');
+        
+        if (videoInput) {
+            videoInput.value = '';
+        }
+        
+        if (statusDiv) {
+            statusDiv.classList.add('hidden');
+            statusDiv.innerHTML = '';
+        }
+    }
+
+    function abrirLogin() {
+        const modal = document.getElementById('authModal');
+        const content = document.getElementById('modalContent');
+        
+        mostrarLogin();
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function cerrarModal() {
+        const modal = document.getElementById('authModal');
+        const content = document.getElementById('modalContent');
+        
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            resetForms();
+        }, 500);
+    }
+
+    function mostrarLogin() {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        
+        registerForm.style.opacity = '0';
+        setTimeout(() => {
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            setTimeout(() => {
+                loginForm.style.opacity = '1';
+            }, 10);
+        }, 150);
+    }
+
+    function mostrarRegistro() {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        
+        loginForm.style.opacity = '0';
+        setTimeout(() => {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            setTimeout(() => {
+                registerForm.style.opacity = '1';
+            }, 10);
+        }, 150);
+    }
+
+    function resetForms() {
+        const loginForm = document.querySelector('#loginForm form');
+        const registerForm = document.getElementById('registerFormElement');
+        
+        if (loginForm) loginForm.reset();
+        if (registerForm) registerForm.reset();
+        
+        setRegisterButtonLoading(false);
+        showRegisterOverlay(false);
+        
+        const logoStatus = document.getElementById('logoStatus');
+        if (logoStatus) logoStatus.classList.add('hidden');
+    }
+
+    function setRegisterButtonLoading(loading = true) {
+        const button = document.getElementById('registerSubmitBtn');
+        if (!button) return;
+        
+        const textSpan = button.querySelector('.button-text');
+        const loadingSpan = button.querySelector('.button-loading');
+        
+        if (loading) {
+            if (textSpan) textSpan.classList.add('hidden');
+            if (loadingSpan) loadingSpan.classList.remove('hidden');
+            button.disabled = true;
+            button.classList.add('opacity-75', 'cursor-not-allowed');
+        } else {
+            if (textSpan) textSpan.classList.remove('hidden');
+            if (loadingSpan) loadingSpan.classList.add('hidden');
+            button.disabled = false;
+            button.classList.remove('opacity-75', 'cursor-not-allowed');
+        }
+    }
+
+    function showRegisterOverlay(show = true) {
+        const overlay = document.getElementById('registerLoadingOverlay');
+        if (overlay) {
+            if (show) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+    }
+
+    function initModalForms() {
+        const registerForm = document.getElementById('registerFormElement');
+        const logoInput = document.getElementById('reg_logo');
+
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                setRegisterButtonLoading(true);
+                showRegisterOverlay(true);
+            });
+        }
+
+        if (logoInput) {
+            logoInput.addEventListener('change', function(e) {
+                const statusDiv = document.getElementById('logoStatus');
+                if (e.target.files.length > 0) {
+                    const fileName = e.target.files[0].name;
+                    if (statusDiv) {
+                        statusDiv.innerHTML = `<span class="text-green-400">✓ ${fileName} seleccionado</span>`;
+                        statusDiv.classList.remove('hidden');
+                    }
+                } else {
+                    if (statusDiv) {
+                        statusDiv.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        const loginForm = document.getElementById('loginForm');
+        const registerFormDiv = document.getElementById('registerForm');
+        
+        if (loginForm) loginForm.style.opacity = '1';
+        if (registerFormDiv) registerFormDiv.style.opacity = '1';
+    }
+
+    // Event listeners
+    document.getElementById('buscadorAnimales').addEventListener('input', aplicarFiltros);
     
-    if (navbar) {
-      const opacity = Math.min(1, scrolled / 100);
-      navbar.style.background = `rgba(255, 255, 255, ${0.95 + opacity * 0.05})`;
-    }
+    document.getElementById('authModal').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
+    });
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        crearEstrellas();
+        inicializarAnimales();
+        actualizarContador(animalesData.length);
+        
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in').forEach((el, i) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, i * 100);
+            });
+        }, 200);
+
+        initModalForms();
+        initFileIndicators();
+    });
+
+    // Efecto parallax
+    let ticking = false;
     
-    ticking = false;
-  }
-  
-  window.addEventListener('scroll', function() {
-    if (!ticking) {
-      requestAnimationFrame(updateParallax);
-      ticking = true;
-    }
-  });
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset;
+                const stars = document.querySelectorAll('.star');
+                
+                stars.forEach((star, i) => {
+                    if (i % 3 === 0) {
+                        const speed = 0.5;
+                        star.style.transform = `translateY(${scrolled * speed}px)`;
+                    }
+                });
+                
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
 </script>
 
 </body>
