@@ -176,6 +176,73 @@
             z-index: 1;
         }
         
+        /* Botón de favorito */
+        .favorite-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 20;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .favorite-btn:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .favorite-btn.active {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        
+        .favorite-btn.active:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        .heart-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .heart-outline {
+            stroke: #ffffff;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .favorite-btn:hover .heart-outline {
+            stroke: #ef4444;
+        }
+        
+        .heart-filled {
+            fill: #ef4444;
+            stroke: #ef4444;
+            stroke-width: 1;
+        }
+        
+        /* Animación de corazón */
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .favorite-btn.animate-heart {
+            animation: heartBeat 0.6s ease-in-out;
+        }
+        
         /* Filtros */
         .filter-container {
             background: rgba(10, 10, 10, 0.9);
@@ -374,7 +441,6 @@
             padding-right: 2.5rem;
         }
 
-        /* Opciones del select */
         select.form-input option {
             background-color: #1f2937;
             color: #ffffff;
@@ -387,7 +453,6 @@
             color: #ffffff;
         }
 
-        /* Focus state para select */
         select.form-input:focus {
             outline: none;
             border-color: #3b82f6;
@@ -524,6 +589,18 @@
         .form-fade-in {
             opacity: 1;
             transform: translateX(0);
+        }
+        
+        /* Contador de favoritos */
+        .favorites-counter {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 4px;
         }
     </style>
 </head>
@@ -735,7 +812,42 @@
                                 </select>
                             </div>
                             
-                            <div class="md:col-span-2">
+                            <!-- CAMPO COLOR COMBINADO -->
+                            <div>
+                                <label for="animal_color_select" class="block text-sm font-medium form-label mb-2">
+                                    Color <span class="text-red-400">*</span>
+                                </label>
+                                <div class="space-y-3">
+                                    <!-- Selector de colores predefinidos -->
+                                    <select id="animal_color_select" name="color_predefinido" 
+                                            class="form-input w-full px-4 py-3 rounded-lg" 
+                                            onchange="manejarCambioColor()">
+                                        <option value="" class="bg-gray-800">Seleccionar color</option>
+                                        <option value="Negro" class="bg-gray-800">Negro</option>
+                                        <option value="Blanco" class="bg-gray-800">Blanco</option>
+                                        <option value="Marrón" class="bg-gray-800">Marrón</option>
+                                        <option value="Gris" class="bg-gray-800">Gris</option>
+                                        <option value="Dorado" class="bg-gray-800">Dorado</option>
+                                        <option value="Rubio" class="bg-gray-800">Rubio</option>
+                                        <option value="Rojizo" class="bg-gray-800">Rojizo</option>
+                                        <option value="Atigrado" class="bg-gray-800">Atigrado</option>
+                                        <option value="Manchado" class="bg-gray-800">Manchado</option>
+                                        <option value="Tricolor" class="bg-gray-800">Tricolor</option>
+                                        <option value="Bicolor" class="bg-gray-800">Bicolor</option>
+                                        <option value="Otro" class="bg-gray-800">Otro (especificar)</option>
+                                    </select>
+                                    
+                                    <!-- Campo de texto personalizado (oculto inicialmente) -->
+                                    <input type="text" id="animal_color_custom" name="color_personalizado" 
+                                           class="form-input w-full px-4 py-3 rounded-lg hidden" 
+                                           placeholder="Especifica el color del animal...">
+                                    
+                                    <!-- Campo oculto que enviará el valor final -->
+                                    <input type="hidden" id="animal_color_final" name="color" value="">
+                                </div>
+                            </div>
+                            
+                            <div>
                                 <label for="animal_raza" class="block text-sm font-medium form-label mb-2">
                                     Raza <span class="text-red-400">*</span>
                                 </label>
@@ -880,33 +992,48 @@
     </div>
 
     <!-- Navbar -->
-    <nav class="navbar-glass fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40">
-        <div class="text-left">
-            <h1 class="text-xl font-bold text-white">Adopta</h1>
-            {% if request.session.esta_logueado %}
-                <p class="text-sm text-gray-400">Hola, {{ request.session.asociacion_nombre }}</p>
-            {% endif %}
-        </div>
+<nav class="navbar-glass fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40">
+    <div class="text-left">
+        <h1 class="text-xl font-bold text-white">Adopta</h1>
+        {% if request.session.esta_logueado %}
+            <p class="text-sm text-gray-400">Hola, {{ request.session.asociacion_nombre }}</p>
+        {% endif %}
+    </div>
 
-        <div class="flex items-center gap-4">
-            {% if request.session.esta_logueado %}
-                <a href="/mis_animales/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
-                    Mis Animales
-                </a>
-                <button onclick="abrirCrearAnimal()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white">
-                    Crear Animal
-                </button>
-                <a href="/logout/" class="text-red-400 hover:text-red-300 px-4 py-2 border border-red-400/30 hover:border-red-300 rounded-lg text-sm transition-all duration-300">
-                    Salir
-                </a>
-            {% else %}
-                <button onclick="abrirLogin()" class="btn-primary px-6 py-2 rounded-lg text-sm font-medium text-white">
-                    Iniciar sesión
-                </button>
-            {% endif %}
-        </div>
-    </nav>
-
+    <div class="flex items-center gap-4">
+        <!-- Nuevo botón de Buscador Avanzado -->
+        <a href="/buscador-avanzado/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Búsqueda Avanzada
+        </a>
+        
+        <a href="/mis-favoritos/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            Favoritos
+            <span id="favoritesCounter" class="favorites-counter hidden">0</span>
+        </a>
+        
+        {% if request.session.esta_logueado %}
+            <a href="/mis_animales/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                Mis Animales
+            </a>
+            <button onclick="abrirCrearAnimal()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                Crear Animal
+            </button>
+            <a href="/logout/" class="text-red-400 hover:text-red-300 px-4 py-2 border border-red-400/30 hover:border-red-300 rounded-lg text-sm transition-all duration-300">
+                Salir
+            </a>
+        {% else %}
+            <button onclick="abrirLogin()" class="btn-primary px-6 py-2 rounded-lg text-sm font-medium text-white">
+                Iniciar sesión
+            </button>
+        {% endif %}
+    </div>
+</nav>
     <!-- Contenido principal -->
     <div class="max-w-7xl mx-auto px-6 py-20">
         
@@ -992,6 +1119,7 @@
             nombre: "{{ animal.nombre|escapejs }}",
             tipo: "{{ animal.tipo_de_animal|escapejs }}",
             raza: "{{ animal.raza|escapejs }}",
+            color: "{{ animal.color|escapejs }}",
             email: "{{ animal.email|escapejs }}",
             telefono: "{{ animal.telefono|escapejs }}",
             poblacion: "{{ animal.poblacion|escapejs }}",
@@ -1003,6 +1131,81 @@
     ];
 
     let filtroActual = '';
+    let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+    // Función para manejar cambios en el selector de color
+    function manejarCambioColor() {
+        const colorSelect = document.getElementById('animal_color_select');
+        const colorCustom = document.getElementById('animal_color_custom');
+        const colorFinal = document.getElementById('animal_color_final');
+        
+        if (colorSelect.value === 'Otro') {
+            colorCustom.classList.remove('hidden');
+            colorCustom.setAttribute('required', 'required');
+            colorCustom.focus();
+            colorFinal.value = '';
+            
+            colorCustom.addEventListener('input', function() {
+                colorFinal.value = this.value.trim();
+            });
+            
+        } else if (colorSelect.value === '') {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+            colorFinal.value = '';
+            
+        } else {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+            colorFinal.value = colorSelect.value;
+        }
+    }
+
+    // Función para resetear el selector de color
+    function resetColorSelector() {
+        const colorSelect = document.getElementById('animal_color_select');
+        const colorCustom = document.getElementById('animal_color_custom');
+        const colorFinal = document.getElementById('animal_color_final');
+        
+        if (colorSelect) colorSelect.value = '';
+        if (colorCustom) {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+        }
+        if (colorFinal) colorFinal.value = '';
+    }
+
+    // Validación del formulario antes del envío
+    function validarColorAntesDelEnvio() {
+        const colorSelect = document.getElementById('animal_color_select');
+        const colorCustom = document.getElementById('animal_color_custom');
+        const colorFinal = document.getElementById('animal_color_final');
+        
+        if (colorSelect.value === '') {
+            alert('Por favor, selecciona un color para el animal.');
+            colorSelect.focus();
+            return false;
+        }
+        
+        if (colorSelect.value === 'Otro' && (!colorCustom.value || colorCustom.value.trim() === '')) {
+            alert('Por favor, especifica el color del animal.');
+            colorCustom.focus();
+            return false;
+        }
+        
+        if (!colorFinal.value || colorFinal.value.trim() === '') {
+            manejarCambioColor();
+            if (!colorFinal.value || colorFinal.value.trim() === '') {
+                alert('Error al procesar el color. Por favor, intenta de nuevo.');
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
     // Crear fondo de estrellas
     function crearEstrellas() {
@@ -1055,12 +1258,31 @@
 
     // Crear tarjeta de animal
     function crearTarjetaAnimal(animal) {
+        const esFavorito = favoritos.includes(animal.id);
+        
         return `
             <div class="animal-card rounded-2xl overflow-hidden fade-in" 
                  data-nombre="${animal.nombre.toLowerCase()}" 
                  data-tipo="${animal.tipo.toLowerCase()}"
                  data-raza="${animal.raza.toLowerCase()}"
-                 data-provincia="${animal.provincia.toLowerCase()}">
+                 data-provincia="${animal.provincia.toLowerCase()}"
+                 data-id="${animal.id}">
+                
+                <!-- Botón de favorito -->
+                <button onclick="toggleFavorito(${animal.id}, this, event)" 
+                        class="favorite-btn ${esFavorito ? 'active' : ''}" 
+                        data-favorito="${esFavorito}">
+                    ${esFavorito ? `
+                        <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    ` : `
+                        <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    `}
+                </button>
+                
                 <a href="/ver_animal/${animal.id}/" class="block">
                     <div class="card-content">
                         <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative">
@@ -1093,6 +1315,56 @@
                 </a>
             </div>
         `;
+    }
+
+    // Toggle favorito
+    function toggleFavorito(animalId, button, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const esFavorito = favoritos.includes(animalId);
+        
+        if (esFavorito) {
+            // Quitar de favoritos
+            favoritos = favoritos.filter(id => id !== animalId);
+            button.classList.remove('active');
+            button.innerHTML = `
+                <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            `;
+        } else {
+            // Agregar a favoritos
+            favoritos.push(animalId);
+            button.classList.add('active');
+            button.innerHTML = `
+                <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            `;
+            
+            // Animación
+            button.classList.add('animate-heart');
+            setTimeout(() => button.classList.remove('animate-heart'), 600);
+        }
+        
+        // Guardar en localStorage
+        localStorage.setItem('favoritos', JSON.stringify(favoritos));
+        
+        // Actualizar contador
+        actualizarContadorFavoritos();
+    }
+
+    // Actualizar contador de favoritos
+    function actualizarContadorFavoritos() {
+        const counter = document.getElementById('favoritesCounter');
+        
+        if (favoritos.length > 0) {
+            counter.textContent = favoritos.length;
+            counter.classList.remove('hidden');
+        } else {
+            counter.classList.add('hidden');
+        }
     }
 
     // Intersection Observer para cargar tarjetas
@@ -1242,6 +1514,7 @@
         
         quitarImagen();
         quitarVideo();
+        resetColorSelector(); // Agregado para resetear el selector de color
     }
 
     // Loading states
@@ -1348,6 +1621,19 @@
                         statusDiv.innerHTML = '';
                     }
                 }
+            });
+        }
+
+        // Agregar validación al formulario de crear animal
+        const crearAnimalForm = document.getElementById('crearAnimalFormElement');
+        if (crearAnimalForm) {
+            crearAnimalForm.addEventListener('submit', function(e) {
+                if (!validarColorAntesDelEnvio()) {
+                    e.preventDefault();
+                    return false;
+                }
+                setCrearAnimalButtonLoading(true);
+                showCrearAnimalOverlay(true);
             });
         }
     }
@@ -1522,11 +1808,16 @@
         if (e.target === this) cerrarModal();
     });
 
+    document.getElementById('crearAnimalModal').addEventListener('click', function(e) {
+        if (e.target === this) cerrarCrearAnimal();
+    });
+
     // Inicialización
     document.addEventListener('DOMContentLoaded', function() {
         crearEstrellas();
         inicializarAnimales();
         actualizarContador(animalesData.length);
+        actualizarContadorFavoritos();
         
         setTimeout(() => {
             document.querySelectorAll('.fade-in').forEach((el, i) => {

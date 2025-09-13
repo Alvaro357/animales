@@ -1,0 +1,659 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados de Búsqueda - Adopta</title>  
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        html {
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            text-align: center;
+            padding-top: 100px;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Fondo de estrellas interactivas */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s infinite;
+        }
+        
+        .star.large {
+            width: 3px;
+            height: 3px;
+            animation: twinkle 4s infinite;
+        }
+        
+        .star.bright {
+            background: #60a5fa;
+            box-shadow: 0 0 4px #60a5fa;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #60a5fa, transparent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: shoot 2s linear infinite;
+        }
+        
+        @keyframes shoot {
+            0% {
+                opacity: 1;
+                transform: translateX(-100px) translateY(100px);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100px) translateY(-100px);
+            }
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Navbar glassmorphism */
+        .navbar-glass {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Botones */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Cards modernas */
+        .animal-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .animal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+        
+        .animal-card:hover::before {
+            opacity: 1;
+        }
+        
+        .animal-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
+                        0 0 0 1px rgba(59, 130, 246, 0.1);
+        }
+        
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Botón de favorito */
+        .favorite-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 20;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .favorite-btn:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .favorite-btn.active {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        
+        .favorite-btn.active:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        .heart-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .heart-outline {
+            stroke: #ffffff;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .favorite-btn:hover .heart-outline {
+            stroke: #ef4444;
+        }
+        
+        .heart-filled {
+            fill: #ef4444;
+            stroke: #ef4444;
+            stroke-width: 1;
+        }
+        
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .favorite-btn.animate-heart {
+            animation: heartBeat 0.6s ease-in-out;
+        }
+        
+        /* Título principal */
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            body {
+                padding-top: 80px;
+            }
+        }
+        
+        /* Filtros aplicados */
+        .filter-tag {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin: 2px;
+        }
+        
+        /* Contador de resultados */
+        .results-counter {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+        
+        .no-results {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        /* Botón volver */
+        .back-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Mensaje sin resultados */
+        .no-results-message {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 40px auto;
+            max-width: 600px;
+        }
+        
+        .no-results-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            opacity: 0.6;
+        }
+        
+        /* Contador de favoritos */
+        .favorites-counter {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fondo de estrellas -->
+<div id="starfield"></div>
+
+<!-- Wrapper de contenido -->
+<div class="content-wrapper">
+
+    <!-- Navbar -->
+    <nav class="navbar-glass fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40">
+        <div class="text-left">
+            <h1 class="text-xl font-bold text-white">Adopta</h1>
+            <p class="text-sm text-gray-400">Resultados de búsqueda</p>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <a href="/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                Inicio
+            </a>
+            <a href="/buscador-avanzado/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                Nueva Búsqueda
+            </a>
+            <a href="/mis-favoritos/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                Favoritos
+                <span id="favoritesCounter" class="favorites-counter hidden">0</span>
+            </a>
+            
+            {% if request.session.esta_logueado %}
+                <a href="/mis_animales/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                    Mis Animales
+                </a>
+                <a href="/logout/" class="text-red-400 hover:text-red-300 px-4 py-2 border border-red-400/30 hover:border-red-300 rounded-lg text-sm transition-all duration-300">
+                    Salir
+                </a>
+            {% else %}
+                <a href="/" class="btn-primary px-6 py-2 rounded-lg text-sm font-medium text-white">
+                    Iniciar sesión
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="max-w-7xl mx-auto px-6 py-20">
+        
+        <!-- Botón volver -->
+        <div class="text-left mb-8 fade-in">
+            <a href="/buscador-avanzado/" class="back-button">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Volver al buscador
+            </a>
+        </div>
+
+        <!-- Título y filtros aplicados -->
+        <div class="text-center mb-16 fade-in">
+            <h1 class="main-title">
+                Resultados de búsqueda
+            </h1>
+            
+            {% if filtros_aplicados %}
+                <div class="mb-6">
+                    <p class="text-gray-400 mb-3">Filtros aplicados:</p>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        {% for filtro in filtros_aplicados %}
+                            <span class="filter-tag">{{ filtro }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Contador de resultados -->
+        <div class="text-center mb-12">
+            {% if total_resultados > 0 %}
+                <span class="results-counter">
+                    {{ total_resultados }} animal{{ total_resultados|pluralize:"es" }} encontrado{{ total_resultados|pluralize:"s" }}
+                </span>
+            {% else %}
+                <span class="results-counter no-results">
+                    No se encontraron animales
+                </span>
+            {% endif %}
+        </div>
+
+        {% if total_resultados > 0 %}
+            <!-- Grid de animales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="contenedorAnimales">
+                {% for animal in animales %}
+                    <div class="animal-card rounded-2xl overflow-hidden fade-in" 
+                         data-nombre="{{ animal.nombre|lower }}" 
+                         data-tipo="{{ animal.tipo_de_animal|lower }}"
+                         data-raza="{{ animal.raza|lower }}"
+                         data-provincia="{{ animal.provincia|lower }}"
+                         data-id="{{ animal.id }}">
+                        
+                        <!-- Botón de favorito -->
+                        <button onclick="toggleFavorito({{ animal.id }}, this, event)" 
+                                class="favorite-btn" 
+                                data-favorito="false">
+                            <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                        
+                        <a href="/ver_animal/{{ animal.id }}/" class="block">
+                            <div class="card-content">
+                                <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative">
+                                    {% if animal.imagen %}
+                                        <img src="{{ animal.imagen.url }}" 
+                                             alt="{{ animal.nombre }}" 
+                                             class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110">
+                                    {% else %}
+                                        <div class="w-full h-full flex items-center justify-center text-gray-500">
+                                            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="p-6 text-center">
+                                    <h3 class="text-2xl font-bold text-white mb-1 tracking-wide">{{ animal.nombre }}</h3>
+                                    <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-1 opacity-90">{{ animal.raza }}</p>
+                                    <p class="text-purple-300 font-medium text-xs uppercase tracking-wider mb-3 opacity-75">{{ animal.color }}</p>
+                                    
+                                    <div class="flex items-center justify-center text-gray-400 text-sm">
+                                        <svg class="w-4 h-4 mr-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span class="font-medium">{{ animal.poblacion }}, {{ animal.provincia }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Mensaje sin resultados -->
+            <div class="no-results-message fade-in">
+                <svg class="no-results-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <h3 class="text-2xl font-semibold text-white mb-4">No encontramos animales</h3>
+                <p class="text-gray-400 mb-6">
+                    No hay animales que coincidan con los filtros seleccionados. 
+                    Prueba a ajustar tus criterios de búsqueda.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/buscador-avanzado/" class="btn-primary px-6 py-3 rounded-lg font-medium text-white">
+                        Nueva búsqueda
+                    </a>
+                    <a href="/" class="btn-secondary px-6 py-3 rounded-lg font-medium text-white">
+                        Ver todos los animales
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- JavaScript -->
+<script>
+    let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+    // Crear estrellas de fondo
+    function crearEstrellas() {
+        const starfield = document.getElementById('starfield');
+        const numStars = 150;
+        
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            
+            if (Math.random() < 0.1) star.classList.add('large');
+            if (Math.random() < 0.05) star.classList.add('bright');
+            
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            
+            starfield.appendChild(star);
+        }
+        
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                shootingStar.style.left = Math.random() * 100 + '%';
+                shootingStar.style.top = Math.random() * 100 + '%';
+                
+                starfield.appendChild(shootingStar);
+                
+                setTimeout(() => {
+                    if (shootingStar.parentNode) {
+                        shootingStar.remove();
+                    }
+                }, 2000);
+            }
+        }, 3000);
+    }
+
+    // Toggle favorito
+    function toggleFavorito(animalId, button, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const esFavorito = favoritos.includes(animalId);
+        
+        if (esFavorito) {
+            favoritos = favoritos.filter(id => id !== animalId);
+            button.classList.remove('active');
+            button.innerHTML = `
+                <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            `;
+        } else {
+            favoritos.push(animalId);
+            button.classList.add('active');
+            button.innerHTML = `
+                <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            `;
+            
+            button.classList.add('animate-heart');
+            setTimeout(() => button.classList.remove('animate-heart'), 600);
+        }
+        
+        localStorage.setItem('favoritos', JSON.stringify(favoritos));
+        actualizarContadorFavoritos();
+    }
+
+    // Actualizar contador de favoritos
+    function actualizarContadorFavoritos() {
+        const counter = document.getElementById('favoritesCounter');
+        
+        if (favoritos.length > 0) {
+            counter.textContent = favoritos.length;
+            counter.classList.remove('hidden');
+        } else {
+            counter.classList.add('hidden');
+        }
+    }
+
+    // Inicializar favoritos en las tarjetas
+    function inicializarFavoritos() {
+        document.querySelectorAll('.favorite-btn').forEach(button => {
+            const animalId = parseInt(button.closest('.animal-card').dataset.id);
+            const esFavorito = favoritos.includes(animalId);
+            
+            if (esFavorito) {
+                button.classList.add('active');
+                button.innerHTML = `
+                    <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                `;
+            }
+        });
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        crearEstrellas();
+        actualizarContadorFavoritos();
+        inicializarFavoritos();
+        
+        // Animación de entrada
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in').forEach((el, i) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, i * 100);
+            });
+        }, 200);
+    });
+
+    // Efecto parallax
+    let ticking = false;
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset;
+                const stars = document.querySelectorAll('.star');
+                
+                stars.forEach((star, i) => {
+                    if (i % 3 === 0) {
+                        const speed = 0.5;
+                        star.style.transform = `translateY(${scrolled * speed}px)`;
+                    }
+                });
+                
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+</script>
+
+</body>
+</html>

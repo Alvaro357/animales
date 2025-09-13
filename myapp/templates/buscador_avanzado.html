@@ -1,0 +1,967 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscador Avanzado - Adopta</title>  
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Solución para el scrollbar horizontal */
+        html {
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+        
+        * {
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Fondo de estrellas mejorado */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        /* Contenedor de partículas */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 4s infinite;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+        
+        .star.large {
+            width: 3px;
+            height: 3px;
+            animation: pulse 3s infinite;
+        }
+        
+        .star.constellation {
+            background: #60a5fa;
+            box-shadow: 0 0 6px #60a5fa;
+            animation: constellation 8s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 0.8; transform: scale(1); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+        
+        @keyframes constellation {
+            0%, 100% { opacity: 0.2; }
+            25% { opacity: 1; }
+            50% { opacity: 0.5; }
+            75% { opacity: 1; }
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            padding-top: 120px;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        
+        /* Navbar glassmorphism */
+        .navbar {
+            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 100vw;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        /* Contenedor principal del buscador */
+        .search-container {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 3rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 1s ease-out 0.3s forwards;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Selector de tipo de animal mejorado */
+        .animal-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .animal-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 140px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            margin: 0.25rem;
+        }
+        
+        .animal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+            will-change: left;
+        }
+        
+        .animal-card:hover::before {
+            left: 100%;
+        }
+        
+        .animal-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .animal-card.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+            transform: translateY(-5px) scale(1.05);
+        }
+        
+        .animal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        .animal-card:hover .animal-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+        
+        .animal-card.active .animal-icon {
+            animation: bounce 0.6s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% { transform: scale(1.1); }
+            40%, 43% { transform: scale(1.3); }
+        }
+        
+        /* Filtros en grid responsivo */
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .filter-group {
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .filter-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+        
+        .filter-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .filter-input:focus + .filter-label {
+            color: #3b82f6;
+        }
+        
+        .filter-input option {
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 12px;
+        }
+        
+        /* Select arrow personalizada */
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .select-wrapper:hover::after {
+            border-top-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Campo especial para otros animales */
+        .otros-animales {
+            grid-column: 1 / -1;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+        
+        .otros-animales.show {
+            opacity: 1;
+            max-height: 100px;
+        }
+        
+        /* Botón de búsqueda mejorado */
+        .search-button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            background-size: 200% 200%;
+            border: none;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1.25rem 3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .search-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .search-button:hover::before {
+            left: 100%;
+        }
+        
+        .search-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+        }
+        
+        .search-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        /* Título con efecto de escritura */
+        .typing-title {
+            background: linear-gradient(135deg, #ffffff, #94a3b8, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .subtitle {
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Floating particles effect */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(96, 165, 250, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s infinite linear;
+            max-width: 100vw;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Botones de navegación */
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Container principal del sitio */
+        .max-w-5xl {
+            max-width: min(80rem, 100vw);
+            padding-left: 1rem;
+            padding-right: 1rem;
+            box-sizing: border-box;
+        }
+        
+        /* Asegurar que no hay scroll horizontal en el formulario */
+        form {
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Responsive mejorado */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding-top: 100px;
+                padding-left: 0;
+                padding-right: 0;
+            }
+            
+            .search-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem 0.5rem;
+                border-radius: 24px;
+            }
+            
+            .animal-selector {
+                gap: 0.75rem;
+                padding: 0;
+            }
+            
+            .animal-card {
+                min-width: 100px;
+                padding: 1rem 0.75rem;
+            }
+            
+            .animal-icon {
+                font-size: 2rem;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 0;
+            }
+            
+            .search-button {
+                width: 100%;
+                padding: 1rem 2rem;
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .search-container {
+                margin: 0.5rem;
+                padding: 1.5rem 1rem;
+            }
+            
+            .animal-selector {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .animal-card {
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+            }
+            
+            .navbar {
+                padding: 1rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fondo de estrellas -->
+<div id="starfield"></div>
+
+<!-- Partículas flotantes -->
+<div id="particles"></div>
+
+<!-- Wrapper de contenido -->
+<div class="content-wrapper">
+
+    <!-- Navbar -->
+    <nav class="navbar fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40">
+        <div class="text-left">
+            <h1 class="text-xl font-bold text-white">Adopta</h1>
+            <p class="text-sm text-gray-400">Encuentra tu compañero</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/" class="nav-btn text-sm font-medium text-white">Inicio</a>
+            <a href="/mis-favoritos/" class="nav-btn text-sm font-medium text-white">Favoritos</a>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        
+        <!-- Título principal -->
+        <div class="text-center mb-12">
+            <h1 class="typing-title text-4xl md:text-5xl font-bold mb-4">
+                Busca tu compañero ideal
+            </h1>
+            <p class="subtitle text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
+                Usa nuestros filtros para encontrar el animal perfecto para ti
+            </p>
+        </div>
+        
+        <!-- Contenedor principal del buscador -->
+        <div class="search-container">
+            <form method="GET" action="/resultados-busqueda/">
+                
+                <!-- Selector de tipo de animal -->
+                <div class="animal-selector">
+                    <div class="animal-card" onclick="selectAnimal('perro')" id="card-perro">
+                        <span class="animal-icon">🐕</span>
+                        <span class="font-semibold">Perros</span>
+                    </div>
+                    <div class="animal-card" onclick="selectAnimal('gato')" id="card-gato">
+                        <span class="animal-icon">🐱</span>
+                        <span class="font-semibold">Gatos</span>
+                    </div>
+                    <div class="animal-card active" onclick="selectAnimal('otros')" id="card-otros">
+                        <span class="animal-icon">🐦</span>
+                        <span class="font-semibold">Otros</span>
+                    </div>
+                </div>
+                
+                <!-- Filtros -->
+                <div class="filters-grid">
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Ubicación</label>
+                        <div class="select-wrapper">
+                            <select name="ubicacion" id="ubicacion-select" class="filter-input">
+                                <option value="">Todas las ubicaciones</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label" id="raza-label">Raza</label>
+                        <div class="select-wrapper">
+                            <select name="raza" id="raza-select" class="filter-input">
+                                <option value="">Cualquier raza</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Color</label>
+                        <div class="select-wrapper">
+                            <select name="color" id="color-select" class="filter-input">
+                                <option value="">Cualquier color</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo especial para otros animales -->
+                    <div class="otros-animales show" id="otros-animales-field">
+                        <div class="filter-group">
+                            <label class="filter-label">Tipo de Animal</label>
+                            <div class="select-wrapper">
+                                <select name="tipo_animal" id="otros-animales-select" class="filter-input">
+                                    <option value="">Selecciona un tipo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Campo oculto para el tipo seleccionado -->
+                <input type="hidden" name="tipo" id="tipo-hidden" value="Otros">
+                
+                <!-- Botón de búsqueda -->
+                <div class="text-center">
+                    <button type="submit" class="search-button">
+                        ✨ Buscar ahora
+                    </button>
+                </div>
+                
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Script para pasar datos de Django a JavaScript -->
+<script id="django-data" type="application/json">
+    {% if datos_por_tipo %}
+        {{ datos_por_tipo|safe }}
+    {% else %}
+        {}
+    {% endif %}
+</script>
+
+<script>
+// Variables globales
+let selectedAnimal = 'otros';
+let animalData = {};
+
+// Obtener datos reales de Django
+try {
+    const datosReales = JSON.parse(document.getElementById('django-data').textContent);
+    console.log('Datos recibidos de Django:', datosReales);
+    
+    // Estructurar los datos correctamente
+    animalData = {
+        perro: {
+            razas: (datosReales.perros && datosReales.perros.razas) || [],
+            colores: (datosReales.perros && datosReales.perros.colores) || [],
+            ubicaciones: (datosReales.perros && datosReales.perros.provincias) || []
+        },
+        gato: {
+            razas: (datosReales.gatos && datosReales.gatos.razas) || [],
+            colores: (datosReales.gatos && datosReales.gatos.colores) || [],
+            ubicaciones: (datosReales.gatos && datosReales.gatos.provincias) || []
+        },
+        otros: {
+            tipos: (datosReales.otros && datosReales.otros.tipos) || [],
+            variedades: ['Pequeño', 'Mediano', 'Grande'],
+            colores: (datosReales.otros && datosReales.otros.colores) || [],
+            ubicaciones: (datosReales.otros && datosReales.otros.provincias) || []
+        }
+    };
+} catch (error) {
+    console.error('Error al parsear datos de Django:', error);
+    // Datos por defecto en caso de error
+    animalData = {
+        perro: { razas: [], colores: [], ubicaciones: [] },
+        gato: { razas: [], colores: [], ubicaciones: [] },
+        otros: { tipos: [], variedades: ['Pequeño', 'Mediano', 'Grande'], colores: [], ubicaciones: [] }
+    };
+}
+
+console.log('Estructura final de animalData:', animalData);
+
+// Crear fondo de estrellas mejorado
+function createStarfield() {
+    const starfield = document.getElementById('starfield');
+    const numStars = 150;
+    
+    for (let i = 0; i < numStars; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        
+        if (Math.random() < 0.15) star.classList.add('large');
+        if (Math.random() < 0.08) star.classList.add('constellation');
+        
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 4 + 's';
+        
+        starfield.appendChild(star);
+    }
+}
+
+// Crear partículas flotantes
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    
+    setInterval(() => {
+        if (document.querySelectorAll('.particle').length < 10) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            
+            particlesContainer.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 8000);
+        }
+    }, 800);
+}
+
+// Función para poblar select con opciones
+function populateSelect(selectId, options, defaultText) {
+    const select = document.getElementById(selectId);
+    if (!select) {
+        console.error(`Select con ID ${selectId} no encontrado`);
+        return;
+    }
+    
+    select.innerHTML = `<option value="">${defaultText}</option>`;
+    
+    // Verificar que options sea un array
+    if (Array.isArray(options)) {
+        options.forEach(option => {
+            if (option && option.trim()) { // Solo agregar opciones no vacías
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                select.appendChild(optionElement);
+            }
+        });
+    }
+}
+
+// Función para actualizar todos los campos según el tipo de animal
+function updateFieldsForAnimalType(tipo) {
+    console.log('Actualizando campos para tipo:', tipo);
+    
+    const ubicacionSelect = document.getElementById('ubicacion-select');
+    const razaSelect = document.getElementById('raza-select');
+    const colorSelect = document.getElementById('color-select');
+    const otrosSelect = document.getElementById('otros-animales-select');
+    const razaLabel = document.getElementById('raza-label');
+    const otrosField = document.getElementById('otros-animales-field');
+    
+    // Verificar que todos los elementos existen
+    if (!ubicacionSelect || !razaSelect || !colorSelect || !otrosSelect || !razaLabel || !otrosField) {
+        console.error('Algunos elementos del formulario no se encontraron');
+        return;
+    }
+    
+    // Resetear todos los selects
+    ubicacionSelect.value = '';
+    razaSelect.value = '';
+    colorSelect.value = '';
+    otrosSelect.value = '';
+    
+    if (tipo === 'perro') {
+        console.log('Configurando para perros:', animalData.perro);
+        
+        populateSelect('ubicacion-select', animalData.perro.ubicaciones, 'Todas las ubicaciones');
+        populateSelect('raza-select', animalData.perro.razas, 'Cualquier raza');
+        populateSelect('color-select', animalData.perro.colores, 'Cualquier color');
+        
+        razaLabel.textContent = 'RAZA';
+        otrosField.classList.remove('show');
+        
+    } else if (tipo === 'gato') {
+        console.log('Configurando para gatos:', animalData.gato);
+        
+        populateSelect('ubicacion-select', animalData.gato.ubicaciones, 'Todas las ubicaciones');
+        populateSelect('raza-select', animalData.gato.razas, 'Cualquier raza');
+        populateSelect('color-select', animalData.gato.colores, 'Cualquier color');
+        
+        razaLabel.textContent = 'RAZA';
+        otrosField.classList.remove('show');
+        
+    } else if (tipo === 'otros') {
+        console.log('Configurando para otros:', animalData.otros);
+        
+        populateSelect('ubicacion-select', animalData.otros.ubicaciones, 'Todas las ubicaciones');
+        populateSelect('raza-select', animalData.otros.variedades, 'Cualquier variedad');
+        populateSelect('color-select', animalData.otros.colores, 'Cualquier color');
+        populateSelect('otros-animales-select', animalData.otros.tipos, 'Selecciona un tipo');
+        
+        razaLabel.textContent = 'VARIEDAD';
+        otrosField.classList.add('show');
+    }
+}
+
+// Seleccionar tipo de animal
+function selectAnimal(tipo) {
+    console.log('Seleccionando animal:', tipo);
+    
+    // Remover active de todas las tarjetas
+    document.querySelectorAll('.animal-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    // Activar la tarjeta seleccionada
+    const targetCard = document.getElementById(`card-${tipo}`);
+    if (targetCard) {
+        targetCard.classList.add('active');
+    }
+    
+    // Actualizar variable global
+    selectedAnimal = tipo;
+    
+    // Actualizar campo oculto
+    const tipoHidden = document.getElementById('tipo-hidden');
+    if (tipoHidden) {
+        const tipoMap = {
+            'perro': 'Perro',
+            'gato': 'Gato',
+            'otros': 'Otros'
+        };
+        tipoHidden.value = tipoMap[tipo];
+        console.log('Campo oculto actualizado a:', tipoHidden.value);
+    }
+    
+    // Actualizar todos los campos según el tipo seleccionado
+    updateFieldsForAnimalType(tipo);
+    
+    // Crear efecto de ondas
+    if (targetCard) {
+        createRippleEffect(targetCard);
+    }
+}
+
+// Efecto de ondas al seleccionar
+function createRippleEffect(element) {
+    const ripple = document.createElement('div');
+    ripple.style.position = 'absolute';
+    ripple.style.borderRadius = '50%';
+    ripple.style.background = 'rgba(59, 130, 246, 0.3)';
+    ripple.style.transform = 'scale(0)';
+    ripple.style.animation = 'ripple 0.6s linear';
+    ripple.style.left = '50%';
+    ripple.style.top = '50%';
+    ripple.style.width = '20px';
+    ripple.style.height = '20px';
+    ripple.style.marginLeft = '-10px';
+    ripple.style.marginTop = '-10px';
+    
+    element.appendChild(ripple);
+    
+    setTimeout(() => {
+        ripple.remove();
+    }, 600);
+}
+
+// Agregar estilos para el efecto ripple
+const rippleStyles = `
+@keyframes ripple {
+    to {
+        transform: scale(8);
+        opacity: 0;
+    }
+}
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = rippleStyles;
+document.head.appendChild(styleSheet);
+
+// Parallax sutil para las estrellas
+let ticking = false;
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        requestAnimationFrame(() => {
+            const scrolled = window.pageYOffset;
+            const stars = document.querySelectorAll('.star');
+            
+            stars.forEach((star, i) => {
+                if (i % 4 === 0) {
+                    const speed = 0.1;
+                    star.style.transform = `translateY(${scrolled * speed}px)`;
+                }
+            });
+            
+            ticking = false;
+        });
+        ticking = true;
+    }
+});
+
+// Inicializar todo
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado, inicializando...');
+    
+    createStarfield();
+    createParticles();
+    
+    // Verificar que los elementos necesarios existen
+    const elementos = ['ubicacion-select', 'raza-select', 'color-select', 'otros-animales-select', 'otros-animales-field'];
+    elementos.forEach(id => {
+        const elemento = document.getElementById(id);
+        if (!elemento) {
+            console.error(`Elemento con ID ${id} no encontrado`);
+        }
+    });
+    
+    // Inicializar con "otros" seleccionado por defecto
+    setTimeout(() => {
+        selectAnimal('otros');
+    }, 100); // Pequeño delay para asegurar que todo esté cargado
+    
+    // Agregar efecto focus mejorado a los inputs
+    document.querySelectorAll('.filter-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            const label = this.closest('.filter-group').querySelector('.filter-label');
+            if (label) {
+                label.style.color = '#3b82f6';
+            }
+        });
+        
+        input.addEventListener('blur', function() {
+            const label = this.closest('.filter-group').querySelector('.filter-label');
+            if (label) {
+                label.style.color = 'rgba(255, 255, 255, 0.7)';
+            }
+        });
+    });
+    
+    // Debug: Mostrar datos cargados en la consola
+    console.log('Inicialización completada');
+    console.log('Animal seleccionado:', selectedAnimal);
+});
+
+// Función auxiliar para debugging
+function debugData() {
+    console.log('=== DEBUG INFO ===');
+    console.log('Animal seleccionado:', selectedAnimal);
+    console.log('Datos disponibles:', animalData);
+    console.log('Elementos del DOM:');
+    console.log('- ubicacion-select:', document.getElementById('ubicacion-select'));
+    console.log('- raza-select:', document.getElementById('raza-select'));
+    console.log('- color-select:', document.getElementById('color-select'));
+    console.log('- otros-animales-select:', document.getElementById('otros-animales-select'));
+    console.log('- otros-animales-field:', document.getElementById('otros-animales-field'));
+    console.log('=================');
+}
+
+// Exponer funciones globalmente para debugging
+window.debugData = debugData;
+window.selectAnimal = selectAnimal;
+</script>
+
+</body>
+</html>

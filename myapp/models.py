@@ -33,6 +33,13 @@ class CreacionAnimales(models.Model):
     descripcion = models.CharField(max_length=500)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     adoptado = models.BooleanField(default=False)
+    color = models.CharField(
+        max_length=100, 
+        help_text="Color del animal (ej: marrón, negro, blanco, manchado, etc.)",
+        blank=False,
+        null=False,
+        default="No especificado"  # Para animales existentes
+    )
 
     class Meta:
         db_table = 'Animales'
@@ -40,3 +47,14 @@ class CreacionAnimales(models.Model):
     
     def __str__(self):
         return self.nombre
+    
+
+
+class AnimalFavorito(models.Model):
+    usuario_ip = models.GenericIPAddressField()  # Para usuarios no registrados
+    asociacion = models.ForeignKey(RegistroAsociacion, on_delete=models.CASCADE, null=True, blank=True)  # Para asociaciones
+    animal = models.ForeignKey(CreacionAnimales, on_delete=models.CASCADE)
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['usuario_ip', 'animal']

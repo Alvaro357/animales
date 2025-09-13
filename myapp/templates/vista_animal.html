@@ -61,6 +61,69 @@
             transform: translateY(-2px);
         }
         
+        /* Botón de favorito */
+        .favorite-btn {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .favorite-btn:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .favorite-btn.active {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        
+        .favorite-btn.active:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        .heart-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .heart-outline {
+            stroke: #ffffff;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .favorite-btn:hover .heart-outline {
+            stroke: #ef4444;
+        }
+        
+        .heart-filled {
+            fill: #ef4444;
+            stroke: #ef4444;
+            stroke-width: 1;
+        }
+        
+        /* Animación de corazón */
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .favorite-btn.animate-heart {
+            animation: heartBeat 0.6s ease-in-out;
+        }
+        
         /* Card principal */
         .main-card {
             background: rgba(255, 255, 255, 0.05);
@@ -154,6 +217,20 @@
             .main-title {
                 font-size: 2rem;
             }
+            
+            .top-buttons {
+                gap: 0.5rem;
+            }
+            
+            .favorite-btn {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+            
+            .heart-icon {
+                width: 1.25rem;
+                height: 1.25rem;
+            }
         }
     </style>
 </head>
@@ -165,8 +242,19 @@
 <!-- Wrapper de contenido -->
 <div class="content-wrapper">
 
-    <!-- Botón de volver -->
-    <div class="fixed top-6 right-6 z-50">
+    <!-- Botones superiores -->
+    <div class="fixed top-6 right-6 z-50 flex items-center gap-3 top-buttons">
+        <!-- Botón de favorito -->
+        <button onclick="toggleFavorito({{ animal.id }}, this, event)" 
+                class="favorite-btn" 
+                id="favoriteBtn"
+                data-favorito="false">
+            <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+        </button>
+        
+        <!-- Botón de volver -->
         <a href="/" class="btn-back text-white px-6 py-3 rounded-xl font-medium text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -299,11 +387,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
                             <p class="text-gray-400 text-sm uppercase tracking-wider mb-1">Población</p>
-                            <p class="text-xl font-semibold text-white">{{ animal.poblacion }}</p>
+                            <p class="text-xl font-semibold text-white" data-poblacion>{{ animal.poblacion }}</p>
                         </div>
                         <div>
                             <p class="text-gray-400 text-sm uppercase tracking-wider mb-1">Provincia</p>
-                            <p class="text-xl font-semibold text-white">{{ animal.provincia }}</p>
+                            <p class="text-xl font-semibold text-white" data-provincia>{{ animal.provincia }}</p>
                         </div>
                         <div>
                             <p class="text-gray-400 text-sm uppercase tracking-wider mb-1">Código Postal</p>
@@ -374,6 +462,10 @@
 </div>
 
 <script>
+    // Variables globales para el sistema de favoritos
+    let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+    const animalId = {{ animal.id }};
+
     // Crear estrellas de fondo
     function createStars() {
         const starfield = document.getElementById('starfield');
@@ -386,6 +478,68 @@
             star.style.top = Math.random() * 100 + '%';
             star.style.animationDelay = Math.random() * 3 + 's';
             starfield.appendChild(star);
+        }
+    }
+
+    // Sistema de favoritos
+    function toggleFavorito(animalId, button, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const esFavorito = favoritos.includes(animalId);
+        
+        if (esFavorito) {
+            // Quitar de favoritos
+            favoritos = favoritos.filter(id => id !== animalId);
+            button.classList.remove('active');
+            button.innerHTML = `
+                <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            `;
+        } else {
+            // Agregar a favoritos
+            favoritos.push(animalId);
+            button.classList.add('active');
+            button.innerHTML = `
+                <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            `;
+            
+            // Animación
+            button.classList.add('animate-heart');
+            setTimeout(() => button.classList.remove('animate-heart'), 600);
+        }
+        
+        // Guardar en localStorage
+        localStorage.setItem('favoritos', JSON.stringify(favoritos));
+        
+        // Actualizar atributo
+        button.setAttribute('data-favorito', !esFavorito);
+    }
+
+    // Inicializar estado del favorito
+    function inicializarFavorito() {
+        const favoriteBtn = document.getElementById('favoriteBtn');
+        const esFavorito = favoritos.includes(animalId);
+        
+        if (esFavorito) {
+            favoriteBtn.classList.add('active');
+            favoriteBtn.setAttribute('data-favorito', 'true');
+            favoriteBtn.innerHTML = `
+                <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            `;
+        } else {
+            favoriteBtn.classList.remove('active');
+            favoriteBtn.setAttribute('data-favorito', 'false');
+            favoriteBtn.innerHTML = `
+                <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+        `;
         }
     }
 
@@ -413,7 +567,7 @@
         }, 300);
     }
 
-    // Función del mapa corregida
+    // Función del mapa
     function loadMap() {
         const placeholder = document.getElementById('mapPlaceholder');
         const mapFrame = document.getElementById('googleMap');
@@ -454,6 +608,7 @@
     // Inicialización
     document.addEventListener('DOMContentLoaded', function() {
         createStars();
+        inicializarFavorito();
         
         // Event listeners del modal
         document.getElementById('imageModal').addEventListener('click', function(e) {
