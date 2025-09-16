@@ -507,7 +507,38 @@
                                 </select>
                             </div>
                             
-                            <div class="md:col-span-2">
+                            <!-- CAMPO COLOR PARA CREAR -->
+                            <div>
+                                <label for="animal_color_select" class="block text-sm font-medium form-label mb-2">
+                                    Color <span class="text-red-400">*</span>
+                                </label>
+                                <div class="space-y-3">
+                                    <select id="animal_color_select" name="color_predefinido" 
+                                            class="form-input w-full px-4 py-3 rounded-lg" 
+                                            onchange="manejarCambioColor()">
+                                        <option value="" class="bg-gray-800">Seleccionar color</option>
+                                        <option value="Negro" class="bg-gray-800">Negro</option>
+                                        <option value="Blanco" class="bg-gray-800">Blanco</option>
+                                        <option value="Marrón" class="bg-gray-800">Marrón</option>
+                                        <option value="Gris" class="bg-gray-800">Gris</option>
+                                        <option value="Dorado" class="bg-gray-800">Dorado</option>
+                                        <option value="Rubio" class="bg-gray-800">Rubio</option>
+                                        <option value="Rojizo" class="bg-gray-800">Rojizo</option>
+                                        <option value="Atigrado" class="bg-gray-800">Atigrado</option>
+                                        <option value="Manchado" class="bg-gray-800">Manchado</option>
+                                        <option value="Tricolor" class="bg-gray-800">Tricolor</option>
+                                        <option value="Bicolor" class="bg-gray-800">Bicolor</option>
+                                        <option value="Otro" class="bg-gray-800">Otro (especificar)</option>
+                                    </select>
+                                    <input type="text" id="animal_color_custom" name="color_personalizado" 
+                                           class="form-input w-full px-4 py-3 rounded-lg hidden" 
+                                           placeholder="Especifica el color del animal..."
+                                           oninput="actualizarColorPersonalizado()">
+                                    <input type="hidden" id="animal_color_final" name="color" value="">
+                                </div>
+                            </div>
+                            
+                            <div>
                                 <label for="animal_raza" class="block text-sm font-medium form-label mb-2">
                                     Raza <span class="text-red-400">*</span>
                                 </label>
@@ -701,7 +732,38 @@
                                 </select>
                             </div>
                             
-                            <div class="md:col-span-2">
+                            <!-- CAMPO COLOR PARA EDITAR -->
+                            <div>
+                                <label for="edit_animal_color_select" class="block text-sm font-medium form-label mb-2">
+                                    Color <span class="text-red-400">*</span>
+                                </label>
+                                <div class="space-y-3">
+                                    <select id="edit_animal_color_select" name="color_predefinido" 
+                                            class="form-input w-full px-4 py-3 rounded-lg" 
+                                            onchange="manejarCambioColorEditar()">
+                                        <option value="" class="bg-gray-800">Seleccionar color</option>
+                                        <option value="Negro" class="bg-gray-800">Negro</option>
+                                        <option value="Blanco" class="bg-gray-800">Blanco</option>
+                                        <option value="Marrón" class="bg-gray-800">Marrón</option>
+                                        <option value="Gris" class="bg-gray-800">Gris</option>
+                                        <option value="Dorado" class="bg-gray-800">Dorado</option>
+                                        <option value="Rubio" class="bg-gray-800">Rubio</option>
+                                        <option value="Rojizo" class="bg-gray-800">Rojizo</option>
+                                        <option value="Atigrado" class="bg-gray-800">Atigrado</option>
+                                        <option value="Manchado" class="bg-gray-800">Manchado</option>
+                                        <option value="Tricolor" class="bg-gray-800">Tricolor</option>
+                                        <option value="Bicolor" class="bg-gray-800">Bicolor</option>
+                                        <option value="Otro" class="bg-gray-800">Otro (especificar)</option>
+                                    </select>
+                                    <input type="text" id="edit_animal_color_custom" name="color_personalizado" 
+                                           class="form-input w-full px-4 py-3 rounded-lg hidden" 
+                                           placeholder="Especifica el color del animal..."
+                                           oninput="actualizarColorPersonalizadoEditar()">
+                                    <input type="hidden" id="edit_animal_color_final" name="color" value="">
+                                </div>
+                            </div>
+                            
+                            <div>
                                 <label for="edit_animal_raza" class="block text-sm font-medium form-label mb-2">
                                     Raza <span class="text-red-400">*</span>
                                 </label>
@@ -1085,6 +1147,7 @@
             nombre: "{{ animal.nombre|escapejs }}",
             tipo_de_animal: "{{ animal.tipo_de_animal|escapejs }}",
             raza: "{{ animal.raza|escapejs }}",
+            color: "{{ animal.color|escapejs }}",
             email: "{{ animal.email|escapejs }}",
             telefono: "{{ animal.telefono|escapejs }}",
             poblacion: "{{ animal.poblacion|escapejs }}",
@@ -1095,6 +1158,178 @@
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     };
+
+    // ========== FUNCIONES PARA MANEJO DE COLOR CREAR ==========
+    function manejarCambioColor() {
+        const colorSelect = document.getElementById('animal_color_select');
+        const colorCustom = document.getElementById('animal_color_custom');
+        const colorFinal = document.getElementById('animal_color_final');
+        
+        if (colorSelect.value === 'Otro') {
+            colorCustom.classList.remove('hidden');
+            colorCustom.setAttribute('required', 'required');
+            colorCustom.focus();
+            colorFinal.value = '';
+        } else if (colorSelect.value === '') {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+            colorFinal.value = '';
+        } else {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+            colorFinal.value = colorSelect.value;
+        }
+    }
+
+    function actualizarColorPersonalizado() {
+        const colorCustom = document.getElementById('animal_color_custom');
+        const colorFinal = document.getElementById('animal_color_final');
+        
+        if (colorCustom && colorFinal) {
+            colorFinal.value = colorCustom.value.trim();
+        }
+    }
+
+    function resetColorSelector() {
+        const colorSelect = document.getElementById('animal_color_select');
+        const colorCustom = document.getElementById('animal_color_custom');
+        const colorFinal = document.getElementById('animal_color_final');
+        
+        if (colorSelect) colorSelect.value = '';
+        if (colorCustom) {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+        }
+        if (colorFinal) colorFinal.value = '';
+    }
+
+    function validarColorAntesDelEnvio() {
+        const colorSelect = document.getElementById('animal_color_select');
+        const colorCustom = document.getElementById('animal_color_custom');
+        const colorFinal = document.getElementById('animal_color_final');
+        
+        if (colorSelect.value === '') {
+            alert('Por favor, selecciona un color para el animal.');
+            colorSelect.focus();
+            return false;
+        }
+        
+        if (colorSelect.value === 'Otro' && (!colorCustom.value || colorCustom.value.trim() === '')) {
+            alert('Por favor, especifica el color del animal.');
+            colorCustom.focus();
+            return false;
+        }
+        
+        if (!colorFinal.value || colorFinal.value.trim() === '') {
+            manejarCambioColor();
+            if (!colorFinal.value || colorFinal.value.trim() === '') {
+                alert('Error al procesar el color. Por favor, intenta de nuevo.');
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    // ========== FUNCIONES PARA MANEJO DE COLOR EDITAR ==========
+    function manejarCambioColorEditar() {
+        const colorSelect = document.getElementById('edit_animal_color_select');
+        const colorCustom = document.getElementById('edit_animal_color_custom');
+        const colorFinal = document.getElementById('edit_animal_color_final');
+        
+        if (colorSelect.value === 'Otro') {
+            colorCustom.classList.remove('hidden');
+            colorCustom.setAttribute('required', 'required');
+            colorCustom.focus();
+            colorFinal.value = '';
+        } else if (colorSelect.value === '') {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+            colorFinal.value = '';
+        } else {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+            colorFinal.value = colorSelect.value;
+        }
+    }
+
+    function actualizarColorPersonalizadoEditar() {
+        const colorCustom = document.getElementById('edit_animal_color_custom');
+        const colorFinal = document.getElementById('edit_animal_color_final');
+        
+        if (colorCustom && colorFinal) {
+            colorFinal.value = colorCustom.value.trim();
+        }
+    }
+
+    function resetColorSelectorEditar() {
+        const colorSelect = document.getElementById('edit_animal_color_select');
+        const colorCustom = document.getElementById('edit_animal_color_custom');
+        const colorFinal = document.getElementById('edit_animal_color_final');
+        
+        if (colorSelect) colorSelect.value = '';
+        if (colorCustom) {
+            colorCustom.classList.add('hidden');
+            colorCustom.removeAttribute('required');
+            colorCustom.value = '';
+        }
+        if (colorFinal) colorFinal.value = '';
+    }
+
+    function validarColorAntesDelEnvioEditar() {
+        const colorSelect = document.getElementById('edit_animal_color_select');
+        const colorCustom = document.getElementById('edit_animal_color_custom');
+        const colorFinal = document.getElementById('edit_animal_color_final');
+        
+        if (colorSelect.value === '') {
+            alert('Por favor, selecciona un color para el animal.');
+            colorSelect.focus();
+            return false;
+        }
+        
+        if (colorSelect.value === 'Otro' && (!colorCustom.value || colorCustom.value.trim() === '')) {
+            alert('Por favor, especifica el color del animal.');
+            colorCustom.focus();
+            return false;
+        }
+        
+        if (!colorFinal.value || colorFinal.value.trim() === '') {
+            manejarCambioColorEditar();
+            if (!colorFinal.value || colorFinal.value.trim() === '') {
+                alert('Error al procesar el color. Por favor, intenta de nuevo.');
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    function configurarColorEditar(colorActual) {
+        const colorSelect = document.getElementById('edit_animal_color_select');
+        const colorCustom = document.getElementById('edit_animal_color_custom');
+        const colorFinal = document.getElementById('edit_animal_color_final');
+        
+        // Lista de colores predefinidos
+        const coloresPredefinidos = ['Negro', 'Blanco', 'Marrón', 'Gris', 'Dorado', 'Rubio', 'Rojizo', 'Atigrado', 'Manchado', 'Tricolor', 'Bicolor'];
+        
+        if (coloresPredefinidos.includes(colorActual)) {
+            // Color predefinido
+            colorSelect.value = colorActual;
+            colorFinal.value = colorActual;
+        } else {
+            // Color personalizado
+            colorSelect.value = 'Otro';
+            colorCustom.classList.remove('hidden');
+            colorCustom.setAttribute('required', 'required');
+            colorCustom.value = colorActual;
+            colorFinal.value = colorActual;
+        }
+    }
 
     // ========== ESTRELLAS ==========
     function crearEstrellas() {
@@ -1271,6 +1506,9 @@
         document.getElementById('edit_animal_codigo_postal').value = animal.codigo_postal;
         document.getElementById('edit_animal_descripcion').value = animal.descripcion;
 
+        // Configurar el color
+        configurarColorEditar(animal.color || 'No especificado');
+
         // Mostrar imagen actual si existe
         const imagenActualContainer = document.getElementById('imagenActualContainer');
         const imagenActual = document.getElementById('imagenActual');
@@ -1318,6 +1556,7 @@
         
         quitarImagen();
         quitarVideo();
+        resetColorSelector();
     }
 
     function resetEditarAnimalForm() {
@@ -1329,6 +1568,7 @@
         
         quitarImagenEditar();
         quitarVideoEditar();
+        resetColorSelectorEditar();
         
         // Ocultar imagen actual
         document.getElementById('imagenActualContainer').classList.add('hidden');
@@ -1774,6 +2014,10 @@
         const crearForm = document.getElementById('crearAnimalFormElement');
         if (crearForm) {
             crearForm.addEventListener('submit', function(e) {
+                if (!validarColorAntesDelEnvio()) {
+                    e.preventDefault();
+                    return false;
+                }
                 setCrearAnimalButtonLoading(true);
                 showCrearAnimalOverlay(true);
             });
@@ -1782,6 +2026,10 @@
         const editarForm = document.getElementById('editarAnimalFormElement');
         if (editarForm) {
             editarForm.addEventListener('submit', function(e) {
+                if (!validarColorAntesDelEnvioEditar()) {
+                    e.preventDefault();
+                    return false;
+                }
                 setEditarAnimalButtonLoading(true);
                 showEditarAnimalOverlay(true);
             });

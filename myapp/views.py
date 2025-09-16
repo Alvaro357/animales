@@ -138,7 +138,7 @@ def comprobacion(request):
 
 #logout
 def logout_view(request):
-    response = redirect('Inicio')
+    response = redirect('inicio')
 
     # Eliminamos la cookie de la sesión
     response.delete_cookie('asociacion_id')
@@ -183,12 +183,34 @@ def crear_animal(request):
     asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
     
     if request.method == 'POST':
+        # Debug: imprimir todos los datos recibidos
+        print("POST data:", request.POST)
+        
         form = CreacionAnimalesForm(request.POST, request.FILES, asociacion=asociacion)
         if form.is_valid():
             animal = form.save(commit=False)
-            animal.asociacion = asociacion  # Asignar la asociación
+            animal.asociacion = asociacion
+            
+            # PROCESAR COLOR MANUALMENTE
+            color_predefinido = request.POST.get('color_predefinido', '')
+            color_personalizado = request.POST.get('color_personalizado', '')
+            color_final = request.POST.get('color', '')
+            
+            # Lógica para determinar el color final
+            if color_predefinido and color_predefinido != 'Otro':
+                animal.color = color_predefinido
+            elif color_predefinido == 'Otro' and color_personalizado:
+                animal.color = color_personalizado
+            elif color_final:
+                animal.color = color_final
+            else:
+                animal.color = "No especificado"
+            
+            print(f"Color final asignado: {animal.color}")
             animal.save()
             return redirect('mis_animales')
+        else:
+            print("Errores del formulario:", form.errors)
     else:
         form = CreacionAnimalesForm(asociacion=asociacion)
     
@@ -230,15 +252,43 @@ def editar_animal(request, animal_id):
     animal = get_object_or_404(CreacionAnimales, id=animal_id, asociacion=asociacion)
     
     if request.method == 'POST':
-        form = CreacionAnimalesForm(request.POST, request.FILES, instance=animal)
-        if form.is_valid():
-            form.save()
-            return redirect('mis_animales')  # Cambiado para redirigir a mis_animales
-    else:
-        form = CreacionAnimalesForm(instance=animal)
+        # IMPORTANTE: Procesar el color igual que en crear_animal
+        color_predefinido = request.POST.get('color_predefinido', '')
+        color_personalizado = request.POST.get('color_personalizado', '')
+        color_final = request.POST.get('color', '')
+        
+        # Lógica para determinar el color final
+        if color_predefinido and color_predefinido != 'Otro':
+            nuevo_color = color_predefinido
+        elif color_predefinido == 'Otro' and color_personalizado:
+            nuevo_color = color_personalizado
+        elif color_final:
+            nuevo_color = color_final
+        else:
+            nuevo_color = "No especificado"
+        
+        # Actualizar todos los campos
+        animal.nombre = request.POST.get('nombre')
+        animal.tipo_de_animal = request.POST.get('tipo_de_animal')
+        animal.raza = request.POST.get('raza')
+        animal.color = nuevo_color  # ← ESTO ES LO IMPORTANTE
+        animal.email = request.POST.get('email')
+        animal.telefono = request.POST.get('telefono')
+        animal.poblacion = request.POST.get('poblacion')
+        animal.provincia = request.POST.get('provincia')
+        animal.codigo_postal = request.POST.get('codigo_postal')
+        animal.descripcion = request.POST.get('descripcion')
+        
+        # Manejar archivos
+        if 'imagen' in request.FILES:
+            animal.imagen = request.FILES['imagen']
+        if 'video' in request.FILES:
+            animal.video = request.FILES['video']
+        
+        animal.save()
+        return redirect('mis_animales')
     
-    return render(request, 'editar_animal.html', {
-        'form': form,
+    return render(request, 'editar_animal.html', {  # ← Asegúrate de que apunte al template correcto
         'animal': animal,
         'asociacion': asociacion
     })

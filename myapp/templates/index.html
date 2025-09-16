@@ -839,8 +839,9 @@
                                     
                                     <!-- Campo de texto personalizado (oculto inicialmente) -->
                                     <input type="text" id="animal_color_custom" name="color_personalizado" 
-                                           class="form-input w-full px-4 py-3 rounded-lg hidden" 
-                                           placeholder="Especifica el color del animal...">
+                                    class="form-input w-full px-4 py-3 rounded-lg hidden" 
+                                    placeholder="Especifica el color del animal..."
+                                    oninput="actualizarColorPersonalizado()">
                                     
                                     <!-- Campo oculto que enviará el valor final -->
                                     <input type="hidden" id="animal_color_final" name="color" value="">
@@ -1134,35 +1135,39 @@
     let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
 
     // Función para manejar cambios en el selector de color
-    function manejarCambioColor() {
-        const colorSelect = document.getElementById('animal_color_select');
-        const colorCustom = document.getElementById('animal_color_custom');
-        const colorFinal = document.getElementById('animal_color_final');
-        
-        if (colorSelect.value === 'Otro') {
-            colorCustom.classList.remove('hidden');
-            colorCustom.setAttribute('required', 'required');
-            colorCustom.focus();
-            colorFinal.value = '';
-            
-            colorCustom.addEventListener('input', function() {
-                colorFinal.value = this.value.trim();
-            });
-            
-        } else if (colorSelect.value === '') {
-            colorCustom.classList.add('hidden');
-            colorCustom.removeAttribute('required');
-            colorCustom.value = '';
-            colorFinal.value = '';
-            
-        } else {
-            colorCustom.classList.add('hidden');
-            colorCustom.removeAttribute('required');
-            colorCustom.value = '';
-            colorFinal.value = colorSelect.value;
-        }
+// Versión corregida sin event listeners duplicados
+function manejarCambioColor() {
+    const colorSelect = document.getElementById('animal_color_select');
+    const colorCustom = document.getElementById('animal_color_custom');
+    const colorFinal = document.getElementById('animal_color_final');
+    
+    if (colorSelect.value === 'Otro') {
+        colorCustom.classList.remove('hidden');
+        colorCustom.setAttribute('required', 'required');
+        colorCustom.focus();
+        colorFinal.value = '';
+    } else if (colorSelect.value === '') {
+        colorCustom.classList.add('hidden');
+        colorCustom.removeAttribute('required');
+        colorCustom.value = '';
+        colorFinal.value = '';
+    } else {
+        colorCustom.classList.add('hidden');
+        colorCustom.removeAttribute('required');
+        colorCustom.value = '';
+        colorFinal.value = colorSelect.value; // Esto asigna el color inmediatamente
     }
+}
 
+// Función separada para el input personalizado
+function actualizarColorPersonalizado() {
+    const colorCustom = document.getElementById('animal_color_custom');
+    const colorFinal = document.getElementById('animal_color_final');
+    
+    if (colorCustom && colorFinal) {
+        colorFinal.value = colorCustom.value.trim();
+    }
+}
     // Función para resetear el selector de color
     function resetColorSelector() {
         const colorSelect = document.getElementById('animal_color_select');

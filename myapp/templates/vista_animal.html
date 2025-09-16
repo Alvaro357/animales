@@ -329,7 +329,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                     
                     <!-- Información básica -->
-                    <div class="info-card p-8 rounded-2xl">
+                     <div class="info-card p-8 rounded-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                             <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -347,9 +347,20 @@
                                 <p class="text-gray-400 text-sm uppercase tracking-wider mb-1">Raza</p>
                                 <p class="text-2xl font-semibold text-purple-300">{{ animal.raza }}</p>
                             </div>
+                            <!-- NUEVA SECCIÓN DE COLOR -->
+                            <div>
+                                <p class="text-gray-400 text-sm uppercase tracking-wider mb-1">Color</p>
+                                <div class="flex items-center gap-3">
+                                    <p class="text-2xl font-semibold text-amber-300">{{ animal.color }}</p>
+                                    <!-- Opcional: Indicador visual de color -->
+                                    <div class="w-6 h-6 rounded-full border-2 border-white/30 shadow-lg" 
+                                         style="background-color: {% if animal.color|lower == 'negro' %}#000000{% elif animal.color|lower == 'blanco' %}#ffffff{% elif animal.color|lower == 'marrón' or animal.color|lower == 'marron' %}#8B4513{% elif animal.color|lower == 'gris' %}#808080{% elif animal.color|lower == 'dorado' %}#FFD700{% elif animal.color|lower == 'rubio' %}#F5DEB3{% elif animal.color|lower == 'rojizo' %}#CD853F{% else %}#94a3b8{% endif %};">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
+                    
                     <!-- Contacto -->
                     <div class="info-card p-8 rounded-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
