@@ -8,6 +8,11 @@ class RegistroAsociacionForm(forms.ModelForm):
     class Meta:
         model = RegistroAsociacion
         fields = ['nombre', 'password', 'email', 'telefono', 'direccion', 'poblacion', 'provincia', 'codigo_postal', 'logo']
+        error_messages = {
+            'nombre': {
+                'unique': 'Ya existe una asociación registrada con este nombre. Por favor, elige otro nombre.',
+            },
+        }
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-cyan-400 sm:text-sm',
@@ -55,6 +60,20 @@ class RegistroAsociacionForm(forms.ModelForm):
                 'accept': 'image/*',
             }),
         }
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if nombre:
+            # Limpiar espacios en blanco para evitar duplicados por espacios extra
+            nombre_limpio = nombre.strip()
+
+            # Verificar si existe otra asociación con el mismo nombre exacto (case insensitive)
+            if RegistroAsociacion.objects.filter(nombre__iexact=nombre_limpio).exists():
+                raise forms.ValidationError(
+                    'Ya existe una asociación registrada con este nombre. Por favor, elige otro nombre.',
+                    code='unique'
+                )
+        return nombre_limpio
 
 class LoginForm(forms.Form):
     username = forms.CharField(

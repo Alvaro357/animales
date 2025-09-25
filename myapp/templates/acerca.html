@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Adopta - Para Asociaciones de Animales</title>  
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        html {
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            text-align: center;
+            padding-top: 100px;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Fondo de estrellas interactivas */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s infinite;
+        }
+        
+        .star.large {
+            width: 3px;
+            height: 3px;
+            animation: twinkle 4s infinite;
+        }
+        
+        .star.bright {
+            background: #60a5fa;
+            box-shadow: 0 0 4px #60a5fa;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        /* Efecto de movimiento de estrellas */
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #60a5fa, transparent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: shoot 2s linear infinite;
+        }
+        
+        @keyframes shoot {
+            0% {
+                opacity: 1;
+                transform: translateX(-100px) translateY(100px);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100px) translateY(-100px);
+            }
+        }
+        
+        /* Contenedor principal con z-index alto */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Navbar glassmorphism */
+        .navbar-glass {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Botones con efectos modernos */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Cards modernas */
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+        
+        .info-card:hover::before {
+            opacity: 1;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
+                        0 0 0 1px rgba(59, 130, 246, 0.1);
+        }
+        
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Modal moderno */
+        .modal-backdrop {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-content {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Formularios */
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Estilos para select en modo oscuro */
+        select.form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        select.form-input option {
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 8px 12px;
+        }
+
+        select.form-input option:checked,
+        select.form-input option:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        select.form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Título principal */
+        .main-title {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            body {
+                padding-top: 80px;
+            }
+            
+            .info-card {
+                margin: 0 -1rem;
+                border-radius: 1rem;
+            }
+        }
+        
+        /* Efectos de entrada */
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Spinners de loading */
+        .loading-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-left: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Efectos especiales para texto */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Texto de párrafo principal */
+        .main-paragraph {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 4xl;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fondo de estrellas -->
+<div id="starfield"></div>
+
+<!-- Wrapper de contenido -->
+<div class="content-wrapper">
+
+    <!-- Modal de Login/Registro -->
+    <div id="authModal" class="fixed inset-0 flex items-center justify-center z-50 modal-backdrop hidden">
+        <div id="modalContent" class="modal-content p-8 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-500">
+            <button onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10">&times;</button>
+            
+            <!-- Formulario de Login -->
+            <div id="loginForm">
+                <h2 class="text-2xl font-semibold mb-6 text-center text-white">Iniciar sesión</h2>
+                <form method="post" action="/login/">
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium form-label mb-2">Usuario</label>
+                        <input type="text" id="username" name="username" 
+                               class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium form-label mb-2">Contraseña</label>
+                        <input type="password" id="password" name="password" 
+                               class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full px-6 py-3 rounded-lg font-medium text-white">
+                        Iniciar sesión
+                    </button>
+                </form>
+                
+                <div class="mt-6 pt-6 border-t border-gray-700 text-center">
+                    <p class="text-gray-400 text-sm mb-3">¿No tienes cuenta?</p>
+                    <button onclick="mostrarRegistro()" class="btn-secondary inline-block px-6 py-2 rounded-lg text-sm font-medium text-white">
+                        Regístrate
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulario de Registro -->
+            <div id="registerForm" class="hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-center text-white">Registrar Asociación</h2>
+                
+                <form method="post" action="/registro/" enctype="multipart/form-data" id="registerFormElement">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="reg_nombre" class="block text-sm font-medium form-label mb-2">
+                                Nombre <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_nombre" name="nombre" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_password" class="block text-sm font-medium form-label mb-2">
+                                Contraseña <span class="text-red-400">*</span>
+                            </label>
+                            <input type="password" id="reg_password" name="password" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="reg_email" class="block text-sm font-medium form-label mb-2">
+                            Email <span class="text-red-400">*</span>
+                        </label>
+                        <input type="email" id="reg_email" name="email" 
+                               class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="reg_telefono" class="block text-sm font-medium form-label mb-2">
+                                Teléfono <span class="text-red-400">*</span>
+                            </label>
+                            <input type="tel" id="reg_telefono" name="telefono" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_logo" class="block text-sm font-medium form-label mb-2">
+                                Logo (opcional)
+                            </label>
+                            <input type="file" id="reg_logo" name="logo" accept="image/*"
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="reg_direccion" class="block text-sm font-medium form-label mb-2">
+                            Dirección <span class="text-red-400">*</span>
+                        </label>
+                        <input type="text" id="reg_direccion" name="direccion" 
+                               class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label for="reg_poblacion" class="block text-sm font-medium form-label mb-2">
+                                Población <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_poblacion" name="poblacion" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_provincia" class="block text-sm font-medium form-label mb-2">
+                                Provincia <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_provincia" name="provincia" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        
+                        <div>
+                            <label for="reg_codigo_postal" class="block text-sm font-medium form-label mb-2">
+                                Código Postal <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" id="reg_codigo_postal" name="codigo_postal" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="registerSubmitBtn" class="btn-primary w-full px-6 py-3 rounded-lg font-medium text-white mb-6">
+                        Registrar Asociación
+                    </button>
+                </form>
+                
+                <div class="pt-6 border-t border-gray-700 text-center">
+                    <p class="text-gray-400 text-sm mb-3">¿Ya tienes cuenta?</p>
+                    <button onclick="mostrarLogin()" class="btn-secondary inline-block px-6 py-2 rounded-lg text-sm font-medium text-white">
+                        Iniciar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar-glass fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40">
+        <div class="text-left">
+            <h1 class="text-xl font-bold text-white">Adopta</h1>
+            <p class="text-sm text-gray-400">Portal para Asociaciones</p>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <a href="/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
+                Inicio
+            </a>
+            
+            <button onclick="abrirLogin()" class="btn-primary px-6 py-2 rounded-lg text-sm font-medium text-white">
+                Iniciar sesión
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="max-w-5xl mx-auto px-6 py-20">
+        
+        <!-- Título principal -->
+        <div class="text-center mb-16 fade-in">
+            <h1 class="main-title text-glow">
+                HOLA MUNDO
+            </h1>
+        </div>
+
+        <!-- Card principal con información -->
+        <div class="mb-12 fade-in">
+            <div class="info-card rounded-2xl p-8 md:p-12 max-w-4xl mx-auto">
+                <div class="card-content">
+                    <div class="highlight-box rounded-xl p-6 md:p-8 mb-8">
+                        <svg class="w-16 h-16 mx-auto mb-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <h2 class="text-2xl font-semibold text-white mb-4">Bienvenidas, Asociaciones de Animales</h2>
+                    </div>
+                    
+                    <div class="main-paragraph text-center">
+                        <p>
+                            Esto va para las asociaciones de animales, lo principal que tenéis que hacer es registraros y después iniciar sesión. Ahí os encontraréis diferentes apartados, para agregar un animal, editar el animal ... Espero que le déis un uso responsable
+                        </p>
+                    </div>
+                    
+                    <div class="flex justify-center mt-12">
+                        <button onclick="abrirLogin()" class="btn-primary px-8 py-4 rounded-xl font-semibold text-white text-lg">
+                            Comenzar Ahora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Crear fondo de estrellas
+    function crearEstrellas() {
+        const starfield = document.getElementById('starfield');
+        const numStars = 150;
+        
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            
+            if (Math.random() < 0.1) star.classList.add('large');
+            if (Math.random() < 0.05) star.classList.add('bright');
+            
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            
+            starfield.appendChild(star);
+        }
+        
+        // Estrellas fugaces
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                shootingStar.style.left = Math.random() * 100 + '%';
+                shootingStar.style.top = Math.random() * 100 + '%';
+                
+                starfield.appendChild(shootingStar);
+                
+                setTimeout(() => {
+                    if (shootingStar.parentNode) {
+                        shootingStar.remove();
+                    }
+                }, 2000);
+            }
+        }, 3000);
+    }
+
+    // Funciones del modal
+    function abrirLogin() {
+        const modal = document.getElementById('authModal');
+        const content = document.getElementById('modalContent');
+        
+        mostrarLogin();
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function cerrarModal() {
+        const modal = document.getElementById('authModal');
+        const content = document.getElementById('modalContent');
+        
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            resetForms();
+        }, 500);
+    }
+
+    function mostrarLogin() {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        
+        registerForm.style.opacity = '0';
+        setTimeout(() => {
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            setTimeout(() => {
+                loginForm.style.opacity = '1';
+            }, 10);
+        }, 150);
+    }
+
+    function mostrarRegistro() {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        
+        loginForm.style.opacity = '0';
+        setTimeout(() => {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            setTimeout(() => {
+                registerForm.style.opacity = '1';
+            }, 10);
+        }, 150);
+    }
+
+    function resetForms() {
+        const loginForm = document.querySelector('#loginForm form');
+        const registerForm = document.getElementById('registerFormElement');
+        
+        if (loginForm) loginForm.reset();
+        if (registerForm) registerForm.reset();
+    }
+
+    // Event listeners
+    document.getElementById('authModal').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
+    });
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        crearEstrellas();
+        
+        // Efectos de entrada
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in').forEach((el, i) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, i * 200);
+            });
+        }, 300);
+        
+        // Inicializar formas
+        const loginForm = document.getElementById('loginForm');
+        const registerFormDiv = document.getElementById('registerForm');
+        
+        if (loginForm) loginForm.style.opacity = '1';
+        if (registerFormDiv) registerFormDiv.style.opacity = '1';
+    });
+
+    // Efecto parallax para las estrellas
+    let ticking = false;
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset;
+                const stars = document.querySelectorAll('.star');
+                
+                stars.forEach((star, i) => {
+                    if (i % 3 === 0) {
+                        const speed = 0.5;
+                        star.style.transform = `translateY(${scrolled * speed}px)`;
+                    }
+                });
+                
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+</script>
+
+</body>
+</html>

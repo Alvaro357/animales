@@ -421,7 +421,19 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        
+
+        /* Estilos para campos con error */
+        .form-input.border-red-500 {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .form-input.border-red-500:focus {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+        }
+
         .form-label {
             color: rgba(255, 255, 255, 0.9);
         }
@@ -653,7 +665,29 @@
             <!-- Formulario de Registro -->
             <div id="registerForm" class="hidden">
                 <h2 class="text-2xl font-semibold mb-6 text-center text-white">Registrar Asociación</h2>
-                
+
+                <!-- Mensaje de error -->
+                <div id="registerErrorMessage" class="hidden mb-4 p-4 bg-red-900/50 border border-red-500 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span id="registerErrorText" class="text-red-300 text-sm"></span>
+                    </div>
+                </div>
+
+                <!-- Mensaje de éxito -->
+                <div id="registerSuccessMessage" class="hidden mb-4 p-4 bg-green-900/50 border border-green-500 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-green-300 text-sm">
+                            <strong>¡Registro exitoso!</strong> Tu asociación ha sido registrada y está pendiente de aprobación. Recibirás un email con más información.
+                        </span>
+                    </div>
+                </div>
+
                 <!-- Overlay de loading para registro -->
                 <div id="registerLoadingOverlay" class="absolute inset-0 flex items-center justify-center hidden bg-black/80 backdrop-blur-sm rounded-2xl">
                     <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center border border-gray-600">
@@ -663,24 +697,30 @@
                     </div>
                 </div>
 
-                <form method="post" action="/registro/" enctype="multipart/form-data" id="registerFormElement">
+                <form method="post" action="/registro/" enctype="multipart/form-data" id="registerFormElement" onsubmit="return handleRegisterSubmit(event)">
                     {% csrf_token %}
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="reg_nombre" class="block text-sm font-medium form-label mb-2">
-                                Nombre <span class="text-red-400">*</span>
+                                Nombre de la Asociación <span class="text-red-400">*</span>
                             </label>
-                            <input type="text" id="reg_nombre" name="nombre" 
-                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <input type="text" id="reg_nombre" name="nombre"
+                                   class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                                   required maxlength="50"
+                                   placeholder="Ej: Protectora de Animales San Francisco">
+                            <div id="nombre-error" class="hidden mt-1 text-sm text-red-400"></div>
                         </div>
-                        
+
                         <div>
                             <label for="reg_password" class="block text-sm font-medium form-label mb-2">
                                 Contraseña <span class="text-red-400">*</span>
                             </label>
-                            <input type="password" id="reg_password" name="password" 
-                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <input type="password" id="reg_password" name="password"
+                                   class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                                   required minlength="6"
+                                   placeholder="Mínimo 6 caracteres">
+                            <div id="password-error" class="hidden mt-1 text-sm text-red-400"></div>
                         </div>
                     </div>
 
@@ -688,8 +728,11 @@
                         <label for="reg_email" class="block text-sm font-medium form-label mb-2">
                             Email <span class="text-red-400">*</span>
                         </label>
-                        <input type="email" id="reg_email" name="email" 
-                               class="form-input w-full px-4 py-3 rounded-lg" required>
+                        <input type="email" id="reg_email" name="email"
+                               class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                               required
+                               placeholder="contacto@tuasociacion.com">
+                        <div id="email-error" class="hidden mt-1 text-sm text-red-400"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -697,17 +740,21 @@
                             <label for="reg_telefono" class="block text-sm font-medium form-label mb-2">
                                 Teléfono <span class="text-red-400">*</span>
                             </label>
-                            <input type="tel" id="reg_telefono" name="telefono" 
-                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <input type="tel" id="reg_telefono" name="telefono"
+                                   class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                                   required maxlength="15"
+                                   placeholder="+34 600 123 456">
+                            <div id="telefono-error" class="hidden mt-1 text-sm text-red-400"></div>
                         </div>
-                        
+
                         <div>
                             <label for="reg_logo" class="block text-sm font-medium form-label mb-2">
                                 Logo (opcional)
                             </label>
                             <input type="file" id="reg_logo" name="logo" accept="image/*"
-                                   class="form-input w-full px-4 py-3 rounded-lg text-sm">
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                             <div id="logoStatus" class="mt-1 text-sm text-gray-400 hidden"></div>
+                            <div id="logo-error" class="hidden mt-1 text-sm text-red-400"></div>
                         </div>
                     </div>
 
@@ -715,8 +762,11 @@
                         <label for="reg_direccion" class="block text-sm font-medium form-label mb-2">
                             Dirección <span class="text-red-400">*</span>
                         </label>
-                        <input type="text" id="reg_direccion" name="direccion" 
-                               class="form-input w-full px-4 py-3 rounded-lg" required>
+                        <input type="text" id="reg_direccion" name="direccion"
+                               class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                               required maxlength="200"
+                               placeholder="Calle, número, piso...">
+                        <div id="direccion-error" class="hidden mt-1 text-sm text-red-400"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -724,30 +774,40 @@
                             <label for="reg_poblacion" class="block text-sm font-medium form-label mb-2">
                                 Población <span class="text-red-400">*</span>
                             </label>
-                            <input type="text" id="reg_poblacion" name="poblacion" 
-                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <input type="text" id="reg_poblacion" name="poblacion"
+                                   class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                                   required maxlength="50"
+                                   placeholder="Ciudad o pueblo">
+                            <div id="poblacion-error" class="hidden mt-1 text-sm text-red-400"></div>
                         </div>
-                        
+
                         <div>
                             <label for="reg_provincia" class="block text-sm font-medium form-label mb-2">
                                 Provincia <span class="text-red-400">*</span>
                             </label>
-                            <input type="text" id="reg_provincia" name="provincia" 
-                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <input type="text" id="reg_provincia" name="provincia"
+                                   class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                                   required maxlength="50"
+                                   placeholder="Ej: Barcelona, Madrid">
+                            <div id="provincia-error" class="hidden mt-1 text-sm text-red-400"></div>
                         </div>
-                        
+
                         <div>
                             <label for="reg_codigo_postal" class="block text-sm font-medium form-label mb-2">
                                 Código Postal <span class="text-red-400">*</span>
                             </label>
-                            <input type="text" id="reg_codigo_postal" name="codigo_postal" 
-                                   class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <input type="text" id="reg_codigo_postal" name="codigo_postal"
+                                   class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                                   required maxlength="10"
+                                   placeholder="08001"
+                                   pattern="[0-9]{4,5}">
+                            <div id="codigo_postal-error" class="hidden mt-1 text-sm text-red-400"></div>
                         </div>
                     </div>
 
                     <button type="submit" id="registerSubmitBtn" class="btn-primary w-full px-6 py-3 rounded-lg font-medium text-white mb-6">
                         <span class="button-text">Registrar Asociación</span>
-                        <span class="button-loading hidden">
+                        <span class="button-loading hidden flex items-center justify-center">
                             <div class="register-spinner-small mr-2"></div>
                             <span class="loading-dots">Procesando</span>
                         </span>
@@ -1857,6 +1917,369 @@ function actualizarColorPersonalizado() {
             });
             ticking = true;
         }
+    });
+
+    // Función para limpiar errores de un campo específico
+    function clearFieldError(fieldName) {
+        const errorDiv = document.getElementById(fieldName + '-error');
+        const field = document.getElementById('reg_' + fieldName);
+
+        if (errorDiv) {
+            errorDiv.classList.add('hidden');
+            errorDiv.textContent = '';
+        }
+
+        if (field) {
+            field.classList.remove('border-red-500');
+        }
+    }
+
+    // Función para mostrar error en un campo específico
+    function showFieldError(fieldName, message) {
+        const errorDiv = document.getElementById(fieldName + '-error');
+        const field = document.getElementById('reg_' + fieldName);
+
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        if (field) {
+            field.classList.add('border-red-500');
+            field.focus();
+        }
+    }
+
+    // Función para limpiar todos los errores del formulario
+    function clearAllFieldErrors() {
+        const fields = ['nombre', 'password', 'email', 'telefono', 'direccion', 'poblacion', 'provincia', 'codigo_postal', 'logo'];
+        fields.forEach(clearFieldError);
+    }
+
+    // Validación client-side
+    function validateRegistrationForm(formData) {
+        const errors = {};
+
+        // Validar nombre
+        const nombre = formData.get('nombre');
+        if (!nombre || nombre.trim().length < 2) {
+            errors.nombre = 'El nombre debe tener al menos 2 caracteres';
+        } else if (nombre.length > 50) {
+            errors.nombre = 'El nombre no puede tener más de 50 caracteres';
+        }
+
+        // Validar contraseña
+        const password = formData.get('password');
+        if (!password || password.length < 6) {
+            errors.password = 'La contraseña debe tener al menos 6 caracteres';
+        }
+
+        // Validar email
+        const email = formData.get('email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            errors.email = 'Por favor, introduce un email válido';
+        }
+
+        // Validar teléfono
+        const telefono = formData.get('telefono');
+        if (!telefono || telefono.trim().length < 9) {
+            errors.telefono = 'Por favor, introduce un teléfono válido';
+        }
+
+        // Validar dirección
+        const direccion = formData.get('direccion');
+        if (!direccion || direccion.trim().length < 5) {
+            errors.direccion = 'La dirección debe tener al menos 5 caracteres';
+        }
+
+        // Validar población
+        const poblacion = formData.get('poblacion');
+        if (!poblacion || poblacion.trim().length < 2) {
+            errors.poblacion = 'Por favor, introduce una población válida';
+        }
+
+        // Validar provincia
+        const provincia = formData.get('provincia');
+        if (!provincia || provincia.trim().length < 2) {
+            errors.provincia = 'Por favor, introduce una provincia válida';
+        }
+
+        // Validar código postal
+        const codigoPostal = formData.get('codigo_postal');
+        const cpRegex = /^[0-9]{4,5}$/;
+        if (!codigoPostal || !cpRegex.test(codigoPostal)) {
+            errors.codigo_postal = 'El código postal debe tener 4 o 5 dígitos';
+        }
+
+        return errors;
+    }
+
+    // Función para manejar el envío del formulario de registro
+    function handleRegisterSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const errorMsg = document.getElementById('registerErrorMessage');
+    const errorText = document.getElementById('registerErrorText');
+    const successMsg = document.getElementById('registerSuccessMessage');
+    const overlay = document.getElementById('registerLoadingOverlay');
+
+    // Función para resetear el estado del botón
+    function resetButtonState() {
+        if (overlay) overlay.classList.add('hidden');
+        setRegisterButtonLoading(false);
+    }
+
+    // Función para mostrar error general
+    function showGeneralError(message) {
+        if (errorMsg && errorText) {
+            errorText.textContent = message;
+            errorMsg.classList.remove('hidden');
+            errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    // Limpiar mensajes y errores previos
+    clearAllFieldErrors();
+    if (errorMsg) errorMsg.classList.add('hidden');
+    if (successMsg) successMsg.classList.add('hidden');
+
+    // Validación client-side
+    const validationErrors = validateRegistrationForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+        Object.keys(validationErrors).forEach(field => {
+            showFieldError(field, validationErrors[field]);
+        });
+        const firstErrorField = Object.keys(validationErrors)[0];
+        const firstErrorElement = document.getElementById('reg_' + firstErrorField);
+        if (firstErrorElement) firstErrorElement.focus();
+        return false;
+    }
+
+    // Mostrar loading
+    if (overlay) overlay.classList.remove('hidden');
+    setRegisterButtonLoading(true);
+
+    // Enviar formulario vía AJAX
+    fetch('/registro/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(async response => {
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
+        // CASO 1: Respuesta exitosa
+        if (response.ok && response.status === 200) {
+            if (contentType && contentType.includes('application/json')) {
+                const data = await response.json();
+                console.log('JSON Response:', data);
+                
+                // Verificar si es realmente exitoso
+                if (data.success === true) {
+                    console.log('✅ Registro exitoso');
+                    if (successMsg) {
+                        successMsg.classList.remove('hidden');
+                    }
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/registro_exitoso/';
+                    }, 2000);
+                    return; // ⚠️ IMPORTANTE: Salir aquí para no continuar
+                } else {
+                    // JSON pero con error
+                    console.log('❌ JSON con error:', data);
+                    if (data.error === 'duplicate_name') {
+                        showFieldError('nombre', 'Ya existe una asociación registrada con este nombre. Por favor, elige otro nombre.');
+                    } else {
+                        showGeneralError(data.message || 'Error en el registro');
+                    }
+                    return;
+                }
+            } else {
+                // Respuesta de texto - puede ser redirect o HTML
+                const text = await response.text();
+                console.log('Text response:', text.substring(0, 200));
+                
+                if (text.includes('registro_exitoso') || text.includes('success')) {
+                    console.log('✅ Registro exitoso (text)');
+                    window.location.href = '/registro_exitoso/';
+                    return;
+                } else {
+                    console.log('❌ Texto inesperado');
+                    showGeneralError('Respuesta inesperada del servidor');
+                    return;
+                }
+            }
+        }
+        
+        // CASO 2: Respuesta con error del servidor (400, 500, etc.)
+        else if (!response.ok) {
+            if (contentType && contentType.includes('application/json')) {
+                const data = await response.json();
+                console.log('Error JSON Response:', data);
+                
+                if (data.error === 'duplicate_name') {
+                    showFieldError('nombre', 'Ya existe una asociación registrada con este nombre. Por favor, elige otro nombre.');
+                } else if (data.error === 'form_errors' && data.form_errors) {
+                    Object.keys(data.form_errors).forEach(field => {
+                        const errors = data.form_errors[field];
+                        if (errors && errors.length > 0) {
+                            showFieldError(field, errors[0]);
+                        }
+                    });
+                } else {
+                    showGeneralError(data.message || 'Error al registrar la asociación.');
+                }
+            } else {
+                const text = await response.text();
+                console.log('Error text response:', text.substring(0, 200));
+                
+                if (text.includes('Ya existe una asociación')) {
+                    showFieldError('nombre', 'Ya existe una asociación registrada con este nombre. Por favor, elige otro nombre.');
+                } else {
+                    showGeneralError('Error al registrar la asociación. Por favor, verifica los datos.');
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error de conexión:', error);
+        showGeneralError('Error de conexión. Por favor, intenta nuevamente.');
+    })
+    .finally(() => {
+        resetButtonState();
+    });
+
+    return false;
+}
+
+    // Agregar validación en tiempo real para los campos del formulario
+    function setupRealTimeValidation() {
+        const fields = [
+            { name: 'nombre', validation: (value) => value.trim().length >= 2 && value.length <= 50 },
+            { name: 'password', validation: (value) => value.length >= 6 },
+            { name: 'email', validation: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) },
+            { name: 'telefono', validation: (value) => value.trim().length >= 9 },
+            { name: 'direccion', validation: (value) => value.trim().length >= 5 },
+            { name: 'poblacion', validation: (value) => value.trim().length >= 2 },
+            { name: 'provincia', validation: (value) => value.trim().length >= 2 },
+            { name: 'codigo_postal', validation: (value) => /^[0-9]{4,5}$/.test(value) }
+        ];
+
+        fields.forEach(field => {
+            const input = document.getElementById('reg_' + field.name);
+            if (input) {
+                // Limpiar error cuando el usuario empieze a escribir
+                input.addEventListener('input', function() {
+                    clearFieldError(field.name);
+
+                    // Limpiar mensaje de error general si existe
+                    const errorMsg = document.getElementById('registerErrorMessage');
+                    if (errorMsg && !errorMsg.classList.contains('hidden')) {
+                        errorMsg.classList.add('hidden');
+                    }
+                });
+
+                // Validación cuando pierde el foco (blur)
+                input.addEventListener('blur', function() {
+                    const value = input.value;
+                    if (value && !field.validation(value)) {
+                        let errorMessage = '';
+
+                        switch(field.name) {
+                            case 'nombre':
+                                errorMessage = 'El nombre debe tener entre 2 y 50 caracteres';
+                                break;
+                            case 'password':
+                                errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+                                break;
+                            case 'email':
+                                errorMessage = 'Por favor, introduce un email válido';
+                                break;
+                            case 'telefono':
+                                errorMessage = 'El teléfono debe tener al menos 9 caracteres';
+                                break;
+                            case 'direccion':
+                                errorMessage = 'La dirección debe tener al menos 5 caracteres';
+                                break;
+                            case 'poblacion':
+                                errorMessage = 'Por favor, introduce una población válida';
+                                break;
+                            case 'provincia':
+                                errorMessage = 'Por favor, introduce una provincia válida';
+                                break;
+                            case 'codigo_postal':
+                                errorMessage = 'El código postal debe tener 4 o 5 dígitos';
+                                break;
+                        }
+
+                        if (errorMessage) {
+                            showFieldError(field.name, errorMessage);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    // Mejorar manejo del archivo logo
+    function setupLogoHandling() {
+        const logoInput = document.getElementById('reg_logo');
+        if (logoInput) {
+            logoInput.addEventListener('change', function(e) {
+                const statusDiv = document.getElementById('logoStatus');
+                const errorDiv = document.getElementById('logo-error');
+
+                // Limpiar errores previos
+                if (errorDiv) {
+                    errorDiv.classList.add('hidden');
+                }
+
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const fileName = file.name;
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+
+                    // Validar tipo de archivo
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!allowedTypes.includes(file.type)) {
+                        showFieldError('logo', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, WebP)');
+                        logoInput.value = '';
+                        return;
+                    }
+
+                    // Validar tamaño (máximo 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        showFieldError('logo', 'El archivo no puede ser mayor a 2MB');
+                        logoInput.value = '';
+                        return;
+                    }
+
+                    if (statusDiv) {
+                        statusDiv.innerHTML = `<span class="text-green-400">✓ ${fileName} (${fileSize} MB)</span>`;
+                        statusDiv.classList.remove('hidden');
+                    }
+                } else {
+                    if (statusDiv) {
+                        statusDiv.classList.add('hidden');
+                    }
+                }
+            });
+        }
+    }
+
+    // Limpiar error cuando el usuario cambie el nombre
+    document.addEventListener('DOMContentLoaded', function() {
+        setupRealTimeValidation();
+        setupLogoHandling();
     });
 </script>
 

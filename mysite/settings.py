@@ -11,27 +11,58 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cargar variables de entorno desde .env
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'dsadsadda1231312ads13dsad')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'q+3!5cmuus4o4w)_i&pm+2tt4k)2$@@sok2&+^cw$@^-deiroq')
+
+# Verificar que SECRET_KEY esté configurada
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "SECRET_KEY no está configurada. "
+        "Define SECRET_KEY en las variables de entorno con un valor aleatorio y seguro."
+    )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+#DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = True  # Temporalmente en True para debugging   
 
-ALLOWED_HOSTS = ['127.0.0.1']
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1').split(',') + ['.onrender.com']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '711d3cef367f.ngrok-free.app',  # URL actual de ngrok
+    '59e98aa68ec2.ngrok-free.app',
+    'f6f52d6fb2cd.ngrok-free.app',
+    '*.ngrok-free.app',  # Para cualquier dominio de ngrok
+    '.ngrok-free.app',  # Wildcard para ngrok
+    '*',  # Temporalmente permitir todos para debugging
+]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Configuración para CSRF con ngrok
+CSRF_TRUSTED_ORIGINS = [
+    'https://711d3cef367f.ngrok-free.app',  # Nueva URL actual
+    'https://f6f52d6fb2cd.ngrok-free.app',
+    'https://*.ngrok-free.app',
+    'https://*.ngrok.io',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 # Application definition
@@ -59,6 +90,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'myapp.middleware.NgrokMiddleware',  # Añadir antes de CSRF
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -147,25 +179,111 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = ''
 LOGOUT_REDIRECT_URL = 'login'
 
-# Para configurar todo lo de los mails
-
+# Configuración segura de email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.me.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'alvaro_m_a@icloud.com'  # Tu correo
-EMAIL_HOST_PASSWORD = 'sjze-tjmh-ezxs-wwzh'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER = os.environ.get('alvaro_m_a@icloud.com')
+EMAIL_HOST_PASSWORD = os.environ.get('Rubicon2212')
+DEFAULT_FROM_EMAIL = 'alvaro_m_a@icloud.com'
+
+# Verificar configuración de email
+if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+    import warnings
+    warnings.warn(
+        "Credenciales de email no configuradas. Las funciones de email no funcionarán. "
+        "Define EMAIL_HOST_USER y EMAIL_HOST_PASSWORD en las variables de entorno.",
+        RuntimeWarning
+    )
 
 
+# Configuración segura de sesiones
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Para usar la base de datos para las sesiones
-
 SESSION_COOKIE_AGE = 86400  # 24 horas en segundos
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Sesión expira al cerrar navegador
 
-# Si quieres asegurarte de que la cookie se mantenga incluso si el navegador se cierra
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+# Configuración de seguridad para cookies de sesión
+SESSION_COOKIE_HTTPONLY = True  # No accesible desde JavaScript
+SESSION_COOKIE_SECURE = not DEBUG  # Solo HTTPS en producción
+SESSION_COOKIE_SAMESITE = 'Lax'  # Protección CSRF
+# Configuración de seguridad para cookies CSRF
+CSRF_COOKIE_HTTPONLY = True  # No accesible desde JavaScript
+CSRF_COOKIE_SECURE = not DEBUG  # Solo HTTPS en producción
+CSRF_COOKIE_SAMESITE = 'Lax'  # Protección CSRF
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.app',
+]
+
+# ==================== CONFIGURACIÓN DE HEADERS DE SEGURIDAD ====================
+
+# Prevenir ataques de sniffing de MIME types
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Activar el filtro XSS del navegador
+SECURE_BROWSER_XSS_FILTER = True
+
+# Configurar HSTS (HTTP Strict Transport Security) - solo en producción
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# Prevenir clickjacking
+X_FRAME_OPTIONS = 'DENY'
+
+# Política de referrer
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Content Security Policy básica
+# NOTA: Ajustar según las necesidades específicas del proyecto
+if not DEBUG:
+    SECURE_FORCE_SSL_REDIRECT = True
+
+# ==================== CONFIGURACIÓN DE LOGGING ====================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'telegram_webhook.log',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO' if DEBUG else 'WARNING',
+    },
+    'loggers': {
+        'myapp.telegram_utils': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+    },
+}

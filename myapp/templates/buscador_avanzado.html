@@ -98,6 +98,13 @@
             75% { opacity: 1; }
         }
         
+        @keyframes ripple {
+            to {
+                transform: scale(8);
+                opacity: 0;
+            }
+        }
+        
         .content-wrapper {
             position: relative;
             z-index: 10;
@@ -637,57 +644,226 @@
 
 <!-- Script para pasar datos de Django a JavaScript -->
 <script id="django-data" type="application/json">
-    {% if datos_por_tipo %}
-        {{ datos_por_tipo|safe }}
+    {% if datos_filtros %}           
+        {{ datos_filtros|safe }}
     {% else %}
-        {}
+        {"animales": [], "total_animales": 0}
     {% endif %}
 </script>
 
 <script>
 // Variables globales
 let selectedAnimal = 'otros';
-let animalData = {};
+let todosLosAnimales = [];
+let filtrosActuales = {
+    categoria: 'otros',
+    provincia: '',
+    raza: '',
+    color: '',
+    tipo_animal: ''
+};
 
-// Obtener datos reales de Django
-try {
-    const datosReales = JSON.parse(document.getElementById('django-data').textContent);
-    console.log('Datos recibidos de Django:', datosReales);
-    
-    // Estructurar los datos correctamente
-    animalData = {
-        perro: {
-            razas: (datosReales.perros && datosReales.perros.razas) || [],
-            colores: (datosReales.perros && datosReales.perros.colores) || [],
-            ubicaciones: (datosReales.perros && datosReales.perros.provincias) || []
-        },
-        gato: {
-            razas: (datosReales.gatos && datosReales.gatos.razas) || [],
-            colores: (datosReales.gatos && datosReales.gatos.colores) || [],
-            ubicaciones: (datosReales.gatos && datosReales.gatos.provincias) || []
-        },
-        otros: {
-            tipos: (datosReales.otros && datosReales.otros.tipos) || [],
-            variedades: ['Pequeño', 'Mediano', 'Grande'],
-            colores: (datosReales.otros && datosReales.otros.colores) || [],
-            ubicaciones: (datosReales.otros && datosReales.otros.provincias) || []
+// ==================== INICIALIZACIÓN ====================
+
+function inicializarDatos() {
+    try {
+        const datosScript = document.getElementById('django-data');
+        if (datosScript) {
+            const datos = JSON.parse(datosScript.textContent);
+            todosLosAnimales = datos.animales || [];
+        } else {
+            console.error('No se encontró el script con datos de Django');
         }
-    };
-} catch (error) {
-    console.error('Error al parsear datos de Django:', error);
-    // Datos por defecto en caso de error
-    animalData = {
-        perro: { razas: [], colores: [], ubicaciones: [] },
-        gato: { razas: [], colores: [], ubicaciones: [] },
-        otros: { tipos: [], variedades: ['Pequeño', 'Mediano', 'Grande'], colores: [], ubicaciones: [] }
-    };
+    } catch (error) {
+        console.error('Error al cargar datos:', error);
+        todosLosAnimales = [];
+    }
 }
 
-console.log('Estructura final de animalData:', animalData);
+function configurarEventListeners() {
+    const ubicacionSelect = document.getElementById('ubicacion-select');
+    if (ubicacionSelect) {
+        ubicacionSelect.addEventListener('change', function() {
+            filtrosActuales.provincia = this.value;
+            actualizarTodosLosSelects('provincia');
+        });
+    }
+    
+    const razaSelect = document.getElementById('raza-select');
+    if (razaSelect) {
+        razaSelect.addEventListener('change', function() {
+            filtrosActuales.raza = this.value;
+            actualizarTodosLosSelects('raza');
+        });
+    }
+    
+    const colorSelect = document.getElementById('color-select');
+    if (colorSelect) {
+        colorSelect.addEventListener('change', function() {
+            filtrosActuales.color = this.value;
+            actualizarTodosLosSelects('color');
+        });
+    }
+    
+    const otrosSelect = document.getElementById('otros-animales-select');
+    if (otrosSelect) {
+        otrosSelect.addEventListener('change', function() {
+            filtrosActuales.tipo_animal = this.value;
+            actualizarTodosLosSelects('tipo_animal');
+        });
+    }
+}
 
-// Crear fondo de estrellas mejorado
+// ==================== LÓGICA DE FILTRADO ====================
+
+function filtrarAnimales() {
+    return todosLosAnimales.filter(animal => {
+        if (animal.categoria !== filtrosActuales.categoria) return false;
+        if (filtrosActuales.provincia && animal.provincia !== filtrosActuales.provincia) return false;
+        if (filtrosActuales.raza && animal.raza !== filtrosActuales.raza) return false;
+        if (filtrosActuales.color && animal.color !== filtrosActuales.color) return false;
+        if (filtrosActuales.categoria === 'otros' && 
+            filtrosActuales.tipo_animal && 
+            animal.tipo_de_animal !== filtrosActuales.tipo_animal) return false;
+        return true;
+    });
+}
+
+function obtenerValoresUnicos(animales, campo) {
+    return animales
+        .map(animal => animal[campo])
+        .filter(valor => valor && valor.trim() !== '' && valor !== 'Sin especificar')
+        .filter((valor, index, arr) => arr.indexOf(valor) === index)
+        .sort();
+}
+
+function actualizarTodosLosSelects(selectCambiado = '') {
+    function filtrarAnimalesSin(campoExcluido) {
+        return todosLosAnimales.filter(animal => {
+            if (animal.categoria !== filtrosActuales.categoria) return false;
+            if (campoExcluido !== 'provincia' && filtrosActuales.provincia && animal.provincia !== filtrosActuales.provincia) return false;
+            if (campoExcluido !== 'raza' && filtrosActuales.raza && animal.raza !== filtrosActuales.raza) return false;
+            if (campoExcluido !== 'color' && filtrosActuales.color && animal.color !== filtrosActuales.color) return false;
+            if (campoExcluido !== 'tipo_animal' && 
+                filtrosActuales.categoria === 'otros' && 
+                filtrosActuales.tipo_animal && 
+                animal.tipo_de_animal !== filtrosActuales.tipo_animal) return false;
+            return true;
+        });
+    }
+    
+    if (selectCambiado !== 'provincia') {
+        const animalesParaUbicaciones = filtrarAnimalesSin('provincia');
+        const provincias = obtenerValoresUnicos(animalesParaUbicaciones, 'provincia');
+        const mantenerProvincia = selectCambiado !== '' && selectCambiado !== 'provincia';
+        actualizarSelect('ubicacion-select', provincias, 'Todas las ubicaciones', mantenerProvincia);
+    }
+    
+    if (selectCambiado !== 'raza') {
+        const animalesParaRazas = filtrarAnimalesSin('raza');
+        const razas = obtenerValoresUnicos(animalesParaRazas, 'raza');
+        const textoRaza = filtrosActuales.categoria === 'otros' ? 'Cualquier variedad' : 'Cualquier raza';
+        const mantenerRaza = selectCambiado !== '' && selectCambiado !== 'raza';
+        actualizarSelect('raza-select', razas, textoRaza, mantenerRaza);
+    }
+    
+    if (selectCambiado !== 'color') {
+        const animalesParaColores = filtrarAnimalesSin('color');
+        const colores = obtenerValoresUnicos(animalesParaColores, 'color');
+        const mantenerColor = selectCambiado !== '' && selectCambiado !== 'color';
+        actualizarSelect('color-select', colores, 'Cualquier color', mantenerColor);
+    }
+    
+    if (filtrosActuales.categoria === 'otros' && selectCambiado !== 'tipo_animal') {
+        const animalesParaTipos = filtrarAnimalesSin('tipo_animal');
+        const tipos = obtenerValoresUnicos(animalesParaTipos, 'tipo_de_animal');
+        const mantenerTipo = selectCambiado !== '' && selectCambiado !== 'tipo_animal';
+        actualizarSelect('otros-animales-select', tipos, 'Selecciona un tipo', mantenerTipo);
+    }
+}
+
+function actualizarSelect(selectId, opciones, textoDefault, mantenerValor = false) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    const valorActual = select.value;
+    
+    select.innerHTML = `<option value="">${textoDefault}</option>`;
+    
+    opciones.forEach(opcion => {
+        const optionElement = document.createElement('option');
+        optionElement.value = opcion;
+        optionElement.textContent = opcion;
+        select.appendChild(optionElement);
+    });
+    
+    if (mantenerValor && valorActual && opciones.includes(valorActual)) {
+        select.value = valorActual;
+    } else if (mantenerValor && valorActual && !opciones.includes(valorActual)) {
+        const campo = selectId.replace('-select', '').replace('ubicacion', 'provincia').replace('otros-animales', 'tipo_animal');
+        if (filtrosActuales[campo] === valorActual) {
+            filtrosActuales[campo] = '';
+        }
+    }
+}
+
+// ==================== SELECCIÓN DE TIPO DE ANIMAL ====================
+
+function selectAnimal(tipo) {
+    document.querySelectorAll('.animal-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    const targetCard = document.getElementById(`card-${tipo}`);
+    if (targetCard) {
+        targetCard.classList.add('active');
+    }
+    
+    selectedAnimal = tipo;
+    filtrosActuales.categoria = tipo;
+    filtrosActuales.provincia = '';
+    filtrosActuales.raza = '';
+    filtrosActuales.color = '';
+    filtrosActuales.tipo_animal = '';
+    
+    const tipoHidden = document.getElementById('tipo-hidden');
+    if (tipoHidden) {
+        const tipoMap = {
+            'perro': 'Perro',
+            'gato': 'Gato',
+            'otros': 'Otros'
+        };
+        tipoHidden.value = tipoMap[tipo];
+    }
+    
+    const razaLabel = document.getElementById('raza-label');
+    const otrosField = document.getElementById('otros-animales-field');
+    
+    if (razaLabel) {
+        razaLabel.textContent = tipo === 'otros' ? 'VARIEDAD' : 'RAZA';
+    }
+    
+    if (otrosField) {
+        if (tipo === 'otros') {
+            otrosField.classList.add('show');
+        } else {
+            otrosField.classList.remove('show');
+        }
+    }
+    
+    actualizarTodosLosSelects('');
+    
+    if (targetCard) {
+        createRippleEffect(targetCard);
+    }
+}
+
+// ==================== EFECTOS VISUALES ====================
+
 function createStarfield() {
     const starfield = document.getElementById('starfield');
+    if (!starfield) return;
+    
     const numStars = 150;
     
     for (let i = 0; i < numStars; i++) {
@@ -705,9 +881,9 @@ function createStarfield() {
     }
 }
 
-// Crear partículas flotantes
 function createParticles() {
     const particlesContainer = document.getElementById('particles');
+    if (!particlesContainer) return;
     
     setInterval(() => {
         if (document.querySelectorAll('.particle').length < 10) {
@@ -719,131 +895,14 @@ function createParticles() {
             particlesContainer.appendChild(particle);
             
             setTimeout(() => {
-                particle.remove();
+                if (particle.parentNode) {
+                    particle.remove();
+                }
             }, 8000);
         }
     }, 800);
 }
 
-// Función para poblar select con opciones
-function populateSelect(selectId, options, defaultText) {
-    const select = document.getElementById(selectId);
-    if (!select) {
-        console.error(`Select con ID ${selectId} no encontrado`);
-        return;
-    }
-    
-    select.innerHTML = `<option value="">${defaultText}</option>`;
-    
-    // Verificar que options sea un array
-    if (Array.isArray(options)) {
-        options.forEach(option => {
-            if (option && option.trim()) { // Solo agregar opciones no vacías
-                const optionElement = document.createElement('option');
-                optionElement.value = option;
-                optionElement.textContent = option;
-                select.appendChild(optionElement);
-            }
-        });
-    }
-}
-
-// Función para actualizar todos los campos según el tipo de animal
-function updateFieldsForAnimalType(tipo) {
-    console.log('Actualizando campos para tipo:', tipo);
-    
-    const ubicacionSelect = document.getElementById('ubicacion-select');
-    const razaSelect = document.getElementById('raza-select');
-    const colorSelect = document.getElementById('color-select');
-    const otrosSelect = document.getElementById('otros-animales-select');
-    const razaLabel = document.getElementById('raza-label');
-    const otrosField = document.getElementById('otros-animales-field');
-    
-    // Verificar que todos los elementos existen
-    if (!ubicacionSelect || !razaSelect || !colorSelect || !otrosSelect || !razaLabel || !otrosField) {
-        console.error('Algunos elementos del formulario no se encontraron');
-        return;
-    }
-    
-    // Resetear todos los selects
-    ubicacionSelect.value = '';
-    razaSelect.value = '';
-    colorSelect.value = '';
-    otrosSelect.value = '';
-    
-    if (tipo === 'perro') {
-        console.log('Configurando para perros:', animalData.perro);
-        
-        populateSelect('ubicacion-select', animalData.perro.ubicaciones, 'Todas las ubicaciones');
-        populateSelect('raza-select', animalData.perro.razas, 'Cualquier raza');
-        populateSelect('color-select', animalData.perro.colores, 'Cualquier color');
-        
-        razaLabel.textContent = 'RAZA';
-        otrosField.classList.remove('show');
-        
-    } else if (tipo === 'gato') {
-        console.log('Configurando para gatos:', animalData.gato);
-        
-        populateSelect('ubicacion-select', animalData.gato.ubicaciones, 'Todas las ubicaciones');
-        populateSelect('raza-select', animalData.gato.razas, 'Cualquier raza');
-        populateSelect('color-select', animalData.gato.colores, 'Cualquier color');
-        
-        razaLabel.textContent = 'RAZA';
-        otrosField.classList.remove('show');
-        
-    } else if (tipo === 'otros') {
-        console.log('Configurando para otros:', animalData.otros);
-        
-        populateSelect('ubicacion-select', animalData.otros.ubicaciones, 'Todas las ubicaciones');
-        populateSelect('raza-select', animalData.otros.variedades, 'Cualquier variedad');
-        populateSelect('color-select', animalData.otros.colores, 'Cualquier color');
-        populateSelect('otros-animales-select', animalData.otros.tipos, 'Selecciona un tipo');
-        
-        razaLabel.textContent = 'VARIEDAD';
-        otrosField.classList.add('show');
-    }
-}
-
-// Seleccionar tipo de animal
-function selectAnimal(tipo) {
-    console.log('Seleccionando animal:', tipo);
-    
-    // Remover active de todas las tarjetas
-    document.querySelectorAll('.animal-card').forEach(card => {
-        card.classList.remove('active');
-    });
-    
-    // Activar la tarjeta seleccionada
-    const targetCard = document.getElementById(`card-${tipo}`);
-    if (targetCard) {
-        targetCard.classList.add('active');
-    }
-    
-    // Actualizar variable global
-    selectedAnimal = tipo;
-    
-    // Actualizar campo oculto
-    const tipoHidden = document.getElementById('tipo-hidden');
-    if (tipoHidden) {
-        const tipoMap = {
-            'perro': 'Perro',
-            'gato': 'Gato',
-            'otros': 'Otros'
-        };
-        tipoHidden.value = tipoMap[tipo];
-        console.log('Campo oculto actualizado a:', tipoHidden.value);
-    }
-    
-    // Actualizar todos los campos según el tipo seleccionado
-    updateFieldsForAnimalType(tipo);
-    
-    // Crear efecto de ondas
-    if (targetCard) {
-        createRippleEffect(targetCard);
-    }
-}
-
-// Efecto de ondas al seleccionar
 function createRippleEffect(element) {
     const ripple = document.createElement('div');
     ripple.style.position = 'absolute';
@@ -857,72 +916,42 @@ function createRippleEffect(element) {
     ripple.style.height = '20px';
     ripple.style.marginLeft = '-10px';
     ripple.style.marginTop = '-10px';
+    ripple.style.pointerEvents = 'none';
     
+    element.style.position = 'relative';
     element.appendChild(ripple);
     
     setTimeout(() => {
-        ripple.remove();
+        if (ripple.parentNode) {
+            ripple.remove();
+        }
     }, 600);
 }
 
-// Agregar estilos para el efecto ripple
-const rippleStyles = `
-@keyframes ripple {
-    to {
-        transform: scale(8);
-        opacity: 0;
-    }
-}
-`;
+function configurarParallax() {
+    let ticking = false;
 
-const styleSheet = document.createElement('style');
-styleSheet.textContent = rippleStyles;
-document.head.appendChild(styleSheet);
-
-// Parallax sutil para las estrellas
-let ticking = false;
-
-window.addEventListener('scroll', () => {
-    if (!ticking) {
-        requestAnimationFrame(() => {
-            const scrolled = window.pageYOffset;
-            const stars = document.querySelectorAll('.star');
-            
-            stars.forEach((star, i) => {
-                if (i % 4 === 0) {
-                    const speed = 0.1;
-                    star.style.transform = `translateY(${scrolled * speed}px)`;
-                }
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset;
+                const stars = document.querySelectorAll('.star');
+                
+                stars.forEach((star, i) => {
+                    if (i % 4 === 0) {
+                        const speed = 0.1;
+                        star.style.transform = `translateY(${scrolled * speed}px)`;
+                    }
+                });
+                
+                ticking = false;
             });
-            
-            ticking = false;
-        });
-        ticking = true;
-    }
-});
-
-// Inicializar todo
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM cargado, inicializando...');
-    
-    createStarfield();
-    createParticles();
-    
-    // Verificar que los elementos necesarios existen
-    const elementos = ['ubicacion-select', 'raza-select', 'color-select', 'otros-animales-select', 'otros-animales-field'];
-    elementos.forEach(id => {
-        const elemento = document.getElementById(id);
-        if (!elemento) {
-            console.error(`Elemento con ID ${id} no encontrado`);
+            ticking = true;
         }
     });
-    
-    // Inicializar con "otros" seleccionado por defecto
-    setTimeout(() => {
-        selectAnimal('otros');
-    }, 100); // Pequeño delay para asegurar que todo esté cargado
-    
-    // Agregar efecto focus mejorado a los inputs
+}
+
+function configurarEfectosInputs() {
     document.querySelectorAll('.filter-input').forEach(input => {
         input.addEventListener('focus', function() {
             const label = this.closest('.filter-group').querySelector('.filter-label');
@@ -938,29 +967,88 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Debug: Mostrar datos cargados en la consola
-    console.log('Inicialización completada');
-    console.log('Animal seleccionado:', selectedAnimal);
-});
-
-// Función auxiliar para debugging
-function debugData() {
-    console.log('=== DEBUG INFO ===');
-    console.log('Animal seleccionado:', selectedAnimal);
-    console.log('Datos disponibles:', animalData);
-    console.log('Elementos del DOM:');
-    console.log('- ubicacion-select:', document.getElementById('ubicacion-select'));
-    console.log('- raza-select:', document.getElementById('raza-select'));
-    console.log('- color-select:', document.getElementById('color-select'));
-    console.log('- otros-animales-select:', document.getElementById('otros-animales-select'));
-    console.log('- otros-animales-field:', document.getElementById('otros-animales-field'));
-    console.log('=================');
 }
 
-// Exponer funciones globalmente para debugging
-window.debugData = debugData;
-window.selectAnimal = selectAnimal;
+// ==================== FUNCIONES DE UTILIDAD ====================
+
+function mostrarEstadoFiltros() {
+    console.log('=== ESTADO ACTUAL DE FILTROS ===');
+    console.log('Filtros actuales:', filtrosActuales);
+    console.log(`Total animales cargados: ${todosLosAnimales.length}`);
+    
+    const animalesPorCategoria = {
+        perro: todosLosAnimales.filter(a => a.categoria === 'perro').length,
+        gato: todosLosAnimales.filter(a => a.categoria === 'gato').length,
+        otros: todosLosAnimales.filter(a => a.categoria === 'otros').length
+    };
+    console.log('Animales por categoría:', animalesPorCategoria);
+    
+    const animalesFiltrados = filtrarAnimales();
+    console.log(`Animales que coinciden con filtros: ${animalesFiltrados.length}`);
+    console.log('================================');
+}
+
+function limpiarFiltros() {
+    filtrosActuales.provincia = '';
+    filtrosActuales.raza = '';
+    filtrosActuales.color = '';
+    filtrosActuales.tipo_animal = '';
+    
+    const selects = ['ubicacion-select', 'raza-select', 'color-select', 'otros-animales-select'];
+    selects.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (select) {
+            select.value = '';
+        }
+    });
+    
+    actualizarTodosLosSelects();
+}
+
+// ==================== INICIALIZACIÓN PRINCIPAL ====================
+
+function inicializar() {
+    inicializarDatos();
+    
+    if (todosLosAnimales.length === 0) {
+        console.warn('No se cargaron animales. Verifica la vista de Django.');
+        return;
+    }
+    
+    createStarfield();
+    createParticles();
+    configurarParallax();
+    configurarEventListeners();
+    configurarEfectosInputs();
+    
+    setTimeout(() => {
+        selectAnimal('otros');
+    }, 100);
+    
+    window.mostrarEstadoFiltros = mostrarEstadoFiltros;
+    window.limpiarFiltros = limpiarFiltros;
+    window.selectAnimal = selectAnimal;
+    window.filtrosActuales = filtrosActuales;
+    window.todosLosAnimales = todosLosAnimales;
+}
+
+// ==================== EVENT LISTENERS ====================
+
+document.addEventListener('DOMContentLoaded', inicializar);
+
+window.addEventListener('error', function(e) {
+    console.error('Error en filtros dependientes:', e.error);
+});
+
+window.addEventListener('resize', function() {
+    const particles = document.querySelectorAll('.particle');
+    if (particles.length > 15) {
+        particles.forEach((particle, index) => {
+            if (index < 5) particle.remove();
+        });
+    }
+});
+
 </script>
 
 </body>

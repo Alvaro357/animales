@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Enviado - Adopta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px auto;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            color: #f59e0b;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .info-title {
+            color: #f59e0b;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-list {
+            color: #e5e5e5;
+            margin: 10px 0;
+        }
+        
+        .info-list li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .info-list li::before {
+            content: "•";
+            color: #f59e0b;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .warning-title {
+            color: #ef4444;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .data-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .data-label {
+            color: #a0a0a0;
+            font-weight: 500;
+        }
+        
+        .data-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .data-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Icono de éxito -->
+        <div class="icon">
+            <svg width="40" height="40" fill="white" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+        </div>
+        
+        <!-- Título principal -->
+        <h1 class="title">¡Registro Enviado!</h1>
+        <p class="subtitle">Tu solicitud está en proceso de revisión</p>
+        
+        <!-- Información del estado -->
+        <div class="info-box">
+            <div class="info-title">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 10px;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                Estado Actual: En Revisión
+            </div>
+            <ul class="info-list">
+                <li>Tu asociación <strong>{{ asociacion.nombre }}</strong> ha sido registrada correctamente</li>
+                <li>Nuestro equipo revisará la información proporcionada</li>
+                <li>Recibirás un email de confirmación cuando sea aprobada</li>
+                <li>El proceso de revisión suele tomar entre 24-48 horas</li>
+            </ul>
+        </div>
+        
+        <!-- Datos registrados -->
+        <div class="data-section">
+            <h3 style="color: #ffffff; margin: 0 0 20px 0; font-size: 1.1rem;">📋 Datos Registrados</h3>
+            <div class="data-row">
+                <span class="data-label">Nombre:</span>
+                <span class="data-value">{{ asociacion.nombre }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Email:</span>
+                <span class="data-value">{{ asociacion.email }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Teléfono:</span>
+                <span class="data-value">{{ asociacion.telefono }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Ubicación:</span>
+                <span class="data-value">{{ asociacion.poblacion }}, {{ asociacion.provincia }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Fecha de registro:</span>
+                <span class="data-value">{{ asociacion.fecha_registro|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Estado:</span>
+                <span class="data-value" style="color: #f59e0b;">⏳ Pendiente de Aprobación</span>
+            </div>
+        </div>
+        
+        <!-- Advertencia importante -->
+        <div class="warning-box">
+            <div class="warning-title">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 10px;">
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                </svg>
+                Importante - No Inicies Sesión Todavía
+            </div>
+            <p style="color: #fca5a5; margin: 0; font-size: 14px;">
+                Tu cuenta aún no está activa. No intentes iniciar sesión hasta recibir el email de aprobación. 
+                Recibirás todas las instrucciones necesarias por correo electrónico.
+            </p>
+        </div>
+        
+        <!-- Qué esperar -->
+        <div class="info-box">
+            <div class="info-title">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 10px;">
+                    <path d="M20 6L9 17l-5-5 1.41-1.41L9 14.17 18.59 4.59 20 6z"/>
+                </svg>
+                Próximos Pasos
+            </div>
+            <ul class="info-list">
+                <li><strong>Revisa tu email:</strong> Te hemos enviado una confirmación</li>
+                <li><strong>Espera la aprobación:</strong> Te notificaremos el resultado</li>
+                <li><strong>Una vez aprobada:</strong> Podrás iniciar sesión y registrar animales</li>
+                <li><strong>¿Dudas?</strong> Responde al email de confirmación</li>
+            </ul>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div style="margin-top: 40px;">
+            <a href="/" class="btn">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: text-bottom;">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                Volver al Inicio
+            </a>
+            <a href="/acerca/" class="btn btn-secondary">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: text-bottom;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+                Más Información
+            </a>
+        </div>
+        
+        <!-- Nota al pie -->
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #a0a0a0; font-size: 14px; margin: 0;">
+                📧 Si no recibes nuestro email en las próximas horas, revisa tu carpeta de spam o correo no deseado.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

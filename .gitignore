@@ -10,3 +10,7 @@ __pycache__/
 
 #Media
 /media/videos/*.mp4
+
+.claude\agents
+
+nul
