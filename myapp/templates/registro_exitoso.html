@@ -210,13 +210,18 @@
                 Estado Actual: En Revisión
             </div>
             <ul class="info-list">
+                {% if asociacion %}
                 <li>Tu asociación <strong>{{ asociacion.nombre }}</strong> ha sido registrada correctamente</li>
+                {% else %}
+                <li>Tu asociación ha sido registrada correctamente</li>
+                {% endif %}
                 <li>Nuestro equipo revisará la información proporcionada</li>
                 <li>Recibirás un email de confirmación cuando sea aprobada</li>
                 <li>El proceso de revisión suele tomar entre 24-48 horas</li>
             </ul>
         </div>
-        
+
+        {% if asociacion %}
         <!-- Datos registrados -->
         <div class="data-section">
             <h3 style="color: #ffffff; margin: 0 0 20px 0; font-size: 1.1rem;">📋 Datos Registrados</h3>
@@ -238,13 +243,14 @@
             </div>
             <div class="data-row">
                 <span class="data-label">Fecha de registro:</span>
-                <span class="data-value">{{ asociacion.fecha_registro|date:"d/m/Y H:i" }}</span>
+                <span class="data-value">{{ asociacion.fecha_registro }}</span>
             </div>
             <div class="data-row">
                 <span class="data-label">Estado:</span>
                 <span class="data-value" style="color: #f59e0b;">⏳ Pendiente de Aprobación</span>
             </div>
         </div>
+        {% endif %}
         
         <!-- Advertencia importante -->
         <div class="warning-box">

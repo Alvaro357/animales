@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST, require_GET
 from django.middleware.csrf import get_token
 from django.utils import timezone
+from django.conf import settings
 import json
 from .telegram_utils import (
     enviar_notificacion_nueva_asociacion,
@@ -22,6 +23,7 @@ from .telegram_utils import (
     enviar_notificacion_reactivacion,
     enviar_notificacion_eliminacion
 )
+from .cloudinary_storage import cloudinary_storage
 
 def session_login_required(view_func):
     """Decorador actualizado que verifica sesión Y estado de la asociación"""
@@ -29,7 +31,7 @@ def session_login_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.session.get('esta_logueado'):
             return redirect('login')
-        
+
         # Verificar estado de la asociación
         asociacion_id = request.COOKIES.get('asociacion_id')
         if asociacion_id:
@@ -46,13 +48,303 @@ def session_login_required(view_func):
                 response = redirect('login')
                 response.delete_cookie('asociacion_id')
                 return response
-        
+
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def admin_login_required(view_func):
+    """Decorador que verifica autenticación de administrador"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('admin_authenticated'):
+            # Redirigir al login de admin si no está autenticado
+            return redirect('admin_login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+# ==================== AUTENTICACIÓN DE ADMINISTRADOR ====================
+
+def admin_login_view(request):
+    """Vista de login para el panel de administración con límite de intentos"""
+    error_message = None
+    warning_message = None
+    info_message = None
+
+    # Obtener la IP del usuario
+    ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
+    if ip_address:
+        ip_address = ip_address.split(',')[0].strip()
+    else:
+        ip_address = request.META.get('REMOTE_ADDR', 'unknown')
+
+    # Definir constantes de seguridad
+    MAX_ATTEMPTS = 3
+    BLOCK_DURATION_MINUTES = 15
+
+    # Inicializar estructura de intentos en sesión si no existe
+    if 'admin_login_attempts' not in request.session:
+        request.session['admin_login_attempts'] = {}
+
+    attempts_data = request.session.get('admin_login_attempts', {})
+    current_time = timezone.now()
+
+    # Verificar si la IP está bloqueada
+    if ip_address in attempts_data:
+        ip_data = attempts_data[ip_address]
+        blocked_until = ip_data.get('blocked_until')
+
+        if blocked_until:
+            blocked_until_dt = timezone.datetime.fromisoformat(blocked_until)
+
+            # Si aún está bloqueado
+            if current_time < blocked_until_dt:
+                time_remaining = blocked_until_dt - current_time
+                minutes_remaining = int(time_remaining.total_seconds() / 60) + 1
+
+                error_message = f'Acceso bloqueado temporalmente. Intenta de nuevo en {minutes_remaining} minutos.'
+
+                return render(request, 'admin_login.html', {
+                    'error_message': error_message,
+                    'is_blocked': True,
+                    'minutes_remaining': minutes_remaining
+                })
+            else:
+                # El bloqueo ha expirado, limpiar datos
+                del attempts_data[ip_address]
+                request.session['admin_login_attempts'] = attempts_data
+                request.session.modified = True
+
+    if request.method == 'POST':
+        password = request.POST.get('password', '')
+
+        # Inicializar datos de la IP si no existen
+        if ip_address not in attempts_data:
+            attempts_data[ip_address] = {
+                'failed_attempts': 0,
+                'blocked_until': None
+            }
+
+        # Verificar contraseña con la configurada en settings
+        if password == settings.ADMIN_PASSWORD:
+            # Login exitoso - limpiar intentos fallidos
+            if ip_address in attempts_data:
+                del attempts_data[ip_address]
+                request.session['admin_login_attempts'] = attempts_data
+                request.session.modified = True
+
+            # Regenerar sesión para prevenir session fixation
+            request.session.cycle_key()
+
+            # Establecer sesión de admin
+            request.session['admin_authenticated'] = True
+            request.session['admin_login_time'] = timezone.now().isoformat()
+
+            # Redirigir al panel de administración
+            return redirect('panel_administracion')
+        else:
+            # Contraseña incorrecta - incrementar contador
+            attempts_data[ip_address]['failed_attempts'] += 1
+            current_attempts = attempts_data[ip_address]['failed_attempts']
+
+            if current_attempts >= MAX_ATTEMPTS:
+                # Bloquear después de 3 intentos fallidos
+                blocked_until = current_time + timezone.timedelta(minutes=BLOCK_DURATION_MINUTES)
+                attempts_data[ip_address]['blocked_until'] = blocked_until.isoformat()
+
+                request.session['admin_login_attempts'] = attempts_data
+                request.session.modified = True
+
+                error_message = f'Has excedido el número máximo de intentos. Acceso bloqueado por {BLOCK_DURATION_MINUTES} minutos.'
+
+                return render(request, 'admin_login.html', {
+                    'error_message': error_message,
+                    'is_blocked': True,
+                    'minutes_remaining': BLOCK_DURATION_MINUTES
+                })
+            else:
+                # Aún quedan intentos
+                remaining_attempts = MAX_ATTEMPTS - current_attempts
+                request.session['admin_login_attempts'] = attempts_data
+                request.session.modified = True
+
+                error_message = 'Contraseña incorrecta'
+
+                if remaining_attempts == 1:
+                    warning_message = f'Advertencia: Te queda {remaining_attempts} intento. Después serás bloqueado por {BLOCK_DURATION_MINUTES} minutos.'
+                else:
+                    warning_message = f'Te quedan {remaining_attempts} intentos antes de ser bloqueado.'
+
+    return render(request, 'admin_login.html', {
+        'error_message': error_message,
+        'warning_message': warning_message,
+        'info_message': info_message,
+        'is_blocked': False
+    })
+
+
+def admin_logout_view(request):
+    """Vista de logout para el panel de administración"""
+    # Eliminar sesión de admin
+    request.session.pop('admin_authenticated', None)
+    request.session.pop('admin_login_time', None)
+
+    # Redirigir al login de admin
+    return redirect('admin_login')
+
+
+# ==================== RESTABLECIMIENTO DE CONTRASEÑA ====================
+
+def solicitar_reset_password(request):
+    """Vista para solicitar el restablecimiento de contraseña"""
+    mensaje_exito = None
+    mensaje_error = None
+
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+
+        if not email:
+            mensaje_error = 'Por favor, introduce tu email.'
+        else:
+            # Buscar asociación por email
+            try:
+                asociacion = RegistroAsociacion.objects.get(email__iexact=email)
+
+                # Generar token y enviar email
+                token = asociacion.generar_token_reset_password()
+                enviar_email_reset_password(asociacion, token, request)
+
+                mensaje_exito = 'Si el email está registrado, recibirás un enlace para restablecer tu contraseña.'
+
+            except RegistroAsociacion.DoesNotExist:
+                # Por seguridad, mostrar el mismo mensaje aunque no exista
+                mensaje_exito = 'Si el email está registrado, recibirás un enlace para restablecer tu contraseña.'
+
+    return render(request, 'solicitar_reset_password.html', {
+        'mensaje_exito': mensaje_exito,
+        'mensaje_error': mensaje_error,
+    })
+
+
+def reset_password(request, token):
+    """Vista para restablecer la contraseña usando el token"""
+    mensaje_error = None
+    token_valido = False
+    asociacion = None
+
+    # Buscar asociación con este token
+    try:
+        asociacion = RegistroAsociacion.objects.get(token_reset_password=token)
+        if asociacion.validar_token_reset(token):
+            token_valido = True
+        else:
+            mensaje_error = 'El enlace ha expirado. Por favor, solicita uno nuevo.'
+    except RegistroAsociacion.DoesNotExist:
+        mensaje_error = 'El enlace no es válido. Por favor, solicita uno nuevo.'
+
+    if request.method == 'POST' and token_valido:
+        nueva_password = request.POST.get('password', '')
+        confirmar_password = request.POST.get('confirmar_password', '')
+
+        if not nueva_password or not confirmar_password:
+            mensaje_error = 'Por favor, completa ambos campos.'
+        elif len(nueva_password) < 6:
+            mensaje_error = 'La contraseña debe tener al menos 6 caracteres.'
+        elif nueva_password != confirmar_password:
+            mensaje_error = 'Las contraseñas no coinciden.'
+        else:
+            # Actualizar contraseña
+            asociacion.password = make_password(nueva_password)
+            asociacion.save(update_fields=['password'])
+
+            # Limpiar token
+            asociacion.limpiar_token_reset()
+
+            # Redirigir al login con mensaje de éxito
+            messages.success(request, 'Tu contraseña ha sido restablecida correctamente. Ya puedes iniciar sesión.')
+            return redirect('login')
+
+    return render(request, 'reset_password.html', {
+        'token_valido': token_valido,
+        'mensaje_error': mensaje_error,
+        'token': token,
+    })
+
+
+def enviar_email_reset_password(asociacion, token, request):
+    """Envía email con enlace para restablecer contraseña"""
+    # Construir URL del enlace
+    if request.is_secure():
+        protocolo = 'https'
+    else:
+        protocolo = 'http'
+
+    host = request.get_host()
+    reset_url = f"{protocolo}://{host}/reset-password/{token}/"
+
+    subject = "Restablecer contraseña - Adopta"
+
+    mensaje_html = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: #3b82f6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1>Restablecer Contraseña</h1>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
+                <p>Hola <strong>{asociacion.nombre}</strong>,</p>
+
+                <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en Adopta.</p>
+
+                <div style="background: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                    <p style="margin: 0; color: #1e40af;">
+                        Haz clic en el siguiente enlace para crear una nueva contraseña:
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{reset_url}" style="background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                        Restablecer Contraseña
+                    </a>
+                </div>
+
+                <p style="color: #666; font-size: 14px;">
+                    Este enlace es válido por <strong>1 hora</strong>. Si no solicitaste restablecer tu contraseña, puedes ignorar este mensaje.
+                </p>
+
+                <p style="color: #666; font-size: 14px;">
+                    Si el botón no funciona, copia y pega esta URL en tu navegador:<br>
+                    <a href="{reset_url}" style="color: #3b82f6; word-break: break-all;">{reset_url}</a>
+                </p>
+
+                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+
+                <p style="color: #999; font-size: 12px; margin-top: 20px;">
+                    Equipo de Adopta
+                </p>
+            </div>
+        </body>
+    </html>
+    """
+
+    try:
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=f"Haz clic en el siguiente enlace para restablecer tu contraseña: {reset_url}",
+            from_email=None,
+            to=[asociacion.email]
+        )
+        email.attach_alternative(mensaje_html, "text/html")
+        email.send(fail_silently=False)
+        print(f"Email de reset de contraseña enviado a: {asociacion.email}")
+    except Exception as e:
+        print(f"Error enviando email de reset de contraseña: {e}")
+
 
 # ==================== VISTAS ADMINISTRATIVAS ====================
 
 @csrf_protect
+@admin_login_required
 def aprobar_asociacion(request, token):
     """Vista para aprobar una asociación usando el token del correo - Ahora con confirmación POST"""
     try:
@@ -147,11 +439,12 @@ def aprobar_asociacion(request, token):
         """, status=404)
 
 @require_GET
+@admin_login_required
 def rechazar_asociacion(request, token):
     """Vista para rechazar una asociación"""
     try:
         asociacion = RegistroAsociacion.objects.get(token_aprobacion=token)
-        
+
         if asociacion.estado == 'rechazada':
             return HttpResponse("""
                 <html>
@@ -164,55 +457,55 @@ def rechazar_asociacion(request, token):
                     </body>
                 </html>
             """.format(asociacion.nombre, token))
-        
+
+        # Generar token CSRF
+        csrf_token = get_token(request)
+
         # Mostrar formulario de rechazo
-        return HttpResponse("""
+        return HttpResponse(f"""
             <html>
                 <head>
                     <title>Rechazar Asociación</title>
                     <style>
-                        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
-                        .form-container { background: #f8f9fa; padding: 30px; border-radius: 10px; }
-                        .form-group { margin-bottom: 20px; }
-                        label { display: block; font-weight: bold; margin-bottom: 5px; }
-                        textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px; }
-                        .btn { padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-                        .btn-danger { background: #ef4444; color: white; }
-                        .btn-secondary { background: #6b7280; color: white; margin-left: 10px; }
+                        body {{ font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }}
+                        .form-container {{ background: #f8f9fa; padding: 30px; border-radius: 10px; }}
+                        .form-group {{ margin-bottom: 20px; }}
+                        label {{ display: block; font-weight: bold; margin-bottom: 5px; }}
+                        textarea {{ width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px; }}
+                        .btn {{ padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }}
+                        .btn-danger {{ background: #ef4444; color: white; }}
+                        .btn-secondary {{ background: #6b7280; color: white; margin-left: 10px; }}
                     </style>
                 </head>
                 <body>
                     <div class="form-container">
                         <h2 style="color: #ef4444;">❌ Rechazar Asociación</h2>
-                        <p><strong>Asociación:</strong> {}</p>
-                        <p><strong>Email:</strong> {}</p>
-                        <p><strong>Fecha de registro:</strong> {}</p>
-                        
-                        <form method="post" action="/admin/rechazar_confirmar/{}/">
+                        <p><strong>Asociación:</strong> {asociacion.nombre}</p>
+                        <p><strong>Email:</strong> {asociacion.email}</p>
+                        <p><strong>Fecha de registro:</strong> {asociacion.fecha_registro.strftime("%d/%m/%Y %H:%M")}</p>
+
+                        <form method="post" action="/admin/rechazar_confirmar/{token}/">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
                             <div class="form-group">
                                 <label for="motivo">Motivo del rechazo (será enviado a la asociación):</label>
                                 <textarea name="motivo" id="motivo" placeholder="Explica el motivo del rechazo..." required></textarea>
                             </div>
-                            
+
                             <button type="submit" class="btn btn-danger">❌ Confirmar Rechazo</button>
                             <a href="/admin/panel/" class="btn btn-secondary">↩️ Cancelar</a>
                         </form>
                     </div>
                 </body>
             </html>
-        """.format(
-            asociacion.nombre,
-            asociacion.email,
-            asociacion.fecha_registro.strftime("%d/%m/%Y %H:%M"),
-            token
-        ))
-        
+        """)
+
     except RegistroAsociacion.DoesNotExist:
         return HttpResponse("❌ Token inválido o asociación no encontrada.", status=404)
 
 
 
 @require_POST
+@admin_login_required
 def rechazar_asociacion_confirmar(request, token):
     """Confirma el rechazo de una asociación - LA ELIMINA INMEDIATAMENTE"""
     try:
@@ -258,6 +551,7 @@ def rechazar_asociacion_confirmar(request, token):
 
 
 @require_GET
+@admin_login_required
 def info_asociacion_admin(request, token):
     """Vista detallada de una asociación para administración"""
     try:
@@ -391,13 +685,13 @@ def info_asociacion_admin(request, token):
 
 def enviar_email_aprobacion(asociacion):
     """Envía email de aprobación a la asociación"""
-    subject = "🎉 ¡Tu asociación ha sido aprobada en Adopta!"
+    subject = "¡Tu asociación ha sido aprobada en Adopta!"
     
     mensaje_html = f"""
     <html>
         <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-                <h1>🎉 ¡Aprobación Exitosa!</h1>
+                <h1>¡Aprobación Exitosa!</h1>
             </div>
             
             <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
@@ -406,13 +700,13 @@ def enviar_email_aprobacion(asociacion):
                 <p>¡Excelentes noticias! Su asociación ha sido <strong>aprobada</strong> y ya puede acceder al sistema de Adopta.</p>
                 
                 <div style="background: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
-                    <h3 style="margin: 0; color: #065f46;">✅ Su cuenta está activa</h3>
+                    <h3 style="margin: 0; color: #065f46;">Su cuenta está activa</h3>
                     <p style="margin: 10px 0 0 0; color: #047857;">
                         Ya puede iniciar sesión y comenzar a registrar sus animales para adopción.
                     </p>
                 </div>
                 
-                <h3>📝 Sus datos de acceso:</h3>
+                <h3>Sus datos de acceso:</h3>
                 <ul>
                     <li><strong>Usuario:</strong> {asociacion.nombre}</li>
                     <li><strong>Contraseña:</strong> La que eligió durante el registro</li>
@@ -420,7 +714,7 @@ def enviar_email_aprobacion(asociacion):
                 
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="http://tu-dominio.com" style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                        🏠 Acceder a Adopta
+                        Acceder a Adopta
                     </a>
                 </div>
                 
@@ -444,9 +738,9 @@ def enviar_email_aprobacion(asociacion):
         )
         email.attach_alternative(mensaje_html, "text/html")
         email.send(fail_silently=False)
-        print(f"✅ Email de aprobación enviado a: {asociacion.email}")
+        print(f"Email de aprobación enviado a: {asociacion.email}")
     except Exception as e:
-        print(f"❌ Error enviando email de aprobación: {e}")
+        print(f"Error enviando email de aprobación: {e}")
 
 
 def enviar_email_rechazo(asociacion, motivo):
@@ -495,11 +789,12 @@ def enviar_email_rechazo(asociacion, motivo):
         )
         email.attach_alternative(mensaje_html, "text/html")
         email.send(fail_silently=False)
-        print(f"✅ Email de rechazo enviado a: {asociacion.email}")
+        print(f"[OK] Email de rechazo enviado a: {asociacion.email}")
     except Exception as e:
-        print(f"❌ Error enviando email de rechazo: {e}")
+        print(f"[ERROR] Error enviando email de rechazo: {e}")
 
 @csrf_protect
+@admin_login_required
 def suspender_asociacion(request, token):
     """Vista para suspender una asociación usando el token - Ahora con confirmación POST"""
     try:
@@ -634,6 +929,7 @@ def suspender_asociacion(request, token):
 
 
 @csrf_protect
+@admin_login_required
 def eliminar_asociacion(request, token):
     """Vista para eliminar definitivamente una asociación - Ahora con confirmación POST"""
     try:
@@ -751,6 +1047,7 @@ def eliminar_asociacion(request, token):
 
 
 @csrf_protect
+@admin_login_required
 def reactivar_asociacion(request, token):
     """Vista para reactivar una asociación suspendida - Ahora con confirmación POST"""
     try:
@@ -878,6 +1175,7 @@ def reactivar_asociacion(request, token):
 
 
 @require_GET
+@admin_login_required
 def info_asociacion(request, token):
     """Vista para mostrar información detallada de la asociación"""
     try:
@@ -1027,8 +1325,21 @@ def info_asociacion(request, token):
 
 def registro_exitoso_view(request):
     """Vista para mostrar página de registro exitoso"""
-    # Esta vista se puede acceder directamente o después de un registro
-    return render(request, 'registro_exitoso.html')
+    # Obtener los datos de la asociación desde la sesión
+    asociacion_data = request.session.get('registro_exitoso_data')
+
+    # Si hay datos en la sesión, usarlos y limpiarlos
+    if asociacion_data:
+        # Limpiar los datos de la sesión para que no se muestren en recargas
+        del request.session['registro_exitoso_data']
+        return render(request, 'registro_exitoso.html', {
+            'asociacion': asociacion_data
+        })
+
+    # Si no hay datos en sesión, mostrar página genérica sin datos
+    return render(request, 'registro_exitoso.html', {
+        'asociacion': None
+    })
 
 
 def registro_asociacion(request):
@@ -1060,6 +1371,15 @@ def registro_asociacion(request):
 
                 # Si es AJAX, devolver respuesta JSON de éxito
                 if is_ajax:
+                    # Guardar datos en la sesión para mostrarlos en la página de éxito
+                    request.session['registro_exitoso_data'] = {
+                        'nombre': asociacion.nombre,
+                        'email': asociacion.email,
+                        'telefono': asociacion.telefono,
+                        'poblacion': asociacion.poblacion,
+                        'provincia': asociacion.provincia,
+                        'fecha_registro': asociacion.fecha_registro.strftime("%d/%m/%Y %H:%M") if asociacion.fecha_registro else ""
+                    }
                     return JsonResponse({
                         'success': True,
                         'message': 'Registro exitoso. Tu asociación está pendiente de aprobación.',
@@ -1221,9 +1541,9 @@ def enviar_email_registro_pendiente(asociacion):
         )
         email.attach_alternative(mensaje_html, "text/html")
         email.send(fail_silently=False)
-        print(f"✅ Email de confirmación enviado a: {asociacion.email}")
+        print(f"[OK] Email de confirmación enviado a: {asociacion.email}")
     except Exception as e:
-        print(f"❌ Error enviando email de confirmación: {e}")
+        print(f"[ERROR] Error enviando email de confirmación: {e}")
 
 def enviar_email_admin_nueva_asociacion(asociacion, request):
     """Envía email al admin con la nueva asociación para revisar"""
@@ -1312,58 +1632,59 @@ def enviar_email_admin_nueva_asociacion(asociacion, request):
             subject=subject,
             body=f"Nueva asociación registrada: {asociacion.nombre}. Token: {asociacion.token_aprobacion}",
             from_email=None,
-            to=['alvaro_m_a@icloud.com']
+            to=['asociacionanimales2@gmail.com']
         )
         email.attach_alternative(mensaje_html, "text/html")
         email.send(fail_silently=False)
-        print(f"✅ Email de revisión enviado para: {asociacion.nombre}")
+        print(f"[OK] Email de revisión enviado para: {asociacion.nombre}")
     except Exception as e:
-        print(f"❌ Error enviando email de revisión: {e}")
+        print(f"[ERROR] Error enviando email de revisión: {e}")
 
 def login_view(request):
     """Vista de login actualizada para manejar estados pendientes y rechazados"""
-    error_message = None
-    
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            
+
             try:
                 asociacion = RegistroAsociacion.objects.get(nombre=username)
 
                 # Verificar contraseña
                 if check_password(password, asociacion.password):
-                    
+
                     # VERIFICAR ESTADO DE LA ASOCIACIÓN
                     if asociacion.estado == 'pendiente':
-                        error_message = {
+                        request.session['login_error'] = {
                             'tipo': 'pendiente',
                             'mensaje': 'Tu asociación está pendiente de aprobación.',
                             'detalle': 'Recibirás un email cuando sea aprobada. Mientras tanto, revisa tu correo.'
                         }
+                        return redirect('inicio')
                     elif asociacion.estado == 'rechazada':
                         motivo = asociacion.motivo_rechazo or "No se especificó un motivo."
-                        error_message = {
+                        request.session['login_error'] = {
                             'tipo': 'rechazada',
                             'mensaje': 'Tu asociación fue rechazada.',
                             'detalle': f'Motivo: {motivo}'
                         }
-                        response = redirect('inicio')
+                        return redirect('inicio')
                     elif asociacion.estado == 'suspendida':
-                        error_message = {
+                        request.session['login_error'] = {
                             'tipo': 'suspendida',
                             'mensaje': 'Tu asociación ha sido suspendida temporalmente.',
                             'detalle': 'Contacta con el administrador si crees que es un error.'
                         }
-                        response = redirect('inicio')
+                        return redirect('inicio')
                     elif asociacion.estado == 'eliminada':
-                        error_message = {
-                            'tipo': 'eliminada', 
+                        request.session['login_error'] = {
+                            'tipo': 'eliminada',
                             'mensaje': 'Esta asociación ha sido eliminada.',
                             'detalle': 'No es posible acceder con esta cuenta.'
                         }
+                        return redirect('inicio')
                     elif asociacion.estado == 'activa':
                         # SECURITY: Regenerar sesión para prevenir session fixation
                         request.session.cycle_key()
@@ -1379,23 +1700,31 @@ def login_view(request):
 
                         return response
                     else:
-                        error_message = {
+                        request.session['login_error'] = {
                             'tipo': 'desconocido',
                             'mensaje': 'Estado de asociación desconocido.',
                             'detalle': 'Contacta con el administrador.'
                         }
+                        return redirect('inicio')
                 else:
-                    form.add_error(None, 'Contraseña incorrecta.')
-                    
-            except RegistroAsociacion.DoesNotExist:
-                form.add_error(None, 'No existe una asociación con ese nombre.')
-    else:
-        form = LoginForm()
+                    # Contraseña incorrecta
+                    request.session['login_error'] = {
+                        'tipo': 'credenciales',
+                        'mensaje': 'Contraseña incorrecta.',
+                        'detalle': 'Verifica tu contraseña e inténtalo de nuevo.'
+                    }
+                    return redirect('inicio')
 
-    return render(request, 'index.html', {
-        'form': form,
-        'error_message': error_message
-    })
+            except RegistroAsociacion.DoesNotExist:
+                request.session['login_error'] = {
+                    'tipo': 'credenciales',
+                    'mensaje': 'No existe una asociación con ese nombre.',
+                    'detalle': 'Verifica el nombre de tu asociación o regístrate.'
+                }
+                return redirect('inicio')
+
+    # Si es GET, redirigir a inicio
+    return redirect('inicio')
 
 
 def logout_view(request):
@@ -1412,41 +1741,57 @@ def Inicio(request):
     animales = CreacionAnimales.objects.filter(
         asociacion__estado__in=['activa', 'suspendida']
     ).select_related('asociacion')
-    
+
+    # Leer y limpiar errores de login de la sesión
+    login_error = request.session.pop('login_error', None)
+
+    # Detectar si es la primera visita
+    if not request.session.get('ha_visitado'):
+        messages.info(
+            request,
+            '¡Bienvenido a nuestra plataforma de adopción de animales! '
+            'Si eres una asociación de animales, puedes iniciar sesión para gestionar tus publicaciones. '
+            'Los visitantes pueden explorar y conocer a los animales disponibles para adopción.'
+        )
+        request.session['ha_visitado'] = True
+
     asociacion_id = request.COOKIES.get('asociacion_id')
     mis_animales = None
-    
+
     if asociacion_id:
         try:
             asociacion = RegistroAsociacion.objects.get(id=asociacion_id)
-            
+
             # Verificar si la asociación puede acceder
             if asociacion.puede_acceder():
                 mis_animales = CreacionAnimales.objects.filter(asociacion=asociacion)
-                
+
                 return render(request, 'index.html', {
                     'asociacion': asociacion,
                     'logueado': True,
                     'animales': animales,
-                    'mis_animales': mis_animales
+                    'mis_animales': mis_animales,
+                    'login_error': login_error
                 })
             else:
                 # Asociación suspendida o eliminada, limpiar sesión
                 response = render(request, 'index.html', {
-                    'logueado': False, 
+                    'logueado': False,
                     'animales': animales,
-                    'mis_animales': None
+                    'mis_animales': None,
+                    'login_error': login_error
                 })
                 response.delete_cookie('asociacion_id')
                 return response
-                
+
         except RegistroAsociacion.DoesNotExist:
             pass
-            
+
     return render(request, 'index.html', {
-        'logueado': False, 
+        'logueado': False,
         'animales': animales,
-        'mis_animales': None
+        'mis_animales': None,
+        'login_error': login_error
     })
 
 
@@ -1461,18 +1806,21 @@ def crear_animal(request):
     """Vista para crear un nuevo animal"""
     asociacion_id = request.COOKIES.get('asociacion_id')
     asociacion = get_object_or_404(RegistroAsociacion, id=asociacion_id)
-    
+
     if request.method == 'POST':
+        # Detectar si es una petición AJAX (desde el modal)
+        es_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
         form = CreacionAnimalesForm(request.POST, request.FILES, asociacion=asociacion)
         if form.is_valid():
             animal = form.save(commit=False)
             animal.asociacion = asociacion
-            
+
             # PROCESAR COLOR MANUALMENTE
             color_predefinido = request.POST.get('color_predefinido', '')
             color_personalizado = request.POST.get('color_personalizado', '')
             color_final = request.POST.get('color', '')
-            
+
             # Lógica para determinar el color final
             if color_predefinido and color_predefinido != 'Otro':
                 animal.color = color_predefinido
@@ -1482,19 +1830,63 @@ def crear_animal(request):
                 animal.color = color_final
             else:
                 animal.color = "No especificado"
-            
+
+            # Guardar el animal primero para poder asociar las imágenes y videos
             animal.save()
-            
+
+            # SUBIR MÚLTIPLES IMÁGENES A CLOUDINARY
+            imagenes_files = request.FILES.getlist('imagenes')
+            if imagenes_files:
+                from .models import ImagenAnimal
+                for idx, imagen_file in enumerate(imagenes_files[:10]):  # Máximo 10 imágenes
+                    imagen_url = cloudinary_storage.upload_image(imagen_file)
+                    if imagen_url:
+                        ImagenAnimal.objects.create(
+                            animal=animal,
+                            imagen=imagen_url,
+                            orden=idx,
+                            es_principal=(idx == 0)  # Primera imagen es principal
+                        )
+                        # Si es la primera imagen, también guardarla en el campo legacy
+                        if idx == 0:
+                            animal.imagen = imagen_url
+                            animal.save()
+
+            # SUBIR MÚLTIPLES VIDEOS A CLOUDINARY
+            videos_files = request.FILES.getlist('videos')
+            if videos_files:
+                from .models import VideoAnimal
+                for idx, video_file in enumerate(videos_files[:5]):  # Máximo 5 videos
+                    video_url = cloudinary_storage.upload_video(video_file)
+                    if video_url:
+                        VideoAnimal.objects.create(
+                            animal=animal,
+                            video=video_url,
+                            orden=idx
+                        )
+                        # Si es el primer video, también guardarlo en el campo legacy
+                        if idx == 0:
+                            animal.video = video_url
+                            animal.save()
+
             # OPCIONAL: Notificar nuevos animales por Telegram
             # from .telegram_utils import enviar_notificacion_nuevo_animal
             # enviar_notificacion_nuevo_animal(animal)
-            
+
+            if es_ajax:
+                return JsonResponse({'success': True, 'message': 'Animal creado exitosamente'})
             return redirect('mis_animales')
         else:
             print("Errores del formulario:", form.errors)
+            if es_ajax:
+                # Devolver errores como JSON para mostrar en el modal
+                errores = {}
+                for field, errors in form.errors.items():
+                    errores[field] = [str(error) for error in errors]
+                return JsonResponse({'success': False, 'errors': errores}, status=400)
     else:
         form = CreacionAnimalesForm(asociacion=asociacion)
-    
+
     return render(request, 'creacion_de_animales.html', {
         'form': form,
         'asociacion': asociacion
@@ -1577,13 +1969,72 @@ def editar_animal(request, animal_id):
         animal.provincia = request.POST.get('provincia')
         animal.codigo_postal = request.POST.get('codigo_postal')
         animal.descripcion = request.POST.get('descripcion')
-        
-        # Manejar archivos
-        if 'imagen' in request.FILES:
-            animal.imagen = request.FILES['imagen']
-        if 'video' in request.FILES:
-            animal.video = request.FILES['video']
-        
+
+        # MANEJAR ELIMINACIÓN DE IMÁGENES
+        imagenes_a_eliminar = request.POST.getlist('eliminar_imagenes')
+        if imagenes_a_eliminar:
+            from .models import ImagenAnimal
+            for imagen_id in imagenes_a_eliminar:
+                try:
+                    imagen = ImagenAnimal.objects.get(id=imagen_id, animal=animal)
+                    # Eliminar de Cloudinary
+                    if imagen.imagen:
+                        cloudinary_storage.delete_file(imagen.imagen)
+                    imagen.delete()
+                except ImagenAnimal.DoesNotExist:
+                    pass
+
+        # MANEJAR ELIMINACIÓN DE VIDEOS
+        videos_a_eliminar = request.POST.getlist('eliminar_videos')
+        if videos_a_eliminar:
+            from .models import VideoAnimal
+            for video_id in videos_a_eliminar:
+                try:
+                    video = VideoAnimal.objects.get(id=video_id, animal=animal)
+                    # Eliminar de Cloudinary
+                    if video.video:
+                        cloudinary_storage.delete_file(video.video)
+                    video.delete()
+                except VideoAnimal.DoesNotExist:
+                    pass
+
+        # SUBIR NUEVAS IMÁGENES
+        imagenes_files = request.FILES.getlist('imagenes')
+        if imagenes_files:
+            from .models import ImagenAnimal
+            # Obtener el orden máximo actual
+            max_orden = ImagenAnimal.objects.filter(animal=animal).count()
+            for idx, imagen_file in enumerate(imagenes_files[:10]):
+                imagen_url = cloudinary_storage.upload_image(imagen_file)
+                if imagen_url:
+                    ImagenAnimal.objects.create(
+                        animal=animal,
+                        imagen=imagen_url,
+                        orden=max_orden + idx,
+                        es_principal=False
+                    )
+                    # Actualizar la imagen principal si no existe
+                    if not animal.imagen:
+                        animal.imagen = imagen_url
+
+        # SUBIR NUEVOS VIDEOS
+        videos_files = request.FILES.getlist('videos')
+        if videos_files:
+            from .models import VideoAnimal
+            # Obtener el orden máximo actual
+            max_orden = VideoAnimal.objects.filter(animal=animal).count()
+            for idx, video_file in enumerate(videos_files[:5]):
+                video_url = cloudinary_storage.upload_video(video_file)
+                if video_url:
+                    VideoAnimal.objects.create(
+                        animal=animal,
+                        video=video_url,
+                        orden=max_orden + idx
+                    )
+                    # Actualizar el video principal si no existe
+                    if not animal.video:
+                        animal.video = video_url
+
         animal.save()
         return redirect('mis_animales')
     
@@ -1606,8 +2057,14 @@ def eliminar_animal(request, animal_id):
     # SECURITY: Verificar que el animal pertenece a la asociación logueada
     if animal.asociacion.id != int(asociacion_id):
         return HttpResponseForbidden("No tienes permisos para eliminar este animal")
-    
+
     if request.method == 'POST':
+        # Eliminar archivos de Cloudinary antes de eliminar el animal
+        if animal.imagen:
+            cloudinary_storage.delete_file(animal.imagen)
+        if animal.video:
+            cloudinary_storage.delete_file(animal.video)
+
         animal.delete()
         return redirect('mis_animales')
     
@@ -1822,6 +2279,7 @@ def acerca(request):
 
 
 @require_GET
+@admin_login_required
 def panel_administracion(request):
     """Panel de administración moderno para gestionar asociaciones"""
     
@@ -1847,3 +2305,28 @@ def panel_administracion(request):
     }
     
     return render(request, 'admin_panel.html', context)
+
+
+# ==================== VISTAS SEO ====================
+
+def robots_txt(request):
+    """Vista para servir el archivo robots.txt"""
+    return render(request, 'robots.txt', {
+        'request': request
+    }, content_type='text/plain')
+
+
+def sitemap_xml(request):
+    """Vista para generar el sitemap.xml dinámicamente"""
+    # Solo incluir animales de asociaciones activas que no estén adoptados
+    animales = CreacionAnimales.objects.filter(
+        asociacion__estado='activa',
+        adoptado=False
+    ).select_related('asociacion')
+
+    base_url = f"{request.scheme}://{request.get_host()}"
+
+    return render(request, 'sitemap.xml', {
+        'animales': animales,
+        'base_url': base_url
+    }, content_type='application/xml')

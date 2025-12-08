@@ -1,0 +1,623 @@
+================================================================================
+                    DIAGRAMA DE FLUJO: BOTONES DE TELEGRAM
+           Sistema de Gestion de Asociaciones de Animales - Django
+================================================================================
+
+                        FLUJO PRINCIPAL: REGISTRO Y APROBACION
+================================================================================
+
+[INICIO] Nueva Asociacion se Registra
+           |
+           v
+[WEB] Usuario completa formulario de registro
+      - Nombre, email, telefono
+      - Direccion, poblacion, provincia, CP
+      - Contrasena
+           |
+           v
+[BACKEND] views.py recibe datos
+      - Crea RegistroAsociacion con estado='pendiente'
+      - Genera tokens (token_aprobacion, token_gestion)
+           |
+           v
+[TELEGRAM UTILS] enviar_notificacion_nueva_asociacion()
+      - Formatea mensaje con datos de la asociacion
+      - Crea botones inline:
+        * [Aprobar] -> callback_data: "aprobar_{id}"
+        * [Rechazar] -> callback_data: "rechazar_{id}"
+        * [Mas Detalles] -> callback_data: "ver_{id}"
+      - Envia a Telegram via API
+           |
+           v
+[TELEGRAM] Bot envia mensaje al admin
+      +----------------------------------------------------+
+      | NUEVA ASOCIACION REGISTRADA                        |
+      |                                                    |
+      | Informacion:                                       |
+      | - Nombre: Protectora Madrid                        |
+      | - Email: info@protectora.com                       |
+      | - Telefono: 666777888                              |
+      | - Ubicacion: Madrid, Madrid                        |
+      | - Fecha: 22/11/2025 10:30                          |
+      |                                                    |
+      | Estado: Pendiente de aprobacion                    |
+      | ID: 123                                            |
+      |                                                    |
+      | [  Aprobar  ] [  Rechazar  ]                       |
+      | [         Mas Detalles        ]                    |
+      +----------------------------------------------------+
+           |
+           v
+[ADMIN] Presiona un boton
+           |
+           +------------------+------------------+------------------+
+           |                  |                  |                  |
+           v                  v                  v                  |
+      [APROBAR]          [RECHAZAR]        [VER DETALLES]          |
+           |                  |                  |                  |
+           |                  |                  v                  |
+           |                  |        (Ver seccion DETALLES)       |
+           |                  |                                     |
+           v                  v                                     |
+    (Continua abajo)   (Continua abajo)                            |
+                                                                    |
+                                                   [Loop: Volver a elegir]
+
+================================================================================
+                            FLUJO: BOTON APROBAR
+================================================================================
+
+[TELEGRAM] Admin presiona "Aprobar"
+           |
+           v
+[TELEGRAM API] Envia callback_query al webhook
+      - callback_data: "aprobar_123"
+      - message_id: 456789
+      - chat_id: 6344843081
+      - callback_query_id: ABC123XYZ
+           |
+           v
+[WEBHOOK] telegram_webhook() recibe POST
+      - Decodifica JSON
+      - Detecta 'callback_query' en data
+      - Extrae callback_data: "aprobar_123"
+      - Detecta prefijo "aprobar_"
+           |
+           v
+[CALLBACK HANDLER] manejar_aprobacion(callback_data, chat_id, message_id, callback_query_id)
+           |
+           +---> [1] Extraer ID: "123"
+           |
+           +---> [2] Buscar asociacion en BD
+           |         - RegistroAsociacion.objects.get(id=123)
+           |         - Si no existe: Error 404, responder callback, SALIR
+           |
+           +---> [3] Verificar estado
+           |         - Si ya esta activa: Responder "Ya aprobada", SALIR
+           |
+           +---> [4] Aprobar asociacion
+           |         - asociacion.aprobar(admin_name="Admin Telegram", notas="Aprobada desde Telegram")
+           |         - Estado cambia a 'activa'
+           |         - fecha_aprobacion = now()
+           |         - aprobada_por = "Admin Telegram"
+           |
+           +---> [5] Enviar email de aprobacion
+           |         - views.enviar_email_aprobacion(asociacion)
+           |         - Email HTML con instrucciones de acceso
+           |         - Si falla: Log error, continua
+           |
+           +---> [6] Editar mensaje en Telegram
+           |         - editar_mensaje_telegram(chat_id, message_id, nuevo_texto)
+           |         - Nuevo texto: "ASOCIACION APROBADA" + datos + confirmacion
+           |         - Sin botones (ya procesado)
+           |
+           +---> [7] Responder callback query
+                     - responder_callback(callback_query_id, "Asociacion aprobada!")
+                     - Quita el spinner, muestra notificacion
+           |
+           v
+[RESULTADO] Asociacion ACTIVA
+      - Puede acceder al sistema
+      - Email de confirmacion enviado
+      - Mensaje de Telegram actualizado
+      - Proceso completado
+
+================================================================================
+                            FLUJO: BOTON RECHAZAR
+================================================================================
+
+[TELEGRAM] Admin presiona "Rechazar"
+           |
+           v
+[TELEGRAM API] Envia callback_query
+      - callback_data: "rechazar_123"
+           |
+           v
+[WEBHOOK] Detecta "rechazar_" y llama a manejar_rechazo()
+           |
+           v
+[CALLBACK HANDLER] manejar_rechazo(callback_data, chat_id, message_id, callback_query_id)
+           |
+           +---> [1] Extraer ID: "123"
+           |
+           +---> [2] Buscar asociacion
+           |         - RegistroAsociacion.objects.get(id=123)
+           |
+           +---> [3] Verificar estado
+           |         - Si NO es 'pendiente': Error, SALIR
+           |
+           +---> [4] Guardar datos ANTES de eliminar
+           |         - nombre_asociacion = asociacion.nombre
+           |         - email_asociacion = asociacion.email
+           |         - poblacion, provincia
+           |
+           +---> [5] Enviar email de rechazo
+           |         - views.enviar_email_rechazo(asociacion, motivo)
+           |         - Motivo: "No cumple con los requisitos minimos..."
+           |         - Si falla: Log error, continua
+           |
+           +---> [6] ELIMINAR PERMANENTEMENTE
+           |         - asociacion.delete()
+           |         - Eliminacion en cascada: Todos los animales tambien
+           |         - Ya no existe en la BD
+           |
+           +---> [7] Editar mensaje en Telegram
+           |         - Texto: "ASOCIACION RECHAZADA Y ELIMINADA"
+           |         - Muestra datos guardados (nombre, email, etc.)
+           |         - Confirma eliminacion permanente
+           |
+           +---> [8] Responder callback query
+                     - "Asociacion rechazada y eliminada!"
+           |
+           v
+[RESULTADO] Asociacion ELIMINADA
+      - No existe en la base de datos
+      - Email de rechazo enviado
+      - Mensaje confirmado en Telegram
+      - Proceso completado
+
+================================================================================
+                          FLUJO: BOTON VER DETALLES
+================================================================================
+
+[TELEGRAM] Admin presiona "Mas Detalles"
+           |
+           v
+[TELEGRAM API] Envia callback_query
+      - callback_data: "ver_123"
+           |
+           v
+[WEBHOOK] Detecta "ver_" y llama a manejar_ver_detalles()
+           |
+           v
+[CALLBACK HANDLER] manejar_ver_detalles(callback_data, chat_id, message_id, callback_query_id)
+           |
+           +---> [1] Extraer ID: "123"
+           |
+           +---> [2] Buscar asociacion
+           |
+           +---> [3] Detectar URL base
+           |         - Intenta conectar a ngrok (localhost:4040)
+           |         - Si funciona: Usa URL publica de ngrok
+           |         - Si falla: Usa localhost o RENDER_EXTERNAL_HOSTNAME
+           |
+           +---> [4] Generar URLs administrativas
+           |         - admin_url: URL del panel principal
+           |         - asociacion_detail_url: Vista detallada con token
+           |
+           +---> [5] Formatear mensaje detallado
+           |         - Informacion basica: nombre, email, telefono
+           |         - Ubicacion completa: direccion, poblacion, provincia, CP
+           |         - Estado: estado actual + fecha registro + ID
+           |         - Enlaces: Panel principal + Vista detallada
+           |
+           +---> [6] Generar botones segun estado
+           |         |
+           |         +---> Si estado = 'pendiente':
+           |         |     - [Aprobar]
+           |         |     - [Rechazar]
+           |         |     - [Eliminar]
+           |         |     - [Ir al Panel Web] (URL externa)
+           |         |
+           |         +---> Si estado != 'pendiente':
+           |               - [Estado: {display}] (informativo)
+           |               - [Eliminar]
+           |               - [Ir al Panel Web]
+           |
+           +---> [7] Editar mensaje
+           |         - Reemplaza mensaje original con detalles
+           |         - Incluye nuevos botones
+           |
+           +---> [8] Responder callback query
+                     - "Detalles cargados"
+           |
+           v
+[RESULTADO] Vista de detalles mostrada
+      - Toda la informacion visible
+      - Enlaces al panel web disponibles
+      - Botones de accion segun contexto
+      - Admin puede tomar decision informada
+
+================================================================================
+                    FLUJO: BOTON ELIMINAR (CON CONFIRMACION)
+================================================================================
+
+[TELEGRAM] Admin presiona "Eliminar"
+           |
+           v
+[TELEGRAM API] Envia callback_query
+      - callback_data: "eliminar_123"
+           |
+           v
+[WEBHOOK] Detecta "eliminar_" y llama a manejar_eliminar_asociacion()
+           |
+           v
+[CALLBACK HANDLER] manejar_eliminar_asociacion(callback_data, chat_id, message_id, callback_query_id)
+           |
+           +---> [1] Extraer ID: "123"
+           |
+           +---> [2] Buscar asociacion
+           |
+           +---> [3] Contar animales
+           |         - animales_count = asociacion.animales.count()
+           |
+           +---> [4] Generar mensaje de ADVERTENCIA
+           |         - "CONFIRMACION DE ELIMINACION"
+           |         - Datos de la asociacion
+           |         - Estado actual
+           |         - Numero de animales
+           |         - "ACCION PERMANENTE E IRREVERSIBLE"
+           |         - Lista lo que se eliminara
+           |
+           +---> [5] Crear botones de confirmacion
+           |         - [SI, Eliminar Permanentemente] -> "confirmar_eliminar_123"
+           |         - [NO, Cancelar] -> "ver_123" (vuelve a detalles)
+           |
+           +---> [6] Editar mensaje
+           |         - Muestra advertencia
+           |         - Muestra botones de confirmacion
+           |
+           +---> [7] Responder callback query
+                     - "Confirma la eliminacion"
+           |
+           v
+[RESULTADO] Esperando confirmacion del admin
+      - Mensaje de advertencia visible
+      - Botones de SI/NO mostrados
+      - Admin debe tomar decision final
+           |
+           +------------------+------------------+
+           |                                     |
+           v                                     v
+     [NO, Cancelar]                      [SI, Eliminar]
+           |                                     |
+           v                                     v
+    Vuelve a detalles              (Continua abajo)
+    (callback: "ver_123")
+
+================================================================================
+                    FLUJO: CONFIRMAR ELIMINACION PERMANENTE
+================================================================================
+
+[TELEGRAM] Admin presiona "SI, Eliminar Permanentemente"
+           |
+           v
+[TELEGRAM API] Envia callback_query
+      - callback_data: "confirmar_eliminar_123"
+           |
+           v
+[WEBHOOK] Detecta "confirmar_eliminar_" y llama a manejar_confirmar_eliminar()
+           |
+           v
+[CALLBACK HANDLER] manejar_confirmar_eliminar(callback_data, chat_id, message_id, callback_query_id)
+           |
+           +---> [1] Extraer ID: "123"
+           |         NOTA: Split especial porque es "confirmar_eliminar_123"
+           |         - callback_data.split('_')[2] = "123"
+           |
+           +---> [2] Buscar asociacion
+           |
+           +---> [3] Guardar datos ANTES de eliminar
+           |         - nombre_asociacion
+           |         - email_asociacion
+           |         - poblacion, provincia
+           |         - animales_count = asociacion.animales.count()
+           |
+           +---> [4] ELIMINAR PERMANENTEMENTE
+           |         - asociacion.delete()
+           |         - Django CASCADE: Elimina tambien:
+           |           * Todos los animales (CreacionAnimales)
+           |           * Todos los favoritos (AnimalFavorito)
+           |           * Cualquier relacion ForeignKey
+           |
+           +---> [5] Generar mensaje de confirmacion
+           |         - "ASOCIACION ELIMINADA PERMANENTEMENTE"
+           |         - Datos de la asociacion eliminada
+           |         - Resumen de datos eliminados
+           |         - Fecha y hora de eliminacion
+           |         - Usuario que elimino
+           |
+           +---> [6] Editar mensaje
+           |         - Muestra confirmacion de eliminacion
+           |         - Sin botones (proceso completado)
+           |
+           +---> [7] Responder callback query
+                     - "Asociacion eliminada"
+           |
+           v
+[RESULTADO] Asociacion ELIMINADA PERMANENTEMENTE
+      - No existe en la base de datos
+      - Animales eliminados tambien
+      - Mensaje de confirmacion mostrado
+      - Operacion irreversible completada
+
+================================================================================
+                    PROCESAMIENTO GENERAL DEL WEBHOOK
+================================================================================
+
+[TELEGRAM] Evento ocurre (boton presionado, mensaje enviado, etc.)
+           |
+           v
+[TELEGRAM API] Envia peticion POST al webhook
+      URL: https://tu-dominio.com/telegram/webhook/
+      Headers:
+        - Content-Type: application/json
+        - X-Telegram-Bot-Api-Secret-Token: (opcional)
+      Body: JSON con datos del evento
+           |
+           v
+[DJANGO] Recibe peticion en telegram_webhook()
+           |
+           +---> [1] Verificar metodo HTTP
+           |         - Si GET: Health check, retornar status OK
+           |         - Si POST: Continuar
+           |         - Si otro: Error 405 Method Not Allowed
+           |
+           +---> [2] Verificar cuerpo no vacio
+           |
+           +---> [3] Decodificar JSON
+           |         - Manejo UTF-8 seguro
+           |         - Error handling para JSON invalido
+           |
+           +---> [4] Determinar tipo de actualizacion
+           |         |
+           |         +---> [A] Si 'callback_query' en data:
+           |         |     |
+           |         |     +---> Extraer:
+           |         |     |     - callback_data (ej: "aprobar_123")
+           |         |     |     - callback_query_id
+           |         |     |     - message.chat.id
+           |         |     |     - message.message_id
+           |         |     |
+           |         |     +---> Routing segun prefijo:
+           |         |           |
+           |         |           +---> "aprobar_" -> manejar_aprobacion()
+           |         |           +---> "rechazar_" -> manejar_rechazo()
+           |         |           +---> "ver_" -> manejar_ver_detalles()
+           |         |           +---> "eliminar_" -> manejar_eliminar_asociacion()
+           |         |           +---> "confirmar_eliminar_" -> manejar_confirmar_eliminar()
+           |         |           +---> otro -> Responder "Accion no reconocida"
+           |         |
+           |         +---> [B] Si 'message' en data:
+           |               |
+           |               +---> Extraer:
+           |               |     - text
+           |               |     - chat.id
+           |               |
+           |               +---> Si texto empieza con '/':
+           |               |     - Procesar como COMANDO
+           |               |     - /registrar -> iniciar_registro_asociacion()
+           |               |     - /cancelar -> limpiar_estado_conversacion()
+           |               |     - /ayuda -> enviar mensaje de ayuda
+           |               |     - otro -> "Comando no reconocido"
+           |               |
+           |               +---> Si NO empieza con '/':
+           |                     - Verificar si hay proceso activo
+           |                     - Si hay estado: procesar_paso_registro()
+           |                     - Si no hay estado: Ignorar
+           |
+           +---> [5] Logging
+           |         - INFO: Operaciones exitosas
+           |         - ERROR: Fallos y excepciones
+           |         - WARNING: Situaciones inusuales
+           |
+           +---> [6] Retornar JsonResponse
+                     - 200 OK: Procesado correctamente
+                     - 400 Bad Request: Datos invalidos
+                     - 404 Not Found: Recurso no encontrado
+                     - 500 Internal Server Error: Error del servidor
+
+================================================================================
+                        FUNCIONES DE COMUNICACION
+================================================================================
+
+enviar_mensaje_telegram(mensaje, botones=None)
+      |
+      +---> [1] Sanitizar mensaje (UTF-8)
+      +---> [2] Construir payload JSON:
+      |         - chat_id: TELEGRAM_CHAT_ID
+      |         - text: mensaje
+      |         - parse_mode: "Markdown"
+      |         - reply_markup: botones (si existen)
+      +---> [3] POST a Telegram API: /sendMessage
+      +---> [4] Retornar True/False segun exito
+
+
+editar_mensaje_telegram(chat_id, message_id, nuevo_texto, botones=None)
+      |
+      +---> [1] Sanitizar texto (UTF-8)
+      +---> [2] Construir payload JSON:
+      |         - chat_id: chat_id
+      |         - message_id: message_id
+      |         - text: nuevo_texto
+      |         - parse_mode: "Markdown"
+      |         - reply_markup: botones (si existen)
+      +---> [3] POST a Telegram API: /editMessageText
+      +---> [4] Retornar True/False segun exito
+
+
+responder_callback(callback_query_id, texto="Procesado")
+      |
+      +---> [1] Sanitizar texto (UTF-8)
+      +---> [2] Construir payload JSON:
+      |         - callback_query_id: callback_query_id
+      |         - text: texto
+      +---> [3] POST a Telegram API: /answerCallbackQuery
+      +---> [4] Retornar True/False segun exito
+      |
+      NOTA: Esta funcion QUITA el spinner de "cargando" en el boton
+
+================================================================================
+                            MODELO DE DATOS
+================================================================================
+
+RegistroAsociacion
+      |
+      +---> Campos basicos:
+      |     - nombre (CharField, unique)
+      |     - email (EmailField)
+      |     - telefono (CharField)
+      |     - direccion, poblacion, provincia, codigo_postal
+      |     - password (CharField, hasheada)
+      |     - logo (ImageField, opcional)
+      |
+      +---> Campos de estado:
+      |     - estado (CharField, choices):
+      |       * 'pendiente' - Default para nuevos registros
+      |       * 'activa' - Aprobada y operativa
+      |       * 'suspendida' - Temporalmente deshabilitada
+      |       * 'rechazada' - Rechazada (NO SE USA, se elimina directamente)
+      |       * 'eliminada' - Eliminada logicamente (NO SE USA)
+      |
+      +---> Campos de fechas:
+      |     - fecha_registro (DateTimeField, auto_now_add)
+      |     - fecha_modificacion_estado (DateTimeField, auto_now)
+      |     - fecha_aprobacion (DateTimeField, nullable)
+      |     - fecha_rechazo (DateTimeField, nullable)
+      |
+      +---> Campos administrativos:
+      |     - aprobada_por (CharField, nullable)
+      |     - notas_admin (TextField, nullable)
+      |     - motivo_rechazo (TextField, nullable)
+      |
+      +---> Tokens de seguridad:
+      |     - token_gestion (CharField, unique)
+      |     - token_aprobacion (CharField, unique)
+      |
+      +---> Metodos:
+            - aprobar(admin_name, notas) - Cambia a 'activa'
+            - rechazar(motivo, admin_name) - Cambia a 'rechazada'
+            - puede_acceder() - Retorna True si estado='activa'
+            - esta_pendiente() - Retorna True si estado='pendiente'
+            - get_estado_display() - Version legible del estado
+
+
+CreacionAnimales (Relacion: ForeignKey a RegistroAsociacion)
+      |
+      +---> asociacion (ForeignKey, on_delete=CASCADE)
+      +---> nombre, tipo_de_animal, raza, color
+      +---> imagen, video (opcionales)
+      +---> email, telefono, poblacion, provincia, codigo_postal
+      +---> descripcion
+      +---> fecha_creacion (DateTimeField, auto_now_add)
+      +---> adoptado (BooleanField)
+
+      NOTA: Si se elimina una RegistroAsociacion, todos sus animales
+            se eliminan AUTOMATICAMENTE por CASCADE
+
+================================================================================
+                            CONFIGURACION
+================================================================================
+
+Variables de entorno requeridas:
+      - TELEGRAM_BOT_TOKEN: Token del bot de Telegram
+      - TELEGRAM_CHAT_ID: ID del chat donde enviar notificaciones
+      - TELEGRAM_WEBHOOK_SECRET: (Opcional) Token secreto para verificar webhook
+
+Variables de Django (settings.py):
+      - ALLOWED_HOSTS: Incluir dominio del webhook
+      - CSRF_TRUSTED_ORIGINS: Incluir dominio del webhook
+
+URLs configuradas (urls.py):
+      - path('telegram/webhook/', telegram_webhook, name='telegram_webhook')
+
+Decoradores necesarios:
+      - @csrf_exempt - Requerido para webhook (peticiones externas)
+
+================================================================================
+                        MANEJO DE ERRORES
+================================================================================
+
+Tipos de errores manejados:
+      |
+      +---> [1] ObjectDoesNotExist
+      |     - Asociacion no encontrada en BD
+      |     - Respuesta: JsonResponse error 404
+      |     - Callback: "Asociacion no encontrada"
+      |
+      +---> [2] RequestException
+      |     - Error de conexion con Telegram API
+      |     - Log: ERROR level
+      |     - Retorna False
+      |
+      +---> [3] UnicodeDecodeError
+      |     - Error decodificando UTF-8
+      |     - Respuesta: JsonResponse error 400
+      |
+      +---> [4] JSONDecodeError
+      |     - JSON invalido
+      |     - Respuesta: JsonResponse error 400
+      |
+      +---> [5] Exception (general)
+            - Cualquier otro error
+            - Log: ERROR level con stack trace
+            - Respuesta: JsonResponse error 500
+
+Logging configurado:
+      - Logger: 'telegram_utils'
+      - Niveles: INFO, WARNING, ERROR
+      - Formato: Timestamp + nivel + mensaje
+
+================================================================================
+                    FLUJO DE TESTING
+================================================================================
+
+Test automatizado (test_telegram_botones_completo.py):
+      |
+      +---> [1] Test funciones basicas
+      |     - enviar_mensaje_telegram()
+      |     - enviar_mensaje_telegram(con botones)
+      |     - responder_callback()
+      |
+      +---> [2] Test callback aprobacion
+      |     - Crear asociacion pendiente
+      |     - Enviar notificacion
+      |     - Simular callback aprobar
+      |     - Verificar estado='activa'
+      |
+      +---> [3] Test callback rechazo
+      |     - Crear asociacion pendiente
+      |     - Simular callback rechazar
+      |     - Verificar eliminacion de BD
+      |
+      +---> [4] Test callback ver detalles
+      |     - Simular callback ver
+      |     - Verificar respuesta 200
+      |
+      +---> [5] Test callbacks eliminacion
+      |     - Simular callback eliminar (confirmacion)
+      |     - Simular callback confirmar_eliminar
+      |     - Verificar eliminacion
+      |
+      +---> [6] Test integracion views
+            - Importar funciones email
+            - Verificar metodos del modelo
+
+Resultado esperado:
+      - 6/6 tests pasados
+      - Mensajes en Telegram
+      - Base de datos modificada correctamente
+
+================================================================================
+                            FIN DEL DIAGRAMA
+================================================================================

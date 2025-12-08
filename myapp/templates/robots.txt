@@ -1,0 +1,25 @@
+# Robots.txt para Conectamos Corazones
+# Plataforma de adopción de animales
+
+User-agent: *
+Allow: /
+Allow: /ver_animal/
+Allow: /buscador-avanzado/
+Allow: /acerca/
+
+# Bloquear páginas de administración y login
+Disallow: /admin/
+Disallow: /django-admin/
+Disallow: /login/
+Disallow: /registro/
+Disallow: /mis_animales/
+Disallow: /crear_animal/
+Disallow: /editar_animal/
+Disallow: /eliminar_animal/
+Disallow: /telegram/
+
+# Sitemap
+Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+
+# Crawl-delay (opcional, para ser amable con los bots)
+Crawl-delay: 1

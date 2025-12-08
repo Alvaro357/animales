@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+ENV/
+
+# Django
+*.log
+local_settings.py
+*.sqlite3
+
+# Media files (se montan como volumen)
+media/
+
+# Static files (se generan en build)
+staticfiles/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Tests
+test_*.py
+*.test.py
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Node
+node_modules/
+npm-debug.log
+
+# Documentacion local
+*.md
+!README.md
+
+# Archivos temporales
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Archivos de entorno
+.env
+.env.local
+.env.*.local

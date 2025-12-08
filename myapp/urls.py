@@ -8,6 +8,10 @@ from . import views
 from .telegram_utils import telegram_webhook 
 
 urlpatterns = [
+    # SEO - robots.txt y sitemap.xml
+    path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
+
     # URLs existentes
     path('', views.Inicio, name='inicio'),
     path('registro/', views.registro_asociacion, name='registro_asociacion'),
@@ -15,6 +19,10 @@ urlpatterns = [
     path('validar-nombre-asociacion/', views.validar_nombre_asociacion, name='validar_nombre_asociacion'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+
+    # Restablecimiento de contraseña
+    path('recuperar-password/', views.solicitar_reset_password, name='solicitar_reset_password'),
+    path('reset-password/<str:token>/', views.reset_password, name='reset_password'),
     path('crear_animal/', views.crear_animal, name='crear_animal'),
     path('mis_animales/', views.mis_animales, name='mis_animales'),
     path('ver_animal/<int:animal_id>/', views.ver_animal, name='ver_animal'),
@@ -35,7 +43,11 @@ urlpatterns = [
     path('gestion/info/<str:token>/', views.info_asociacion, name='info_asociacion'),
     
     # ==================== NUEVAS URLs PARA SISTEMA DE APROBACIÓN ====================
-    
+
+    # Autenticación de admin
+    path('admin/login/', views.admin_login_view, name='admin_login'),
+    path('admin/logout/', views.admin_logout_view, name='admin_logout'),
+
     # Panel de administración principal
     path('admin/panel/', views.panel_administracion, name='panel_administracion'),
     

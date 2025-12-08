@@ -1,4 +1,4 @@
-{% load static tailwind_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,17 +9,181 @@
         html {
             font-size: 22px;
         }
-        
+
         /* Estilos para asteriscos obligatorios */
         .required-asterisk {
             color: #dc2626;
             margin-left: 2px;
             font-weight: bold;
         }
+
+        /* Estilos para preview de imágenes */
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            min-height: 180px;
+        }
+
+        .preview-container.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #e5e7eb;
+            background: #fafafa;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border: 3px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: move;
+        }
+
+        .preview-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .preview-item.drag-over {
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        .preview-item.principal {
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.95);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            line-height: 1;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-item .remove-btn:hover {
+            background: rgb(220, 38, 38);
+            transform: scale(1.1);
+        }
+
+        .preview-item .principal-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .preview-item .order-number {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Drag and drop zone */
+        .drop-zone {
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone:hover {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        }
+
+        .drop-zone.drag-over {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            transform: scale(1.02);
+        }
+
+        .drop-zone-icon {
+            font-size: 48px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        /* Loading indicator */
+        .uploading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .spinner {
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-100 py-10">
-    
+
     <div class="fixed top-10 right-10">
         <a href="/" class="text-red-600 uppercase tracking-widest text-sm border border-red-600 px-4 py-2 rounded hover:text-white hover:bg-red-600 hover:shadow-[0_0_5px_#f87171,0_0_25px_#f87171,0_0_50px_#f87171,0_0_100px_#f87171] transition">Volver</a>
     </div>
@@ -34,7 +198,48 @@
                         {{ field.label }}
                         {% if field.field.required %}<span class="required-asterisk">*</span>{% endif %}
                     </label>
-                    {{ field }}
+
+                    {% if field.name == 'imagenes' %}
+                        <!-- Zona de drag and drop para múltiples imágenes -->
+                        <div id="dropZone" class="drop-zone">
+                            <div class="drop-zone-icon">📷</div>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Arrastra tus imágenes aquí</h3>
+                            <p class="text-sm text-gray-500 mb-4">o</p>
+                            <label for="id_imagenes" class="inline-block bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 cursor-pointer transition">
+                                Seleccionar Imágenes
+                            </label>
+                            <input type="file"
+                                   name="imagenes"
+                                   id="id_imagenes"
+                                   accept="image/*"
+                                   multiple
+                                   class="hidden"
+                                   onchange="handleImageSelection(this.files)">
+                            <p class="text-xs text-gray-400 mt-4">Máximo 10 imágenes • JPG, PNG, GIF, WebP • Hasta 5MB por imagen</p>
+                        </div>
+                        <div id="imagenesPreview" class="preview-container empty" style="display: none;">
+                            <p class="text-gray-400">No hay imágenes seleccionadas</p>
+                        </div>
+                        <p class="text-xs text-blue-600 mt-2 font-semibold" id="imageCounter" style="display: none;">
+                            <span id="imageCount">0</span> de 10 imágenes seleccionadas
+                        </p>
+
+                    {% elif field.name == 'videos' %}
+                        <!-- Campo personalizado para múltiples videos -->
+                        <input type="file"
+                               name="videos"
+                               id="id_videos"
+                               accept="video/*"
+                               multiple
+                               class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100"
+                               onchange="previewVideos(this, 'videosPreview')">
+                        <p class="text-xs text-gray-500 mt-1">Puedes seleccionar hasta 5 videos</p>
+                        <div id="videosPreview" class="preview-container"></div>
+
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+
                     {% if field.errors %}
                         <p class="text-red-500 text-sm">{{ field.errors|striptags }}</p>
                     {% endif %}
@@ -45,5 +250,334 @@
             </button>
         </form>
     </div>
+
+    <script>
+        // Variables globales para almacenar los archivos seleccionados
+        let selectedImages = [];
+        let selectedVideos = [];
+        let draggedItem = null;
+
+        // Inicializar drag and drop cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragAndDrop();
+        });
+
+        // Configurar drag and drop
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+            if (!dropZone) return;
+
+            // Prevenir comportamiento por defecto
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            // Highlight drop zone
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.add('drag-over');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.remove('drag-over');
+                }, false);
+            });
+
+            // Manejar drop
+            dropZone.addEventListener('drop', handleDrop, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDrop(e) {
+            const files = e.dataTransfer.files;
+            handleImageSelection(files);
+        }
+
+        // Manejar selección de imágenes (desde input o drag & drop)
+        function handleImageSelection(files) {
+            const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+            // Verificar cuántas imágenes podemos agregar
+            const espacioDisponible = 10 - selectedImages.length;
+
+            if (espacioDisponible === 0) {
+                showNotification('⚠️ Ya has alcanzado el máximo de 10 imágenes', 'warning');
+                return;
+            }
+
+            if (imageFiles.length > espacioDisponible) {
+                showNotification(`⚠️ Solo puedes agregar ${espacioDisponible} imagen(es) más`, 'warning');
+                imageFiles.splice(espacioDisponible);
+            }
+
+            // Validar tamaño de archivos (5MB max)
+            const validFiles = imageFiles.filter(file => {
+                // Verificar que no sea un archivo duplicado
+                const isDuplicate = selectedImages.some(existingFile =>
+                    existingFile.name === file.name &&
+                    existingFile.size === file.size &&
+                    existingFile.lastModified === file.lastModified
+                );
+
+                if (isDuplicate) {
+                    showNotification(`⚠️ ${file.name} ya fue agregada`, 'warning');
+                    return false;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification(`❌ ${file.name} es demasiado grande (máx. 5MB)`, 'error');
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                selectedImages.push(...validFiles);
+                showNotification(`✅ ${validFiles.length} imagen(es) agregada(s)`, 'success');
+                updateImagePreview();
+                updateImageInput();
+            }
+        }
+
+        // Actualizar preview de imágenes con drag & drop para reordenar
+        function updateImagePreview() {
+            const preview = document.getElementById('imagenesPreview');
+            const dropZone = document.getElementById('dropZone');
+            const counter = document.getElementById('imageCounter');
+            const count = document.getElementById('imageCount');
+
+            if (selectedImages.length === 0) {
+                // Mostrar zona de drop completa cuando no hay imágenes
+                dropZone.style.display = 'block';
+                dropZone.innerHTML = `
+                    <div class="drop-zone-icon">📷</div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Arrastra tus imágenes aquí</h3>
+                    <p class="text-sm text-gray-500 mb-4">o</p>
+                    <label for="id_imagenes" class="inline-block bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 cursor-pointer transition">
+                        Seleccionar Imágenes
+                    </label>
+                    <input type="file" name="imagenes" id="id_imagenes" accept="image/*" multiple class="hidden" onchange="handleImageSelection(this.files)">
+                    <p class="text-xs text-gray-400 mt-4">Máximo 10 imágenes • JPG, PNG, GIF, WebP • Hasta 5MB por imagen</p>
+                `;
+                preview.style.display = 'none';
+                counter.style.display = 'none';
+                return;
+            }
+
+            // Cuando hay imágenes, mostrar un botón más pequeño para agregar más
+            if (selectedImages.length < 10) {
+                dropZone.style.display = 'block';
+                dropZone.style.padding = '20px';
+                dropZone.innerHTML = `
+                    <div class="flex items-center justify-center gap-4">
+                        <div class="drop-zone-icon" style="font-size: 24px;">➕</div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-700">Agregar más imágenes</h3>
+                            <p class="text-xs text-gray-500">Arrastra aquí o
+                                <label for="id_imagenes" class="text-blue-500 hover:text-blue-600 cursor-pointer underline">
+                                    selecciona
+                                </label>
+                            </p>
+                            <input type="file" name="imagenes" id="id_imagenes" accept="image/*" multiple class="hidden" onchange="handleImageSelection(this.files)">
+                        </div>
+                    </div>
+                `;
+            } else {
+                dropZone.style.display = 'none';
+            }
+
+            preview.style.display = 'grid';
+            preview.classList.remove('empty');
+            counter.style.display = 'block';
+            count.textContent = selectedImages.length;
+
+            // Re-configurar eventos de drag & drop después de actualizar HTML
+            setTimeout(() => setupDragAndDrop(), 100);
+
+            preview.innerHTML = '';
+
+            selectedImages.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    if (index === 0) div.classList.add('principal');
+                    div.draggable = true;
+                    div.dataset.index = index;
+
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        ${index === 0 ? '<span class="principal-badge">Principal</span>' : ''}
+                        <span class="order-number">${index + 1}</span>
+                        <button type="button" class="remove-btn" onclick="removeImage(${index})">×</button>
+                    `;
+
+                    // Agregar eventos de drag para reordenar
+                    div.addEventListener('dragstart', handleDragStart);
+                    div.addEventListener('dragend', handleDragEnd);
+                    div.addEventListener('dragover', handleDragOver);
+                    div.addEventListener('drop', handleDropImage);
+
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Funciones de drag para reordenar imágenes
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+
+            // Limpiar todas las clases de drag
+            document.querySelectorAll('.preview-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+
+            e.dataTransfer.dropEffect = 'move';
+
+            const afterElement = getDragAfterElement(e.currentTarget.parentNode, e.clientX);
+            if (afterElement == null) {
+                e.currentTarget.classList.add('drag-over');
+            }
+
+            return false;
+        }
+
+        function handleDropImage(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            if (draggedItem !== this) {
+                const draggedIndex = parseInt(draggedItem.dataset.index);
+                const targetIndex = parseInt(this.dataset.index);
+
+                // Reordenar array
+                const draggedFile = selectedImages[draggedIndex];
+                selectedImages.splice(draggedIndex, 1);
+                selectedImages.splice(targetIndex, 0, draggedFile);
+
+                updateImagePreview();
+                updateImageInput();
+            }
+
+            return false;
+        }
+
+        function getDragAfterElement(container, x) {
+            const draggableElements = [...container.querySelectorAll('.preview-item:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = x - box.left - box.width / 2;
+
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Función para eliminar una imagen
+        function removeImage(index) {
+            selectedImages.splice(index, 1);
+            updateImagePreview();
+            updateImageInput();
+            showNotification('🗑️ Imagen eliminada', 'info');
+        }
+
+        // Actualizar el input de imágenes
+        function updateImageInput() {
+            const input = document.getElementById('id_imagenes');
+            const dataTransfer = new DataTransfer();
+            selectedImages.forEach(file => dataTransfer.items.add(file));
+            input.files = dataTransfer.files;
+        }
+
+        // Función para previsualizar videos (mantener la existente mejorada)
+        function previewVideos(input, previewId) {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = '';
+            selectedVideos = Array.from(input.files).slice(0, 5);
+
+            selectedVideos.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <video src="${e.target.result}" controls></video>
+                        <span class="order-number">${index + 1}</span>
+                        <button type="button" class="remove-btn" onclick="removeVideo(${index})">×</button>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeVideo(index) {
+            selectedVideos.splice(index, 1);
+            updateVideoInput();
+        }
+
+        function updateVideoInput() {
+            const input = document.getElementById('id_videos');
+            const dataTransfer = new DataTransfer();
+            selectedVideos.forEach(file => dataTransfer.items.add(file));
+            input.files = dataTransfer.files;
+            previewVideos(input, 'videosPreview');
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
+
+            const colors = {
+                'info': 'bg-blue-500',
+                'success': 'bg-green-500',
+                'warning': 'bg-yellow-500',
+                'error': 'bg-red-500'
+            };
+
+            notification.classList.add(colors[type] || colors.info, 'text-white');
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
 </body>
 </html>

@@ -101,6 +101,19 @@ class RegistroAsociacion(models.Model):
         default=False,
         help_text="Si ya se enviaron los datos completos al admin"
     )
+
+    # CAMPOS PARA RESTABLECIMIENTO DE CONTRASEÑA
+    token_reset_password = models.CharField(
+        max_length=64,
+        blank=True,
+        null=True,
+        help_text="Token único para restablecer contraseña"
+    )
+    token_reset_expira = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="Fecha de expiración del token de reset"
+    )
     
     def save(self, *args, **kwargs):
         # Generar tokens si no existen
@@ -195,7 +208,35 @@ class RegistroAsociacion(models.Model):
                 minutos = delta.seconds // 60
                 return f"Hace {minutos} minutos"
         return "Tiempo desconocido"
-    
+
+    def generar_token_reset_password(self):
+        """Genera un token seguro para restablecer contraseña (válido 1 hora)"""
+        import time
+        timestamp = str(int(time.time() * 1000000))
+        base_string = f"{self.nombre}-reset-{timestamp}-{secrets.token_hex(16)}"
+        token = hashlib.sha256(base_string.encode()).hexdigest()
+
+        self.token_reset_password = token
+        self.token_reset_expira = timezone.now() + timezone.timedelta(hours=1)
+        self.save(update_fields=['token_reset_password', 'token_reset_expira'])
+        return token
+
+    def validar_token_reset(self, token):
+        """Valida si el token de reset es válido y no ha expirado"""
+        if not self.token_reset_password or not self.token_reset_expira:
+            return False
+        if self.token_reset_password != token:
+            return False
+        if timezone.now() > self.token_reset_expira:
+            return False
+        return True
+
+    def limpiar_token_reset(self):
+        """Limpia el token de reset después de usarlo"""
+        self.token_reset_password = None
+        self.token_reset_expira = None
+        self.save(update_fields=['token_reset_password', 'token_reset_expira'])
+
     class Meta:
         db_table = 'asociaciones'
         ordering = ['-fecha_registro']
@@ -209,19 +250,17 @@ class CreacionAnimales(models.Model):
     nombre = models.CharField(max_length=100)
     tipo_de_animal = models.CharField(max_length=200)
     raza = models.CharField(max_length=50)
-    imagen = models.ImageField(
-        upload_to='animales/fotos/',
+    imagen = models.URLField(
+        max_length=500,
         blank=True,
         null=True,
-        validators=[validate_image_file],
-        help_text="Foto del animal (máximo 5MB, formatos: JPG, PNG, GIF, WebP)"
+        help_text="URL de la foto del animal en Backblaze B2"
     )
-    video = models.FileField(
-        upload_to='animales/videos/',
+    video = models.URLField(
+        max_length=500,
         blank=True,
         null=True,
-        validators=[validate_video_file],
-        help_text="Video del animal (máximo 10MB, formatos: MP4, AVI, MOV, WebM)"
+        help_text="URL del video del animal en Backblaze B2"
     )
     email = models.EmailField()
     telefono = models.CharField(max_length=130)
@@ -232,25 +271,116 @@ class CreacionAnimales(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     adoptado = models.BooleanField(default=False)
     color = models.CharField(
-        max_length=100, 
+        max_length=100,
         help_text="Color del animal (ej: marrón, negro, blanco, manchado, etc.)",
         blank=False,
         null=False,
         default="No especificado"
     )
 
+    TAMANOS = [
+        ('Mini', 'Mini'),
+        ('Pequeño', 'Pequeño'),
+        ('Mediano-Pequeño', 'Mediano-Pequeño'),
+        ('Mediano', 'Mediano'),
+        ('Mediano-Grande', 'Mediano-Grande'),
+        ('Grande', 'Grande'),
+    ]
+
+    tamano = models.CharField(
+        max_length=20,
+        choices=TAMANOS,
+        help_text="Tamaño del animal",
+        blank=False,
+        null=False,
+        default="Mediano"
+    )
+
     class Meta:
         db_table = 'Animales'
         ordering = ['-fecha_creacion']
-        
+
     def __str__(self):
         return self.nombre
+
+    def get_primera_imagen(self):
+        """Retorna la URL de la primera imagen (nueva o legacy)"""
+        # Primero buscar la imagen marcada como principal
+        primera_imagen = self.imagenes.filter(es_principal=True).first()
+        if primera_imagen:
+            return primera_imagen.imagen
+        # Si no hay principal, buscar la primera imagen por orden
+        primera_cualquiera = self.imagenes.first()
+        if primera_cualquiera:
+            return primera_cualquiera.imagen
+        # Fallback al campo legacy
+        return self.imagen if self.imagen else None
 
 class AnimalFavorito(models.Model):
     usuario_ip = models.GenericIPAddressField()
     asociacion = models.ForeignKey(RegistroAsociacion, on_delete=models.CASCADE, null=True, blank=True)
     animal = models.ForeignKey(CreacionAnimales, on_delete=models.CASCADE)
     fecha_agregado = models.DateTimeField(auto_now_add=True)
-        
+
     class Meta:
         unique_together = ['usuario_ip', 'animal']
+
+class ImagenAnimal(models.Model):
+    """Modelo para almacenar múltiples imágenes de un animal"""
+    animal = models.ForeignKey(CreacionAnimales, on_delete=models.CASCADE, related_name='imagenes')
+    imagen = models.URLField(
+        max_length=500,
+        help_text="URL de la imagen del animal en Cloudinary"
+    )
+    orden = models.PositiveIntegerField(
+        default=0,
+        help_text="Orden de visualización de la imagen"
+    )
+    es_principal = models.BooleanField(
+        default=False,
+        help_text="Indica si es la imagen principal del animal"
+    )
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'imagenes_animales'
+        ordering = ['orden', '-es_principal', '-fecha_subida']
+        verbose_name = 'Imagen de Animal'
+        verbose_name_plural = 'Imágenes de Animales'
+
+    def __str__(self):
+        return f"Imagen de {self.animal.nombre} - Orden {self.orden}"
+
+    def save(self, *args, **kwargs):
+        # Si se marca como principal, desmarcar las demás
+        if self.es_principal:
+            ImagenAnimal.objects.filter(animal=self.animal, es_principal=True).exclude(pk=self.pk).update(es_principal=False)
+        super().save(*args, **kwargs)
+
+class VideoAnimal(models.Model):
+    """Modelo para almacenar múltiples videos de un animal"""
+    animal = models.ForeignKey(CreacionAnimales, on_delete=models.CASCADE, related_name='videos')
+    video = models.URLField(
+        max_length=500,
+        help_text="URL del video del animal en Cloudinary"
+    )
+    orden = models.PositiveIntegerField(
+        default=0,
+        help_text="Orden de visualización del video"
+    )
+    descripcion = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Descripción opcional del video"
+    )
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'videos_animales'
+        ordering = ['orden', '-fecha_subida']
+        verbose_name = 'Video de Animal'
+        verbose_name_plural = 'Videos de Animales'
+
+    def __str__(self):
+        return f"Video de {self.animal.nombre} - Orden {self.orden}"

@@ -1,4 +1,4 @@
-{% load static tailwind_tags %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -6,16 +6,16 @@
     <meta charset="UTF-8">
     <title>Mis Favoritos - Adopta</title>  
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style type="text/tailwindcss">
         html {
             font-size: 16px;
         }
-        
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Pacifico', cursive;
             background: #0a0a0a;
-            color: #ffffff;
+            color: #ffe4cc;
             text-align: center;
             padding-top: 100px;
             position: relative;
@@ -51,8 +51,8 @@
         }
         
         .star.bright {
-            background: #60a5fa;
-            box-shadow: 0 0 4px #60a5fa;
+            background: #ffd89b;
+            box-shadow: 0 0 4px #ffd89b;
         }
         
         @keyframes twinkle {
@@ -65,7 +65,7 @@
             position: absolute;
             width: 2px;
             height: 2px;
-            background: linear-gradient(45deg, #60a5fa, transparent);
+            background: linear-gradient(45deg, #ffd89b, transparent);
             border-radius: 50%;
             opacity: 0;
             animation: shoot 2s linear infinite;
@@ -97,16 +97,17 @@
         
         /* Botones con efectos modernos */
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #ffb4a2, #ff9a7f);
+            border: 1px solid rgba(255, 180, 162, 0.3);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            color: #5c4a42;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(255, 180, 162, 0.3);
         }
         
         .btn-primary::before {
@@ -125,15 +126,16 @@
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 201, 217, 0.15);
+            border: 1px solid rgba(255, 201, 217, 0.3);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            color: #ffe4cc;
         }
-        
+
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 201, 217, 0.25);
+            border-color: rgba(255, 201, 217, 0.5);
             transform: translateY(-1px);
         }
         
@@ -154,7 +156,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            background: linear-gradient(135deg, rgba(255, 180, 162, 0.1), rgba(255, 201, 217, 0.1));
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 0;
@@ -166,9 +168,9 @@
         
         .animal-card:hover {
             transform: translateY(-8px);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
-                        0 0 0 1px rgba(59, 130, 246, 0.1);
+            border-color: rgba(255, 180, 162, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 180, 162, 0.1);
         }
         
         .card-content {
@@ -202,12 +204,12 @@
         }
         
         .favorite-btn.active {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(255, 201, 217, 0.2);
+            border-color: rgba(255, 201, 217, 0.4);
         }
-        
+
         .favorite-btn.active:hover {
-            background: rgba(239, 68, 68, 0.3);
+            background: rgba(255, 201, 217, 0.3);
         }
         
         .heart-icon {
@@ -223,12 +225,12 @@
         }
         
         .favorite-btn:hover .heart-outline {
-            stroke: #ef4444;
+            stroke: #ffc9d9;
         }
-        
+
         .heart-filled {
-            fill: #ef4444;
-            stroke: #ef4444;
+            fill: #ffc9d9;
+            stroke: #ffc9d9;
             stroke-width: 1;
         }
         
@@ -262,15 +264,15 @@
         }
         
         .filter-btn.active {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-color: #3b82f6;
-            color: #ffffff;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #ffb4a2, #ff9a7f);
+            border-color: #ffb4a2;
+            color: #5c4a42;
+            box-shadow: 0 0 20px rgba(255, 180, 162, 0.4);
         }
         
         .filter-btn:hover:not(.active) {
             background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            color: #ffe4cc;
         }
         
         /* Responsive para filtros */
@@ -321,26 +323,28 @@
         
         .search-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
         }
         
         /* Título principal */
         .main-title {
             font-size: 3.5rem;
             font-weight: 700;
-            line-height: 1.1;
+            line-height: 1.4;
             letter-spacing: -0.025em;
-            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            background: linear-gradient(135deg, #ffe4cc, #ffb4a2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 2rem;
+            padding: 0.5rem 0;
         }
-        
+
         @media (max-width: 768px) {
             .main-title {
                 font-size: 2.5rem;
+                line-height: 1.3;
             }
             
             body {
@@ -359,15 +363,15 @@
         
         /* Contador de resultados */
         .results-counter {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+            background: rgba(255, 216, 155, 0.15);
+            border: 1px solid rgba(255, 216, 155, 0.3);
+            color: #ffd89b;
         }
-        
+
         .results-counter.no-results {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            background: rgba(255, 201, 217, 0.15);
+            border: 1px solid rgba(255, 201, 217, 0.3);
+            color: #ffc9d9;
         }
         
         /* Estado de vacío */
@@ -397,7 +401,7 @@
         .empty-heart {
             width: 4rem;
             height: 4rem;
-            stroke: rgba(239, 68, 68, 0.3);
+            stroke: rgba(255, 201, 217, 0.5);
             fill: none;
             stroke-width: 1.5;
         }
@@ -426,7 +430,7 @@
                 <a href="/mis_animales/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white">
                     Mis Animales
                 </a>
-                <a href="/logout/" class="text-red-400 hover:text-red-300 px-4 py-2 border border-red-400/30 hover:border-red-300 rounded-lg text-sm transition-all duration-300">
+                <a href="/logout/" class="text-pink-300 hover:text-pink-200 px-4 py-2 border border-pink-300/30 hover:border-pink-200 rounded-lg text-sm transition-all duration-300">
                     Salir
                 </a>
             {% else %}
@@ -538,12 +542,13 @@
             nombre: "{{ animal.nombre|escapejs }}",
             tipo: "{{ animal.tipo_de_animal|escapejs }}",
             raza: "{{ animal.raza|escapejs }}",
+            tamano: "{{ animal.tamano|escapejs }}",
             email: "{{ animal.email|escapejs }}",
             telefono: "{{ animal.telefono|escapejs }}",
             poblacion: "{{ animal.poblacion|escapejs }}",
             provincia: "{{ animal.provincia|escapejs }}",
             descripcion: "{{ animal.descripcion|escapejs }}",
-            imagen: "{% if animal.imagen %}{{ animal.imagen.url }}{% endif %}"
+            imagen: "{% if animal.imagen %}{{ animal.imagen }}{% endif %}"
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
@@ -616,10 +621,10 @@
                 
                 <a href="/ver_animal/${animal.id}/" class="block">
                     <div class="card-content">
-                        <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative">
+                        <div class="aspect-[3/4] bg-gray-800 rounded-t-2xl overflow-hidden relative">
                             ${animal.imagen ? `
-                                <img src="${animal.imagen}" 
-                                     alt="${animal.nombre}" 
+                                <img src="${animal.imagen}"
+                                     alt="${animal.nombre}"
                                      class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110">
                             ` : `
                                 <div class="w-full h-full flex items-center justify-center text-gray-500">
@@ -629,11 +634,12 @@
                                 </div>
                             `}
                         </div>
-                        
+
                         <div class="p-6 text-center">
                             <h3 class="text-2xl font-bold text-white mb-1 tracking-wide">${animal.nombre}</h3>
-                            <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-3 opacity-90">${animal.raza}</p>
-                            
+                            <p class="text-amber-300 font-medium text-sm uppercase tracking-wider mb-1 opacity-90">${animal.raza}</p>
+                            <p class="text-gray-400 text-xs uppercase tracking-wide mb-3 opacity-75">Tamaño: ${animal.tamano}</p>
+
                             <div class="flex items-center justify-center text-gray-400 text-sm">
                                 <svg class="w-4 h-4 mr-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>

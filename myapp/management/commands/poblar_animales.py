@@ -2,12 +2,94 @@
 # Crear esta estructura: myapp/management/commands/poblar_animales.py
 
 import random
+import hashlib
+import requests
+import io
+import time
+import cloudinary
+import cloudinary.uploader
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from django.conf import settings
 from myapp.models import RegistroAsociacion, CreacionAnimales
 
 class Command(BaseCommand):
-    help = 'Poblar la base de datos con 500 animales variados'
+    help = 'Poblar la base de datos con 500 animales variados con fotos en Cloudinary'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Configurar Cloudinary
+        cloudinary.config(
+            cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+            api_key=settings.CLOUDINARY_API_KEY,
+            api_secret=settings.CLOUDINARY_API_SECRET,
+            secure=True
+        )
+
+    def descargar_y_subir_imagen(self, tipo_animal, indice):
+        """Descarga una imagen de un servicio externo y la sube a Cloudinary"""
+        seed = hashlib.md5(f"{tipo_animal}_{indice}_{random.randint(1,10000)}".encode()).hexdigest()[:8]
+
+        # URLs de imágenes según el tipo de animal
+        if tipo_animal == 'Perro':
+            urls = [
+                f"https://placedog.net/400/300?id={indice % 100 + random.randint(1, 50)}",
+                f"https://loremflickr.com/400/300/dog?lock={indice + random.randint(1, 1000)}",
+            ]
+        elif tipo_animal == 'Gato':
+            width = 400 + (indice % 10)
+            height = 300 + (indice % 10)
+            urls = [
+                f"https://placekitten.com/{width}/{height}",
+                f"https://loremflickr.com/400/300/cat?lock={indice + random.randint(1, 1000)}",
+            ]
+        elif tipo_animal == 'Conejo':
+            urls = [
+                f"https://loremflickr.com/400/300/rabbit?lock={indice + random.randint(1, 1000)}",
+                f"https://loremflickr.com/400/300/bunny?lock={indice + random.randint(1, 1000)}",
+            ]
+        elif tipo_animal == 'Pájaro':
+            urls = [
+                f"https://loremflickr.com/400/300/bird?lock={indice + random.randint(1, 1000)}",
+                f"https://loremflickr.com/400/300/parrot?lock={indice + random.randint(1, 1000)}",
+            ]
+        else:
+            urls = [
+                f"https://loremflickr.com/400/300/pet?lock={indice + random.randint(1, 1000)}",
+                f"https://loremflickr.com/400/300/animal?lock={indice + random.randint(1, 1000)}",
+            ]
+
+        # Intentar descargar y subir la imagen
+        for url in urls:
+            try:
+                # Descargar la imagen
+                response = requests.get(url, timeout=15, allow_redirects=True)
+                if response.status_code == 200 and len(response.content) > 1000:
+                    # Subir a Cloudinary directamente desde la URL
+                    result = cloudinary.uploader.upload(
+                        url,
+                        folder=f"animales/fotos/{tipo_animal.lower()}",
+                        public_id=f"{tipo_animal.lower()}_{indice}_{seed}",
+                        resource_type="image",
+                        overwrite=True
+                    )
+                    return result.get('secure_url')
+            except Exception as e:
+                continue
+
+        # Si falla, usar un placeholder de Cloudinary
+        try:
+            placeholder_url = f"https://res.cloudinary.com/demo/image/upload/w_400,h_300,c_fill/sample.jpg"
+            result = cloudinary.uploader.upload(
+                placeholder_url,
+                folder=f"animales/fotos/{tipo_animal.lower()}",
+                public_id=f"{tipo_animal.lower()}_{indice}_{seed}_placeholder",
+                resource_type="image",
+                overwrite=True
+            )
+            return result.get('secure_url')
+        except:
+            return None
 
     def handle(self, *args, **options):
         # Verificar que hay asociaciones
@@ -125,6 +207,9 @@ class Command(BaseCommand):
                 familia_tipo=random.choice(familia_tipos)
             )
 
+            # Descargar y subir imagen a Cloudinary
+            imagen_url = self.descargar_y_subir_imagen('Perro', i)
+
             animal = CreacionAnimales.objects.create(
                 asociacion=asociacion,
                 nombre=f"{nombre} {random.randint(1, 999)}" if random.random() < 0.3 else nombre,
@@ -137,9 +222,13 @@ class Command(BaseCommand):
                 provincia=provincia,
                 codigo_postal=f"{random.randint(10000, 52999)}",
                 descripcion=descripcion,
-                adoptado=random.random() < 0.15  # 15% adoptados
+                adoptado=random.random() < 0.15,  # 15% adoptados
+                imagen=imagen_url if imagen_url else ''
             )
             animales_creados += 1
+
+            if (i + 1) % 10 == 0:
+                self.stdout.write(f'  Creados {i + 1} perros (subidos a Cloudinary)...')
 
         # Crear gatos
         for i in range(gatos_cantidad):
@@ -160,6 +249,9 @@ class Command(BaseCommand):
                 familia_tipo=random.choice(familia_tipos)
             )
 
+            # Descargar y subir imagen a Cloudinary
+            imagen_url = self.descargar_y_subir_imagen('Gato', i)
+
             animal = CreacionAnimales.objects.create(
                 asociacion=asociacion,
                 nombre=f"{nombre} {random.randint(1, 999)}" if random.random() < 0.3 else nombre,
@@ -172,9 +264,13 @@ class Command(BaseCommand):
                 provincia=provincia,
                 codigo_postal=f"{random.randint(10000, 52999)}",
                 descripcion=descripcion,
-                adoptado=random.random() < 0.12  # 12% adoptados
+                adoptado=random.random() < 0.12,  # 12% adoptados
+                imagen=imagen_url if imagen_url else ''
             )
             animales_creados += 1
+
+            if (i + 1) % 10 == 0:
+                self.stdout.write(f'  Creados {i + 1} gatos (subidos a Cloudinary)...')
 
         # Crear otros animales
         tipos_otros = ['Conejo', 'Pájaro', 'Otros']
@@ -204,6 +300,9 @@ class Command(BaseCommand):
                 familia_tipo=random.choice(familia_tipos)
             )
 
+            # Descargar y subir imagen a Cloudinary
+            imagen_url = self.descargar_y_subir_imagen(tipo, i)
+
             animal = CreacionAnimales.objects.create(
                 asociacion=asociacion,
                 nombre=f"{nombre} {random.randint(1, 999)}" if random.random() < 0.3 else nombre,
@@ -216,9 +315,13 @@ class Command(BaseCommand):
                 provincia=provincia,
                 codigo_postal=f"{random.randint(10000, 52999)}",
                 descripcion=descripcion,
-                adoptado=random.random() < 0.10  # 10% adoptados
+                adoptado=random.random() < 0.10,  # 10% adoptados
+                imagen=imagen_url if imagen_url else ''
             )
             animales_creados += 1
+
+            if (i + 1) % 10 == 0:
+                self.stdout.write(f'  Creados {i + 1} otros animales (subidos a Cloudinary)...')
 
         self.stdout.write(
             self.style.SUCCESS(

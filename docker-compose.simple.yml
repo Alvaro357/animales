@@ -1,0 +1,25 @@
+# Docker Compose simplificado - Solo Django con SQLite
+# Usar: docker-compose -f docker-compose.simple.yml up --build
+
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: animales_web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./media:/app/media
+      - ./db.sqlite3:/app/db.sqlite3
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-clave-secreta-cambiar-en-produccion}
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME:-}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY:-}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}

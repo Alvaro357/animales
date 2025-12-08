@@ -1,4 +1,4 @@
-{% load static tailwind_tags %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -456,10 +456,10 @@
                         
                         <a href="/ver_animal/{{ animal.id }}/" class="block">
                             <div class="card-content">
-                                <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative">
+                                <div class="aspect-[3/4] bg-gray-800 rounded-t-2xl overflow-hidden relative">
                                     {% if animal.imagen %}
-                                        <img src="{{ animal.imagen.url }}" 
-                                             alt="{{ animal.nombre }}" 
+                                        <img src="{{ animal.imagen }}"
+                                             alt="{{ animal.nombre }}"
                                              class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110">
                                     {% else %}
                                         <div class="w-full h-full flex items-center justify-center text-gray-500">
@@ -469,12 +469,13 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="p-6 text-center">
                                     <h3 class="text-2xl font-bold text-white mb-1 tracking-wide">{{ animal.nombre }}</h3>
                                     <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-1 opacity-90">{{ animal.raza }}</p>
+                                    <p class="text-gray-400 text-xs uppercase tracking-wide mb-1 opacity-75">Tamaño: {{ animal.tamano }}</p>
                                     <p class="text-purple-300 font-medium text-xs uppercase tracking-wider mb-3 opacity-75">{{ animal.color }}</p>
-                                    
+
                                     <div class="flex items-center justify-center text-gray-400 text-sm">
                                         <svg class="w-4 h-4 mr-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>

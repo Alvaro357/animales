@@ -7,16 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Animales - Adopta</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style type="text/tailwindcss">
         html {
             font-size: 16px;
         }
         
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Pacifico', cursive;
             background: #0a0a0a;
-            color: #ffffff;
+            color: #ffe4cc;
             position: relative;
             overflow-x: hidden;
             min-height: 100vh;
@@ -50,8 +50,8 @@
         }
         
         .star.bright {
-            background: #60a5fa;
-            box-shadow: 0 0 4px #60a5fa;
+            background: #ffd89b;
+            box-shadow: 0 0 4px #ffd89b;
         }
         
         @keyframes twinkle {
@@ -63,7 +63,7 @@
             position: absolute;
             width: 2px;
             height: 2px;
-            background: linear-gradient(45deg, #60a5fa, transparent);
+            background: linear-gradient(45deg, #ffd89b, transparent);
             border-radius: 50%;
             opacity: 0;
             animation: shoot 2s linear infinite;
@@ -94,40 +94,43 @@
         
         /* Botones modernos */
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #ffb4a2, #ff9a7f);
+            border: 1px solid rgba(255, 180, 162, 0.4);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            color: #5c4a42;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(255, 180, 162, 0.4);
         }
-        
+
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 201, 217, 0.15);
+            border: 1px solid rgba(255, 201, 217, 0.3);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            color: #ffc9d9;
         }
-        
+
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 201, 217, 0.25);
+            border-color: rgba(255, 201, 217, 0.5);
             transform: translateY(-1px);
         }
-        
+
         .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: linear-gradient(135deg, #ffb4a2, #ff9a7f);
+            border: 1px solid rgba(255, 180, 162, 0.4);
             transition: all 0.3s ease;
+            color: #5c4a42;
         }
-        
+
         .btn-danger:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 20px 40px rgba(255, 180, 162, 0.4);
         }
         
         /* Cards modernas */
@@ -147,21 +150,21 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            background: linear-gradient(135deg, rgba(255, 180, 162, 0.1), rgba(255, 201, 217, 0.1));
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 0;
         }
-        
+
         .animal-card:hover::before {
             opacity: 1;
         }
-        
+
         .animal-card:hover {
             transform: translateY(-8px);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
-                        0 0 0 1px rgba(59, 130, 246, 0.1);
+            border-color: rgba(255, 180, 162, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 180, 162, 0.2);
         }
         
         .card-content {
@@ -179,24 +182,24 @@
         .filter-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
+            color: #ffd4b8;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             min-height: 44px;
             font-size: 16px;
         }
-        
+
         .filter-btn.active {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-color: #3b82f6;
-            color: #ffffff;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #ffb4a2, #ff9a7f);
+            border-color: #ffb4a2;
+            color: #5c4a42;
+            box-shadow: 0 0 20px rgba(255, 180, 162, 0.5);
         }
-        
+
         .filter-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            background: rgba(255, 180, 162, 0.1);
+            color: #ffe4cc;
         }
         
         /* Buscador */
@@ -213,17 +216,17 @@
         
         .search-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
         }
-        
+
         /* Título principal */
         .main-title {
             font-size: 3rem;
             font-weight: 700;
             line-height: 1.1;
             letter-spacing: -0.025em;
-            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            background: linear-gradient(135deg, #ffe4cc, #ffb4a2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -251,12 +254,12 @@
         
         .form-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
         }
-        
+
         .form-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: #ffe4cc;
         }
         
         /* Estilos para select en modo oscuro */
@@ -282,14 +285,14 @@
 
         select.form-input option:checked,
         select.form-input option:hover {
-            background-color: #3b82f6;
-            color: #ffffff;
+            background-color: #ffb4a2;
+            color: #5c4a42;
         }
 
         select.form-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
         }
         
         /* Lazy loading */
@@ -334,19 +337,19 @@
         
         /* Estados */
         .badge-disponible {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+            background: rgba(255, 216, 155, 0.15);
+            border: 1px solid rgba(255, 216, 155, 0.3);
+            color: #ffd89b;
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
         }
-        
+
         .badge-adoptado {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            background: rgba(255, 201, 217, 0.15);
+            border: 1px solid rgba(255, 201, 217, 0.3);
+            color: #ffc9d9;
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 12px;
@@ -399,17 +402,17 @@
         
         /* Spinners para crear animal */
         .create-spinner {
-            border: 3px solid rgba(59, 130, 246, 0.3);
-            border-left: 3px solid #3b82f6;
+            border: 3px solid rgba(255, 180, 162, 0.3);
+            border-left: 3px solid #ffb4a2;
             border-radius: 50%;
             width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
         }
-        
+
         .create-spinner-small {
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            border-left: 2px solid #3b82f6;
+            border: 2px solid rgba(255, 180, 162, 0.3);
+            border-left: 2px solid #ffb4a2;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -542,9 +545,25 @@
                                 <label for="animal_raza" class="block text-sm font-medium form-label mb-2">
                                     Raza <span class="text-red-400">*</span>
                                 </label>
-                                <input type="text" id="animal_raza" name="raza" 
-                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                <input type="text" id="animal_raza" name="raza"
+                                       class="form-input w-full px-4 py-3 rounded-lg" required
                                        placeholder="Raza del animal">
+                            </div>
+
+                            <div>
+                                <label for="animal_tamano" class="block text-sm font-medium form-label mb-2">
+                                    Tamaño <span class="text-red-400">*</span>
+                                </label>
+                                <select id="animal_tamano" name="tamano"
+                                        class="form-input w-full px-4 py-3 rounded-lg" required>
+                                    <option value="" class="bg-gray-800">Seleccionar tamaño</option>
+                                    <option value="Mini" class="bg-gray-800">Mini</option>
+                                    <option value="Pequeño" class="bg-gray-800">Pequeño</option>
+                                    <option value="Mediano-Pequeño" class="bg-gray-800">Mediano-Pequeño</option>
+                                    <option value="Mediano" class="bg-gray-800">Mediano</option>
+                                    <option value="Mediano-Grande" class="bg-gray-800">Mediano-Grande</option>
+                                    <option value="Grande" class="bg-gray-800">Grande</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -554,32 +573,40 @@
                         <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Multimedia</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium form-label mb-2">Imagen</label>
-                                <div class="relative">
-                                    <input type="file" id="animal_imagen" name="imagen" accept="image/*" class="hidden">
-                                    <button type="button" onclick="document.getElementById('animal_imagen').click()" 
-                                            class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group">
-                                        <div class="flex flex-col items-center gap-3">
-                                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="text-center">
-                                                <p class="text-white font-medium">Subir Imagen</p>
-                                                <p class="text-gray-400 text-sm">Haz clic para seleccionar</p>
-                                            </div>
+                                <label class="block text-sm font-medium form-label mb-2">Imágenes</label>
+                                <!-- Zona de drag and drop para múltiples imágenes -->
+                                <label for="modal_imagenes" id="modalDropZone" class="file-upload-btn px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group block" style="cursor: pointer;">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
                                         </div>
-                                    </button>
-                                    <div id="imagenStatus" class="mt-2 hidden"></div>
-                                </div>
+                                        <div class="text-center">
+                                            <p class="text-white font-medium">Subir Imágenes</p>
+                                            <p class="text-gray-400 text-sm">Arrastra aquí o haz clic para seleccionar</p>
+                                            <input type="file"
+                                                   id="modal_imagenes"
+                                                   name="imagenes"
+                                                   accept="image/*"
+                                                   multiple
+                                                   class="hidden"
+                                                   onchange="handleModalImageSelection(this.files)">
+                                            <p class="text-xs text-gray-500 mt-2">Máximo 10 imágenes • JPG, PNG, GIF, WebP • Hasta 5MB</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <div id="modalImagePreview" class="grid grid-cols-3 gap-2 mt-3" style="display: none;"></div>
+                                <p class="text-xs text-blue-400 mt-2 font-semibold" id="modalImageCounter" style="display: none;">
+                                    <span id="modalImageCount">0</span> de 10 imágenes seleccionadas
+                                </p>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium form-label mb-2">Video</label>
+                                <label class="block text-sm font-medium form-label mb-2">Videos</label>
                                 <div class="relative">
-                                    <input type="file" id="animal_video" name="video" accept="video/*" class="hidden">
-                                    <button type="button" onclick="document.getElementById('animal_video').click()" 
+                                    <input type="file" id="modal_videos" name="videos" accept="video/*" multiple class="hidden" onchange="handleModalVideoSelection(this.files)">
+                                    <button type="button" onclick="document.getElementById('modal_videos').click()"
                                             class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-purple-400 transition-all duration-300 group">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
@@ -588,12 +615,16 @@
                                                 </svg>
                                             </div>
                                             <div class="text-center">
-                                                <p class="text-white font-medium">Subir Video</p>
+                                                <p class="text-white font-medium">Subir Videos</p>
                                                 <p class="text-gray-400 text-sm">Haz clic para seleccionar</p>
+                                                <p class="text-xs text-gray-500 mt-1">Máximo 5 videos • MP4, AVI, MOV • Hasta 10MB</p>
                                             </div>
                                         </div>
                                     </button>
-                                    <div id="videoStatus" class="mt-2 hidden"></div>
+                                    <div id="modalVideoPreview" class="grid grid-cols-3 gap-2 mt-3" style="display: none;"></div>
+                                    <p class="text-xs text-purple-400 mt-2 font-semibold" id="modalVideoCounter" style="display: none;">
+                                        <span id="modalVideoCount">0</span> de 5 videos seleccionados
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -767,68 +798,111 @@
                                 <label for="edit_animal_raza" class="block text-sm font-medium form-label mb-2">
                                     Raza <span class="text-red-400">*</span>
                                 </label>
-                                <input type="text" id="edit_animal_raza" name="raza" 
-                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                <input type="text" id="edit_animal_raza" name="raza"
+                                       class="form-input w-full px-4 py-3 rounded-lg" required
                                        placeholder="Raza del animal">
+                            </div>
+
+                            <div>
+                                <label for="edit_animal_tamano" class="block text-sm font-medium form-label mb-2">
+                                    Tamaño <span class="text-red-400">*</span>
+                                </label>
+                                <select id="edit_animal_tamano" name="tamano"
+                                        class="form-input w-full px-4 py-3 rounded-lg" required>
+                                    <option value="" class="bg-gray-800">Seleccionar tamaño</option>
+                                    <option value="Mini" class="bg-gray-800">Mini</option>
+                                    <option value="Pequeño" class="bg-gray-800">Pequeño</option>
+                                    <option value="Mediano-Pequeño" class="bg-gray-800">Mediano-Pequeño</option>
+                                    <option value="Mediano" class="bg-gray-800">Mediano</option>
+                                    <option value="Mediano-Grande" class="bg-gray-800">Mediano-Grande</option>
+                                    <option value="Grande" class="bg-gray-800">Grande</option>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <!-- Multimedia -->
                     <div class="mb-8">
-                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Multimedia</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium form-label mb-2">Imagen actual</label>
-                                <div id="imagenActualContainer" class="mb-4 hidden">
-                                    <img id="imagenActual" class="w-full h-32 object-cover rounded-lg border border-gray-600" alt="Imagen actual">
-                                    <p class="text-sm text-gray-400 mt-1">Imagen actual</p>
-                                </div>
-                                <label class="block text-sm font-medium form-label mb-2">Cambiar imagen</label>
-                                <div class="relative">
-                                    <input type="file" id="edit_animal_imagen" name="imagen" accept="image/*" class="hidden">
-                                    <button type="button" onclick="document.getElementById('edit_animal_imagen').click()" 
-                                            class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group">
-                                        <div class="flex flex-col items-center gap-3">
-                                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="text-center">
-                                                <p class="text-white font-medium">Cambiar Imagen</p>
-                                                <p class="text-gray-400 text-sm">Opcional</p>
-                                            </div>
-                                        </div>
-                                    </button>
-                                    <div id="editImagenStatus" class="mt-2 hidden"></div>
-                                </div>
+                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Imágenes</h3>
+
+                        <!-- Imágenes existentes -->
+                        <div id="editImagenesExistentesContainer" class="mb-4">
+                            <label class="block text-sm font-medium form-label mb-2">Imágenes actuales</label>
+                            <div id="editImagenesExistentes" class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                <!-- Se llena dinámicamente -->
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium form-label mb-2">Video actual</label>
-                                <div id="videoActualContainer" class="mb-4 hidden">
-                                    <p class="text-sm text-gray-400">Video cargado actualmente</p>
+                            <p id="editNoImagenesMsg" class="text-gray-500 text-sm hidden">No hay imágenes cargadas</p>
+                            <p class="text-xs text-gray-400 mt-2">Haz clic en ✕ para marcar una imagen para eliminar</p>
+                        </div>
+
+                        <!-- Agregar nuevas imágenes -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium form-label mb-2">Agregar nuevas imágenes</label>
+                            <label for="edit_modal_imagenes" id="editModalDropZone" class="file-upload-btn px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group block cursor-pointer">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-white font-medium">Agregar Imágenes</p>
+                                        <p class="text-gray-400 text-sm">Arrastra aquí o haz clic para seleccionar</p>
+                                        <input type="file"
+                                               id="edit_modal_imagenes"
+                                               name="imagenes"
+                                               accept="image/*"
+                                               multiple
+                                               class="hidden"
+                                               onchange="handleEditModalImageSelection(this.files)">
+                                        <p class="text-xs text-gray-500 mt-2">Máximo 10 imágenes • JPG, PNG, GIF, WebP • Hasta 5MB</p>
+                                    </div>
                                 </div>
-                                <label class="block text-sm font-medium form-label mb-2">Cambiar video</label>
-                                <div class="relative">
-                                    <input type="file" id="edit_animal_video" name="video" accept="video/*" class="hidden">
-                                    <button type="button" onclick="document.getElementById('edit_animal_video').click()" 
-                                            class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-purple-400 transition-all duration-300 group">
-                                        <div class="flex flex-col items-center gap-3">
-                                            <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                                                <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="text-center">
-                                                <p class="text-white font-medium">Cambiar Video</p>
-                                                <p class="text-gray-400 text-sm">Opcional</p>
-                                            </div>
+                            </label>
+                            <div id="editModalImagePreview" class="grid grid-cols-3 gap-2 mt-3" style="display: none;"></div>
+                            <p class="text-xs text-blue-400 mt-2 font-semibold" id="editModalImageCounter" style="display: none;">
+                                <span id="editModalImageCount">0</span> nuevas imágenes seleccionadas
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Videos -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Videos</h3>
+
+                        <!-- Videos existentes -->
+                        <div id="editVideosExistentesContainer" class="mb-4">
+                            <label class="block text-sm font-medium form-label mb-2">Videos actuales</label>
+                            <div id="editVideosExistentes" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <!-- Se llena dinámicamente -->
+                            </div>
+                            <p id="editNoVideosMsg" class="text-gray-500 text-sm hidden">No hay videos cargados</p>
+                        </div>
+
+                        <!-- Agregar nuevos videos -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium form-label mb-2">Agregar nuevos videos</label>
+                            <div class="relative">
+                                <input type="file" id="edit_modal_videos" name="videos" accept="video/*" multiple class="hidden" onchange="handleEditModalVideoSelection(this.files)">
+                                <button type="button" onclick="document.getElementById('edit_modal_videos').click()"
+                                        class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-purple-400 transition-all duration-300 group">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                            </svg>
                                         </div>
-                                    </button>
-                                    <div id="editVideoStatus" class="mt-2 hidden"></div>
-                                </div>
+                                        <div class="text-center">
+                                            <p class="text-white font-medium">Agregar Videos</p>
+                                            <p class="text-gray-400 text-sm">Haz clic para seleccionar</p>
+                                            <p class="text-xs text-gray-500 mt-1">Máximo 5 videos • MP4, AVI, MOV • Hasta 10MB</p>
+                                        </div>
+                                    </div>
+                                </button>
+                                <div id="editModalVideoPreview" class="grid grid-cols-3 gap-2 mt-3" style="display: none;"></div>
+                                <p class="text-xs text-purple-400 mt-2 font-semibold" id="editModalVideoCounter" style="display: none;">
+                                    <span id="editModalVideoCount">0</span> nuevos videos seleccionados
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -1070,8 +1144,8 @@
                     </div>
 
                     <!-- Imagen -->
-                    <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative">
-                        {% if animal.imagen %}
+                    <div class="aspect-[3/4] bg-gray-800 rounded-t-2xl overflow-hidden relative">
+                        {% if animal.get_primera_imagen %}
                             <!-- Placeholder animado -->
                             <div class="lazy-placeholder w-full h-full absolute inset-0 flex items-center justify-center text-gray-400">
                                 <div class="text-center">
@@ -1083,9 +1157,9 @@
                                 </div>
                             </div>
                             <!-- Imagen lazy -->
-                            <img 
-                                data-src="{{ animal.imagen.url }}" 
-                                alt="Imagen de {{ animal.nombre }}" 
+                            <img
+                                data-src="{{ animal.get_primera_imagen }}"
+                                alt="Imagen de {{ animal.nombre }}"
                                 class="lazy-image w-full h-full object-cover absolute inset-0 transition-transform duration-500 hover:scale-110"
                                 loading="lazy"
                             >
@@ -1101,8 +1175,9 @@
                     <!-- Información -->
                     <div class="p-6 flex-grow flex flex-col">
                         <h3 class="text-2xl font-bold text-white mb-2 tracking-wide">{{ animal.nombre }}</h3>
-                        <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-3 opacity-90">{{ animal.raza }}</p>
-                        
+                        <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-1 opacity-90">{{ animal.raza }}</p>
+                        <p class="text-gray-400 text-xs uppercase tracking-wide mb-3 opacity-75">Tamaño: {{ animal.tamano }}</p>
+
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-gray-400 text-sm">Estado:</span>
                             <span class="estado-badge {% if animal.adoptado %}badge-adoptado{% else %}badge-disponible{% endif %}">
@@ -1147,6 +1222,7 @@
             nombre: "{{ animal.nombre|escapejs }}",
             tipo_de_animal: "{{ animal.tipo_de_animal|escapejs }}",
             raza: "{{ animal.raza|escapejs }}",
+            tamano: "{{ animal.tamano|escapejs }}",
             color: "{{ animal.color|escapejs }}",
             email: "{{ animal.email|escapejs }}",
             telefono: "{{ animal.telefono|escapejs }}",
@@ -1154,7 +1230,17 @@
             provincia: "{{ animal.provincia|escapejs }}",
             codigo_postal: "{{ animal.codigo_postal|escapejs }}",
             descripcion: "{{ animal.descripcion|escapejs }}",
-            imagen: "{% if animal.imagen %}{{ animal.imagen.url }}{% endif %}"
+            imagen: "{% if animal.get_primera_imagen %}{{ animal.get_primera_imagen }}{% endif %}",
+            imagenes: [
+                {% for img in animal.imagenes.all %}
+                {id: {{ img.id }}, url: "{{ img.imagen }}", es_principal: {{ img.es_principal|yesno:"true,false" }}}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            videos: [
+                {% for vid in animal.videos.all %}
+                {id: {{ vid.id }}, url: "{{ vid.video }}"}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     };
@@ -1381,7 +1467,7 @@
         toggleBtn.disabled = true;
         
         try {
-            const response = await fetch(`/animales/toggle-adopcion/${animalId}/`, {
+            const response = await fetch(`/toggle_adopcion/${animalId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
@@ -1439,7 +1525,7 @@
         
         // Configurar el modal
         nombreSpan.textContent = nombreAnimal;
-        form.action = `/animales/eliminar/${animalId}/`;
+        form.action = `/eliminar_animal/${animalId}/`;
         
         // Mostrar modal
         modal.classList.remove('hidden');
@@ -1476,13 +1562,18 @@
     function cerrarCrearAnimal() {
         const modal = document.getElementById('crearAnimalModal');
         const content = document.getElementById('crearAnimalContent');
-        
+
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
-        
+
         setTimeout(() => {
             modal.classList.add('hidden');
             resetCrearAnimalForm();
+            // Limpiar las imágenes y videos seleccionados
+            modalSelectedImages = [];
+            modalSelectedVideos = [];
+            updateModalImagePreview();
+            updateModalVideoPreview();
         }, 500);
     }
 
@@ -1494,11 +1585,15 @@
             return;
         }
 
+        // Resetear el modal antes de cargar nuevos datos
+        resetEditModal();
+
         // Llenar formulario con datos del animal
         document.getElementById('animalNombreEditar').textContent = animal.nombre;
         document.getElementById('edit_animal_nombre').value = animal.nombre;
         document.getElementById('edit_animal_tipo').value = animal.tipo_de_animal;
         document.getElementById('edit_animal_raza').value = animal.raza;
+        document.getElementById('edit_animal_tamano').value = animal.tamano;
         document.getElementById('edit_animal_email').value = animal.email;
         document.getElementById('edit_animal_telefono').value = animal.telefono;
         document.getElementById('edit_animal_poblacion').value = animal.poblacion;
@@ -1509,41 +1604,40 @@
         // Configurar el color
         configurarColorEditar(animal.color || 'No especificado');
 
-        // Mostrar imagen actual si existe
-        const imagenActualContainer = document.getElementById('imagenActualContainer');
-        const imagenActual = document.getElementById('imagenActual');
-        if (animal.imagen) {
-            imagenActual.src = animal.imagen;
-            imagenActualContainer.classList.remove('hidden');
-        } else {
-            imagenActualContainer.classList.add('hidden');
-        }
+        // Cargar imágenes existentes del animal
+        loadExistingImages(animal.imagenes || []);
+
+        // Cargar videos existentes del animal
+        loadExistingVideos(animal.videos || []);
 
         // Configurar la acción del formulario
         const form = document.getElementById('editarAnimalFormElement');
-        form.action = `/animales/editar/${animalId}/`;
+        form.action = `/editar_animal/${animalId}/`;
 
         // Mostrar modal
         const modal = document.getElementById('editarAnimalModal');
         const content = document.getElementById('editarAnimalContent');
-        
+
         modal.classList.remove('hidden');
         setTimeout(() => {
             content.classList.remove('scale-95', 'opacity-0');
             content.classList.add('scale-100', 'opacity-100');
+            // Configurar drag and drop después de mostrar el modal
+            setupEditModalDragAndDrop();
         }, 10);
     }
 
     function cerrarEditarAnimal() {
         const modal = document.getElementById('editarAnimalModal');
         const content = document.getElementById('editarAnimalContent');
-        
+
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
-        
+
         setTimeout(() => {
             modal.classList.add('hidden');
             resetEditarAnimalForm();
+            resetEditModal();
         }, 500);
     }
 
@@ -2062,6 +2156,735 @@
         }, 200);
     });
 
+    // ========== FUNCIONES PARA MÚLTIPLES IMÁGENES Y VIDEOS EN MODAL ==========
+    let modalSelectedImages = [];
+    let modalSelectedVideos = [];
+
+    // Manejar selección de imágenes en el modal
+    function handleModalImageSelection(files) {
+        const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+        // Verificar cuántas imágenes podemos agregar
+        const espacioDisponible = 10 - modalSelectedImages.length;
+
+        if (espacioDisponible === 0) {
+            showModalNotification('⚠️ Ya has alcanzado el máximo de 10 imágenes', 'warning');
+            return;
+        }
+
+        if (imageFiles.length > espacioDisponible) {
+            showModalNotification(`⚠️ Solo puedes agregar ${espacioDisponible} imagen(es) más`, 'warning');
+            imageFiles.splice(espacioDisponible);
+        }
+
+        // Validar tamaño de archivos (5MB max)
+        const validFiles = imageFiles.filter(file => {
+            // Verificar que no sea un archivo duplicado
+            const isDuplicate = modalSelectedImages.some(existingFile =>
+                existingFile.name === file.name &&
+                existingFile.size === file.size &&
+                existingFile.lastModified === file.lastModified
+            );
+
+            if (isDuplicate) {
+                showModalNotification(`⚠️ ${file.name} ya fue agregada`, 'warning');
+                return false;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showModalNotification(`❌ ${file.name} es demasiado grande (máx. 5MB)`, 'error');
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length > 0) {
+            modalSelectedImages.push(...validFiles);
+            showModalNotification(`✅ ${validFiles.length} imagen(es) agregada(s)`, 'success');
+            updateModalImagePreview();
+            updateModalImageInput();
+        }
+    }
+
+    // Actualizar preview de imágenes en el modal
+    function updateModalImagePreview() {
+        const preview = document.getElementById('modalImagePreview');
+        const dropZone = document.getElementById('modalDropZone');
+        const counter = document.getElementById('modalImageCounter');
+        const count = document.getElementById('modalImageCount');
+
+        if (!preview || !dropZone || !counter || !count) return;
+
+        if (modalSelectedImages.length === 0) {
+            // Restaurar la zona de drop completa
+            dropZone.innerHTML = `
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-white font-medium">Subir Imágenes</p>
+                        <p class="text-gray-400 text-sm">Arrastra aquí o
+                            <label for="modal_imagenes" class="text-blue-400 hover:text-blue-500 cursor-pointer">
+                                haz clic para seleccionar
+                            </label>
+                        </p>
+                        <input type="file" id="modal_imagenes" name="imagenes" accept="image/*" multiple class="hidden" onchange="handleModalImageSelection(this.files)">
+                        <p class="text-xs text-gray-500 mt-2">Máximo 10 imágenes • JPG, PNG, GIF, WebP • Hasta 5MB</p>
+                    </div>
+                </div>
+            `;
+            preview.style.display = 'none';
+            counter.style.display = 'none';
+            return;
+        }
+
+        // Mostrar botón más pequeño para agregar más
+        if (modalSelectedImages.length < 10) {
+            dropZone.innerHTML = `
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-sm text-blue-400">➕ Agregar más</span>
+                    <label for="modal_imagenes" class="text-sm text-blue-400 hover:text-blue-500 cursor-pointer underline">
+                        Seleccionar
+                    </label>
+                    <input type="file" id="modal_imagenes" name="imagenes" accept="image/*" multiple class="hidden" onchange="handleModalImageSelection(this.files)">
+                </div>
+            `;
+            dropZone.classList.add('py-2');
+        } else {
+            dropZone.style.display = 'none';
+        }
+
+        preview.style.display = 'grid';
+        counter.style.display = 'block';
+        count.textContent = modalSelectedImages.length;
+
+        preview.innerHTML = '';
+
+        modalSelectedImages.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="${file.name}" class="w-full h-full object-cover">
+                    ${index === 0 ? '<span class="absolute top-1 left-1 text-xs bg-green-500 text-white px-2 py-1 rounded">Principal</span>' : ''}
+                    <button type="button" onclick="removeModalImage(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
+                        ×
+                    </button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Re-configurar drag & drop para la nueva zona
+        setTimeout(() => setupModalDragAndDrop(), 100);
+    }
+
+    // Eliminar imagen del modal
+    function removeModalImage(index) {
+        modalSelectedImages.splice(index, 1);
+        updateModalImagePreview();
+        updateModalImageInput();
+        showModalNotification('🗑️ Imagen eliminada', 'info');
+    }
+
+    // Actualizar el input de imágenes del modal
+    function updateModalImageInput() {
+        const input = document.getElementById('modal_imagenes');
+        if (!input) return;
+
+        const dataTransfer = new DataTransfer();
+        modalSelectedImages.forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+    }
+
+    // Manejar selección de videos en el modal
+    function handleModalVideoSelection(files) {
+        const videoFiles = Array.from(files).filter(file => file.type.startsWith('video/'));
+
+        const espacioDisponible = 5 - modalSelectedVideos.length;
+
+        if (espacioDisponible === 0) {
+            showModalNotification('⚠️ Ya has alcanzado el máximo de 5 videos', 'warning');
+            return;
+        }
+
+        if (videoFiles.length > espacioDisponible) {
+            showModalNotification(`⚠️ Solo puedes agregar ${espacioDisponible} video(s) más`, 'warning');
+            videoFiles.splice(espacioDisponible);
+        }
+
+        // Validar tamaño de archivos (10MB max)
+        const validFiles = videoFiles.filter(file => {
+            const isDuplicate = modalSelectedVideos.some(existingFile =>
+                existingFile.name === file.name &&
+                existingFile.size === file.size
+            );
+
+            if (isDuplicate) {
+                showModalNotification(`⚠️ ${file.name} ya fue agregado`, 'warning');
+                return false;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showModalNotification(`❌ ${file.name} es demasiado grande (máx. 10MB)`, 'error');
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length > 0) {
+            modalSelectedVideos.push(...validFiles);
+            showModalNotification(`✅ ${validFiles.length} video(s) agregado(s)`, 'success');
+            updateModalVideoPreview();
+        }
+    }
+
+    // Actualizar preview de videos en el modal
+    function updateModalVideoPreview() {
+        const preview = document.getElementById('modalVideoPreview');
+        const counter = document.getElementById('modalVideoCounter');
+        const count = document.getElementById('modalVideoCount');
+
+        if (!preview || !counter || !count) return;
+
+        if (modalSelectedVideos.length === 0) {
+            preview.style.display = 'none';
+            counter.style.display = 'none';
+            return;
+        }
+
+        preview.style.display = 'grid';
+        counter.style.display = 'block';
+        count.textContent = modalSelectedVideos.length;
+
+        preview.innerHTML = '';
+
+        modalSelectedVideos.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+                div.innerHTML = `
+                    <video src="${e.target.result}" class="w-full h-full object-cover"></video>
+                    <button type="button" onclick="removeModalVideo(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
+                        ×
+                    </button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        updateModalVideoInput();
+    }
+
+    // Eliminar video del modal
+    function removeModalVideo(index) {
+        modalSelectedVideos.splice(index, 1);
+        updateModalVideoPreview();
+        showModalNotification('🗑️ Video eliminado', 'info');
+    }
+
+    // Actualizar el input de videos del modal
+    function updateModalVideoInput() {
+        const input = document.getElementById('modal_videos');
+        if (!input) return;
+
+        const dataTransfer = new DataTransfer();
+        modalSelectedVideos.forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+    }
+
+    // ========== FUNCIONES PARA MÚLTIPLES IMÁGENES Y VIDEOS EN MODAL DE EDICIÓN ==========
+    let editModalSelectedImages = [];
+    let editModalSelectedVideos = [];
+    let editImagenesToDelete = [];
+    let editVideosToDelete = [];
+
+    // Manejar selección de imágenes en el modal de edición
+    function handleEditModalImageSelection(files) {
+        const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+        // Verificar cuántas imágenes podemos agregar
+        const espacioDisponible = 10 - editModalSelectedImages.length;
+
+        if (espacioDisponible === 0) {
+            showModalNotification('⚠️ Ya has alcanzado el máximo de 10 imágenes nuevas', 'warning');
+            return;
+        }
+
+        if (imageFiles.length > espacioDisponible) {
+            showModalNotification(`⚠️ Solo puedes agregar ${espacioDisponible} imagen(es) más`, 'warning');
+            imageFiles.splice(espacioDisponible);
+        }
+
+        // Validar tamaño de archivos (5MB max)
+        const validFiles = imageFiles.filter(file => {
+            // Verificar que no sea un archivo duplicado
+            const isDuplicate = editModalSelectedImages.some(existingFile =>
+                existingFile.name === file.name &&
+                existingFile.size === file.size &&
+                existingFile.lastModified === file.lastModified
+            );
+
+            if (isDuplicate) {
+                showModalNotification(`⚠️ ${file.name} ya fue agregada`, 'warning');
+                return false;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showModalNotification(`❌ ${file.name} es demasiado grande (máx. 5MB)`, 'error');
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length > 0) {
+            editModalSelectedImages.push(...validFiles);
+            showModalNotification(`✅ ${validFiles.length} imagen(es) agregada(s)`, 'success');
+            updateEditModalImagePreview();
+            updateEditModalImageInput();
+        }
+    }
+
+    // Actualizar preview de imágenes nuevas en el modal de edición
+    function updateEditModalImagePreview() {
+        const preview = document.getElementById('editModalImagePreview');
+        const counter = document.getElementById('editModalImageCounter');
+        const count = document.getElementById('editModalImageCount');
+
+        if (!preview || !counter || !count) return;
+
+        if (editModalSelectedImages.length === 0) {
+            preview.style.display = 'none';
+            counter.style.display = 'none';
+            return;
+        }
+
+        preview.style.display = 'grid';
+        counter.style.display = 'block';
+        count.textContent = editModalSelectedImages.length;
+
+        preview.innerHTML = '';
+
+        editModalSelectedImages.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="${file.name}" class="w-full h-full object-cover">
+                    <span class="absolute top-1 left-1 text-xs bg-green-500 text-white px-2 py-1 rounded">Nueva</span>
+                    <button type="button" onclick="removeEditModalImage(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
+                        ×
+                    </button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Eliminar imagen nueva del modal de edición
+    function removeEditModalImage(index) {
+        editModalSelectedImages.splice(index, 1);
+        updateEditModalImagePreview();
+        updateEditModalImageInput();
+        showModalNotification('🗑️ Imagen eliminada', 'info');
+    }
+
+    // Actualizar el input de imágenes del modal de edición
+    function updateEditModalImageInput() {
+        const input = document.getElementById('edit_modal_imagenes');
+        if (!input) return;
+
+        const dataTransfer = new DataTransfer();
+        editModalSelectedImages.forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+    }
+
+    // Cargar imágenes existentes del animal en el modal de edición
+    function loadExistingImages(imagenes) {
+        const container = document.getElementById('editImagenesExistentes');
+        const noMsg = document.getElementById('editNoImagenesMsg');
+
+        if (!container) return;
+
+        container.innerHTML = '';
+        editImagenesToDelete = [];
+
+        if (!imagenes || imagenes.length === 0) {
+            noMsg.classList.remove('hidden');
+            return;
+        }
+
+        noMsg.classList.add('hidden');
+
+        imagenes.forEach(img => {
+            const div = document.createElement('div');
+            div.id = `edit-img-${img.id}`;
+            div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+            div.innerHTML = `
+                <img src="${img.url}" alt="Imagen ${img.id}" class="w-full h-full object-cover">
+                ${img.es_principal ? '<span class="absolute bottom-1 left-1 text-xs bg-green-500 text-white px-2 py-1 rounded">Principal</span>' : ''}
+                <button type="button" onclick="toggleDeleteExistingImage(${img.id})" class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-all">
+                    ×
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Marcar/desmarcar imagen existente para eliminar
+    function toggleDeleteExistingImage(imagenId) {
+        const elemento = document.getElementById(`edit-img-${imagenId}`);
+        const index = editImagenesToDelete.indexOf(imagenId);
+
+        if (index > -1) {
+            // Desmarcar
+            editImagenesToDelete.splice(index, 1);
+            elemento.classList.remove('opacity-40');
+            elemento.querySelector('img').classList.remove('grayscale');
+            const overlay = elemento.querySelector('.delete-overlay');
+            if (overlay) overlay.remove();
+            showModalNotification('↩️ Imagen restaurada', 'info');
+        } else {
+            // Marcar para eliminar
+            editImagenesToDelete.push(imagenId);
+            elemento.classList.add('opacity-40');
+            elemento.querySelector('img').classList.add('grayscale');
+            // Agregar overlay de eliminación
+            const overlay = document.createElement('div');
+            overlay.className = 'delete-overlay absolute inset-0 flex items-center justify-center bg-red-500/50';
+            overlay.innerHTML = '<span class="text-white font-bold text-xs">ELIMINAR</span>';
+            elemento.appendChild(overlay);
+            showModalNotification('🗑️ Imagen marcada para eliminar', 'warning');
+        }
+    }
+
+    // Manejar selección de videos en el modal de edición
+    function handleEditModalVideoSelection(files) {
+        const videoFiles = Array.from(files).filter(file => file.type.startsWith('video/'));
+
+        const espacioDisponible = 5 - editModalSelectedVideos.length;
+
+        if (espacioDisponible === 0) {
+            showModalNotification('⚠️ Ya has alcanzado el máximo de 5 videos nuevos', 'warning');
+            return;
+        }
+
+        if (videoFiles.length > espacioDisponible) {
+            showModalNotification(`⚠️ Solo puedes agregar ${espacioDisponible} video(s) más`, 'warning');
+            videoFiles.splice(espacioDisponible);
+        }
+
+        // Validar tamaño de archivos (10MB max)
+        const validFiles = videoFiles.filter(file => {
+            const isDuplicate = editModalSelectedVideos.some(existingFile =>
+                existingFile.name === file.name &&
+                existingFile.size === file.size
+            );
+
+            if (isDuplicate) {
+                showModalNotification(`⚠️ ${file.name} ya fue agregado`, 'warning');
+                return false;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showModalNotification(`❌ ${file.name} es demasiado grande (máx. 10MB)`, 'error');
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length > 0) {
+            editModalSelectedVideos.push(...validFiles);
+            showModalNotification(`✅ ${validFiles.length} video(s) agregado(s)`, 'success');
+            updateEditModalVideoPreview();
+        }
+    }
+
+    // Actualizar preview de videos nuevos en el modal de edición
+    function updateEditModalVideoPreview() {
+        const preview = document.getElementById('editModalVideoPreview');
+        const counter = document.getElementById('editModalVideoCounter');
+        const count = document.getElementById('editModalVideoCount');
+
+        if (!preview || !counter || !count) return;
+
+        if (editModalSelectedVideos.length === 0) {
+            preview.style.display = 'none';
+            counter.style.display = 'none';
+            return;
+        }
+
+        preview.style.display = 'grid';
+        counter.style.display = 'block';
+        count.textContent = editModalSelectedVideos.length;
+
+        preview.innerHTML = '';
+
+        editModalSelectedVideos.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+                div.innerHTML = `
+                    <video src="${e.target.result}" class="w-full h-full object-cover"></video>
+                    <span class="absolute top-1 left-1 text-xs bg-purple-500 text-white px-2 py-1 rounded">Nuevo</span>
+                    <button type="button" onclick="removeEditModalVideo(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
+                        ×
+                    </button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        updateEditModalVideoInput();
+    }
+
+    // Eliminar video nuevo del modal de edición
+    function removeEditModalVideo(index) {
+        editModalSelectedVideos.splice(index, 1);
+        updateEditModalVideoPreview();
+        showModalNotification('🗑️ Video eliminado', 'info');
+    }
+
+    // Actualizar el input de videos del modal de edición
+    function updateEditModalVideoInput() {
+        const input = document.getElementById('edit_modal_videos');
+        if (!input) return;
+
+        const dataTransfer = new DataTransfer();
+        editModalSelectedVideos.forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+    }
+
+    // Cargar videos existentes del animal en el modal de edición
+    function loadExistingVideos(videos) {
+        const container = document.getElementById('editVideosExistentes');
+        const noMsg = document.getElementById('editNoVideosMsg');
+
+        if (!container) return;
+
+        container.innerHTML = '';
+        editVideosToDelete = [];
+
+        if (!videos || videos.length === 0) {
+            noMsg.classList.remove('hidden');
+            return;
+        }
+
+        noMsg.classList.add('hidden');
+
+        videos.forEach(vid => {
+            const div = document.createElement('div');
+            div.id = `edit-vid-${vid.id}`;
+            div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-video';
+            div.innerHTML = `
+                <video src="${vid.url}" class="w-full h-full object-cover" controls></video>
+                <button type="button" onclick="toggleDeleteExistingVideo(${vid.id})" class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-all">
+                    ×
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Marcar/desmarcar video existente para eliminar
+    function toggleDeleteExistingVideo(videoId) {
+        const elemento = document.getElementById(`edit-vid-${videoId}`);
+        const index = editVideosToDelete.indexOf(videoId);
+
+        if (index > -1) {
+            // Desmarcar
+            editVideosToDelete.splice(index, 1);
+            elemento.classList.remove('opacity-40');
+            const overlay = elemento.querySelector('.delete-overlay');
+            if (overlay) overlay.remove();
+            showModalNotification('↩️ Video restaurado', 'info');
+        } else {
+            // Marcar para eliminar
+            editVideosToDelete.push(videoId);
+            elemento.classList.add('opacity-40');
+            // Agregar overlay de eliminación
+            const overlay = document.createElement('div');
+            overlay.className = 'delete-overlay absolute inset-0 flex items-center justify-center bg-red-500/50 pointer-events-none';
+            overlay.innerHTML = '<span class="text-white font-bold text-xs">ELIMINAR</span>';
+            elemento.appendChild(overlay);
+            showModalNotification('🗑️ Video marcado para eliminar', 'warning');
+        }
+    }
+
+    // Resetear el modal de edición
+    function resetEditModal() {
+        editModalSelectedImages = [];
+        editModalSelectedVideos = [];
+        editImagenesToDelete = [];
+        editVideosToDelete = [];
+
+        const imgPreview = document.getElementById('editModalImagePreview');
+        const vidPreview = document.getElementById('editModalVideoPreview');
+        const imgCounter = document.getElementById('editModalImageCounter');
+        const vidCounter = document.getElementById('editModalVideoCounter');
+
+        if (imgPreview) imgPreview.style.display = 'none';
+        if (vidPreview) vidPreview.style.display = 'none';
+        if (imgCounter) imgCounter.style.display = 'none';
+        if (vidCounter) vidCounter.style.display = 'none';
+
+        // Limpiar inputs de archivo
+        const imgInput = document.getElementById('edit_modal_imagenes');
+        const vidInput = document.getElementById('edit_modal_videos');
+        if (imgInput) imgInput.value = '';
+        if (vidInput) vidInput.value = '';
+    }
+
+    // Configurar drag and drop para el modal de edición
+    function setupEditModalDragAndDrop() {
+        const dropZone = document.getElementById('editModalDropZone');
+        if (!dropZone) return;
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaultsModal, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-blue-500', 'bg-blue-500/10');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            handleEditModalImageSelection(e.dataTransfer.files);
+        }, false);
+    }
+
+    // Función para mostrar notificaciones en el modal
+    function showModalNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg z-[60] transform transition-all duration-300 translate-x-full`;
+
+        const colors = {
+            'info': 'bg-blue-500',
+            'success': 'bg-green-500',
+            'warning': 'bg-yellow-500',
+            'error': 'bg-red-500'
+        };
+
+        notification.classList.add(colors[type] || colors.info, 'text-white');
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.remove('translate-x-full');
+        }, 10);
+
+        setTimeout(() => {
+            notification.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    // Configurar drag and drop para el modal
+    function setupModalDragAndDrop() {
+        const dropZone = document.getElementById('modalDropZone');
+        if (!dropZone) return;
+
+        // Prevenir comportamiento por defecto
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.removeEventListener(eventName, preventDefaultsModal);
+            dropZone.addEventListener(eventName, preventDefaultsModal, false);
+        });
+
+        // Highlight drop zone
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.removeEventListener(eventName, highlightDropZone);
+            dropZone.addEventListener(eventName, highlightDropZone, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.removeEventListener(eventName, unhighlightDropZone);
+            dropZone.addEventListener(eventName, unhighlightDropZone, false);
+        });
+
+        // Manejar drop
+        dropZone.removeEventListener('drop', handleModalDrop);
+        dropZone.addEventListener('drop', handleModalDrop, false);
+    }
+
+    function preventDefaultsModal(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlightDropZone() {
+        const dropZone = document.getElementById('modalDropZone');
+        if (dropZone) {
+            dropZone.classList.add('border-blue-500', 'bg-blue-500', 'bg-opacity-10');
+        }
+    }
+
+    function unhighlightDropZone() {
+        const dropZone = document.getElementById('modalDropZone');
+        if (dropZone) {
+            dropZone.classList.remove('border-blue-500', 'bg-blue-500', 'bg-opacity-10');
+        }
+    }
+
+    function handleModalDrop(e) {
+        const files = e.dataTransfer.files;
+        handleModalImageSelection(files);
+    }
+
+    // Inicializar drag and drop cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        setupModalDragAndDrop();
+
+        // Manejar el envío del formulario de edición para agregar IDs de elementos a eliminar
+        const editForm = document.getElementById('editarAnimalFormElement');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                // Agregar inputs hidden con los IDs de imágenes a eliminar
+                editImagenesToDelete.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'eliminar_imagenes';
+                    input.value = id;
+                    this.appendChild(input);
+                });
+
+                // Agregar inputs hidden con los IDs de videos a eliminar
+                editVideosToDelete.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'eliminar_videos';
+                    input.value = id;
+                    this.appendChild(input);
+                });
+
+                // Mostrar indicador de carga
+                const overlay = document.getElementById('editarAnimalLoadingOverlay');
+                if (overlay) overlay.classList.remove('hidden');
+            });
+        }
+    });
+
     // Efecto parallax
     let ticking = false;
     window.addEventListener('scroll', () => {
@@ -2069,14 +2892,14 @@
             requestAnimationFrame(() => {
                 const scrolled = window.pageYOffset;
                 const stars = document.querySelectorAll('.star');
-                
+
                 stars.forEach((star, i) => {
                     if (i % 3 === 0) {
                         const speed = 0.5;
                         star.style.transform = `translateY(${scrolled * speed}px)`;
                     }
                 });
-                
+
                 ticking = false;
             });
             ticking = true;

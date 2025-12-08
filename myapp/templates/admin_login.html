@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Admin - Adopta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Fondo de estrellas */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        /* Card de login */
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Input styles */
+        .input-field {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Button styles */
+        .btn-login {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* Error message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: shake 0.5s;
+        }
+
+        /* Warning message */
+        .warning-message {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            animation: shake 0.5s;
+        }
+
+        /* Info message */
+        .info-message {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Blocked overlay */
+        .blocked-overlay {
+            animation: pulse-red 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.5); }
+        }
+
+        /* Lock icon animation */
+        .lock-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield background -->
+    <div id="starfield"></div>
+
+    <!-- Login card -->
+    <div class="login-card p-8 max-w-md w-full mx-4 {% if is_blocked %}blocked-overlay{% endif %}">
+        <!-- Header with icon -->
+        <div class="text-center mb-8">
+            <div class="lock-icon inline-block mb-4">
+                {% if is_blocked %}
+                <!-- Icono de candado cerrado con exclamación -->
+                <svg class="w-16 h-16 mx-auto text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                {% else %}
+                <!-- Icono de candado normal -->
+                <svg class="w-16 h-16 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                {% endif %}
+            </div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                Panel de Administración
+            </h1>
+            {% if is_blocked %}
+            <p class="text-red-400 mt-2 font-semibold">Acceso Bloqueado</p>
+            {% else %}
+            <p class="text-gray-400 mt-2">Ingresa tu contraseña para continuar</p>
+            {% endif %}
+        </div>
+
+        <!-- Error message -->
+        {% if error_message %}
+        <div class="error-message rounded-lg p-4 mb-6 text-red-200">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium">{{ error_message }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Warning message -->
+        {% if warning_message %}
+        <div class="warning-message rounded-lg p-4 mb-6 text-yellow-200">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium">{{ warning_message }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Info message -->
+        {% if info_message %}
+        <div class="info-message rounded-lg p-4 mb-6 text-blue-200">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium">{{ info_message }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Blocked timer display -->
+        {% if is_blocked %}
+        <div class="bg-red-900 bg-opacity-30 border border-red-500 rounded-lg p-6 mb-6 text-center">
+            <svg class="w-12 h-12 mx-auto text-red-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-red-300 text-sm mb-2">Demasiados intentos fallidos</p>
+            <p class="text-white font-bold text-2xl">{{ minutes_remaining }} minutos</p>
+            <p class="text-red-300 text-sm mt-2">hasta poder intentar nuevamente</p>
+        </div>
+        {% endif %}
+
+        <!-- Login form -->
+        {% if not is_blocked %}
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+                    Contraseña
+                </label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="input-field w-full px-4 py-3 rounded-lg"
+                    placeholder="Ingresa la contraseña de administrador"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <button
+                type="submit"
+                class="btn-login w-full py-3 rounded-lg font-semibold text-white"
+            >
+                Iniciar Sesión
+            </button>
+        </form>
+        {% else %}
+        <!-- Formulario deshabilitado cuando está bloqueado -->
+        <div class="space-y-6 opacity-50">
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+                    Contraseña
+                </label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="input-field w-full px-4 py-3 rounded-lg cursor-not-allowed"
+                    placeholder="Acceso temporalmente bloqueado"
+                    disabled
+                >
+            </div>
+
+            <button
+                type="button"
+                class="w-full py-3 rounded-lg font-semibold text-white bg-gray-600 cursor-not-allowed"
+                disabled
+            >
+                Bloqueado
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="mt-8 text-center">
+            <a href="{% url 'inicio' %}" class="text-sm text-gray-400 hover:text-blue-400 transition-colors">
+                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+
+    <!-- Script para generar estrellas -->
+    <script>
+        const starfield = document.getElementById('starfield');
+        const numberOfStars = 100;
+
+        for (let i = 0; i < numberOfStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starfield.appendChild(star);
+        }
+
+        // Auto-focus en el input si no está bloqueado
+        {% if not is_blocked %}
+        const passwordInput = document.getElementById('password');
+        if (passwordInput && !passwordInput.disabled) {
+            passwordInput.focus();
+        }
+        {% endif %}
+
+        // Auto-refresh cuando expire el bloqueo
+        {% if is_blocked and minutes_remaining %}
+        // Refrescar la página después del tiempo de bloqueo
+        setTimeout(function() {
+            window.location.reload();
+        }, {{ minutes_remaining }} * 60 * 1000);
+
+        // Mostrar contador regresivo si está bloqueado
+        let minutesRemaining = {{ minutes_remaining }};
+        const timerElement = document.querySelector('.text-2xl');
+
+        if (timerElement) {
+            setInterval(function() {
+                if (minutesRemaining > 0) {
+                    minutesRemaining--;
+                    if (minutesRemaining === 0) {
+                        window.location.reload();
+                    } else {
+                        timerElement.textContent = minutesRemaining + ' minutos';
+                    }
+                }
+            }, 60000); // Actualizar cada minuto
+        }
+        {% endif %}
+    </script>
+</body>
+</html>

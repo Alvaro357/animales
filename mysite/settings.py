@@ -12,13 +12,17 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Cargar variables de entorno desde .env
-load_dotenv(BASE_DIR / '.env')
+# Cargar variables de entorno desde .env (si está disponible)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / '.env')
+except ImportError:
+    # Si dotenv no está instalado, continuar sin él
+    pass
 
 
 # Quick-start development settings - unsuitable for production
@@ -35,13 +39,13 @@ if not SECRET_KEY:
     )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-DEBUG = True  # Temporalmente en True para debugging   
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'   
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    '711d3cef367f.ngrok-free.app',  # URL actual de ngrok
+    '67a6f8ff6b61.ngrok-free.app',  # URL actual de ngrok
+    '711d3cef367f.ngrok-free.app',
     '59e98aa68ec2.ngrok-free.app',
     'f6f52d6fb2cd.ngrok-free.app',
     '*.ngrok-free.app',  # Para cualquier dominio de ngrok
@@ -56,7 +60,8 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 # Configuración para CSRF con ngrok
 CSRF_TRUSTED_ORIGINS = [
-    'https://711d3cef367f.ngrok-free.app',  # Nueva URL actual
+    'https://67a6f8ff6b61.ngrok-free.app',  # Nueva URL actual
+    'https://711d3cef367f.ngrok-free.app',
     'https://f6f52d6fb2cd.ngrok-free.app',
     'https://*.ngrok-free.app',
     'https://*.ngrok.io',
@@ -75,12 +80,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'myapp',
-    'tailwind',
-    'theme',
-    'django_browser_reload', # Para recargar el css
 ]
 
-TAILWIND_APP_NAME = 'theme'
+# TAILWIND_APP_NAME = 'theme'  # Comentado porque tailwind app está deshabilitada
 
 
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
@@ -95,8 +97,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
+
+# Solo activar browser reload en desarrollo local
+if DEBUG:
+    INSTALLED_APPS.append('django_browser_reload')
+    MIDDLEWARE.append('django_browser_reload.middleware.BrowserReloadMiddleware')
 
 
 ROOT_URLCONF = 'mysite.urls'
@@ -123,12 +129,27 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Usar PostgreSQL si DATABASE_URL está definida (Docker), sino SQLite (desarrollo local)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', 'animales_db'),
+            'USER': os.environ.get('POSTGRES_USER', 'animales_user'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'password123'),
+            'HOST': 'db',
+            'PORT': '5432',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -166,9 +187,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedMainfestStaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -179,14 +201,14 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = ''
 LOGOUT_REDIRECT_URL = 'login'
 
-# Configuración segura de email
+# Configuración segura de email (Gmail)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.me.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('alvaro_m_a@icloud.com')
-EMAIL_HOST_PASSWORD = os.environ.get('Rubicon2212')
-DEFAULT_FROM_EMAIL = 'alvaro_m_a@icloud.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'asociacionanimales2@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # Contraseña de aplicación de Gmail
+DEFAULT_FROM_EMAIL = 'asociacionanimales2@gmail.com'
 
 # Verificar configuración de email
 if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
@@ -214,6 +236,11 @@ CSRF_COOKIE_SAMESITE = 'Lax'  # Protección CSRF
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudinary Configuration
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'dfg7cdvlo')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '884186126363959')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', 'FtUCkSSA5bBBQn6ms229maPwE4E')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.app',
@@ -243,6 +270,14 @@ SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 # NOTA: Ajustar según las necesidades específicas del proyecto
 if not DEBUG:
     SECURE_FORCE_SSL_REDIRECT = True
+
+# ==================== CONFIGURACIÓN DE LOGGING ====================
+
+# ==================== CONFIGURACIÓN DE AUTENTICACIÓN DE ADMIN ====================
+
+# Contraseña para el panel de administración
+# IMPORTANTE: Cambiar en producción a una contraseña segura usando variables de entorno
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 # ==================== CONFIGURACIÓN DE LOGGING ====================
 

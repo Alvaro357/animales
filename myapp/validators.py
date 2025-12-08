@@ -2,6 +2,7 @@
 Validadores de seguridad para archivos subidos
 """
 import os
+import mimetypes
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
 
@@ -30,9 +31,15 @@ def validate_image_file(value):
         'image/webp'
     ]
 
-    if value.content_type not in allowed_content_types:
+    # Obtener content_type - maneja tanto UploadedFile como FieldFile
+    content_type = getattr(value, 'content_type', None)
+    if not content_type:
+        # Si no tiene content_type (FieldFile), inferir del nombre
+        content_type, _ = mimetypes.guess_type(value.name)
+
+    if content_type and content_type not in allowed_content_types:
         raise ValidationError(
-            f'Tipo de archivo no permitido: {value.content_type}. '
+            f'Tipo de archivo no permitido: {content_type}. '
             f'Tipos permitidos: JPEG, PNG, GIF, WebP'
         )
 
@@ -85,9 +92,15 @@ def validate_video_file(value):
         'video/webm'
     ]
 
-    if value.content_type not in allowed_content_types:
+    # Obtener content_type - maneja tanto UploadedFile como FieldFile
+    content_type = getattr(value, 'content_type', None)
+    if not content_type:
+        # Si no tiene content_type (FieldFile), inferir del nombre
+        content_type, _ = mimetypes.guess_type(value.name)
+
+    if content_type and content_type not in allowed_content_types:
         raise ValidationError(
-            f'Tipo de archivo no permitido: {value.content_type}. '
+            f'Tipo de archivo no permitido: {content_type}. '
             f'Tipos permitidos: MP4, MPEG, MOV, AVI, WebM'
         )
 
@@ -138,9 +151,15 @@ def validate_logo_file(value):
         'image/png'
     ]
 
-    if value.content_type not in allowed_content_types:
+    # Obtener content_type - maneja tanto UploadedFile como FieldFile
+    content_type = getattr(value, 'content_type', None)
+    if not content_type:
+        # Si no tiene content_type (FieldFile), inferir del nombre
+        content_type, _ = mimetypes.guess_type(value.name)
+
+    if content_type and content_type not in allowed_content_types:
         raise ValidationError(
-            f'Tipo de archivo no permitido para logo: {value.content_type}. '
+            f'Tipo de archivo no permitido para logo: {content_type}. '
             f'Solo se permiten: JPEG, PNG'
         )
 

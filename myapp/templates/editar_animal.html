@@ -1,56 +1,712 @@
-{% load static tailwind_tags %}
-
+{% load static %}
 <!DOCTYPE html>
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Inicio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar {{ animal.nombre }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style type="text/tailwindcss">
+    <style>
         html {
-            font-size: 22px;
+            font-size: 18px;
         }
-        body {
-            font-family: sans-serif;
-            background-color: #f5f5f5;
+
+        .required-asterisk {
+            color: #dc2626;
+            margin-left: 2px;
+            font-weight: bold;
+        }
+
+        /* Grid de imágenes/videos existentes */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .media-item {
+            position: relative;
+            aspect-ratio: 1;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f9fafb;
+        }
+
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-item .delete-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .media-item .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .media-item .principal-badge {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            background: rgba(16, 185, 129, 0.95);
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .media-item.marked-for-deletion {
+            opacity: 0.4;
+            border-color: #ef4444;
+        }
+
+        .media-item.marked-for-deletion::after {
+            content: 'ELIMINAR';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        /* Preview de nuevas imágenes */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f0fdf4;
+        }
+
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-item .new-badge {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(16, 185, 129, 0.95);
+            color: white;
+            border-radius: 3px;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 24px;
             text-align: center;
-            padding-top: 150px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-        .card {
-            background: white;
-            padding: 30px;
-            margin: auto;
-            width: 50%;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
         }
-        a {
-            color: #007bff;
-            text-decoration: none;
-            margin: 10px;
+
+        /* Botón cyan neon */
+        .btn-neon {
+            color: #03e9f4;
+            border: 1px solid #03e9f4;
+            transition: all 0.3s;
+        }
+
+        .btn-neon:hover {
+            color: white;
+            background: #03e9f4;
+            box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4;
+        }
+
+        /* Notificación */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #03e9f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
-
 </head>
-<body>
+<body class="bg-gray-100 py-8">
 
-{% block content %}
-<div class="max-w-md mx-auto my-12 bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold text-[#03e9f4] mb-6">Editar {{ animal.nombre }}</h2>
-    
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div class="flex gap-4 mt-6">
-            <button type="submit" class="bg-[#03e9f4] text-white px-4 py-2 rounded hover:bg-[#03b4bd] transition">
-                Guardar cambios
-            </button>
-            <a href="{% url 'mis_animales' %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition">
-                Cancelar
-            </a>
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="bg-white p-6 rounded-xl flex flex-col items-center gap-4">
+            <div class="spinner"></div>
+            <p class="text-gray-700 font-medium">Subiendo imágenes...</p>
         </div>
-    </form>
-</div>
-{% endblock %}
+    </div>
 
+    <!-- Botón volver -->
+    <div class="fixed top-6 right-6 z-50">
+        <a href="/mis_animales/" class="text-red-500 border border-red-500 px-4 py-2 rounded hover:bg-red-500 hover:text-white transition text-sm font-medium">
+            ← Volver
+        </a>
+    </div>
+
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Editar: {{ animal.nombre }}</h1>
+
+        <form method="post" enctype="multipart/form-data" id="editForm" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Información básica -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="text" name="nombre" value="{{ animal.nombre }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Tipo de Animal <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="text" name="tipo_de_animal" value="{{ animal.tipo_de_animal }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Raza <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="text" name="raza" value="{{ animal.raza }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Color <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="text" name="color" value="{{ animal.color }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Email <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="email" name="email" value="{{ animal.email }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Teléfono <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="tel" name="telefono" value="{{ animal.telefono }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Población <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="text" name="poblacion" value="{{ animal.poblacion }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Provincia <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="text" name="provincia" value="{{ animal.provincia }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Código Postal <span class="required-asterisk">*</span>
+                    </label>
+                    <input type="text" name="codigo_postal" value="{{ animal.codigo_postal }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <textarea name="descripcion" rows="3"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent">{{ animal.descripcion }}</textarea>
+            </div>
+
+            <!-- ==================== IMÁGENES ==================== -->
+            <div class="border-t pt-6">
+                <h2 class="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+                    📷 Imágenes
+                </h2>
+
+                <!-- Imágenes existentes -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Imágenes actuales:</h3>
+                    {% if animal.imagenes.all %}
+                        <div class="media-grid" id="imagenesExistentes">
+                            {% for imagen in animal.imagenes.all %}
+                            <div class="media-item" id="img-{{ imagen.id }}">
+                                <img src="{{ imagen.imagen }}" alt="Imagen {{ forloop.counter }}">
+                                {% if imagen.es_principal %}
+                                <span class="principal-badge">Principal</span>
+                                {% endif %}
+                                <button type="button" class="delete-btn" onclick="toggleEliminarImagen({{ imagen.id }})" title="Marcar para eliminar">
+                                    ×
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Haz clic en × para marcar una imagen para eliminar</p>
+                    {% else %}
+                        <p class="text-gray-400 text-sm italic">No hay imágenes cargadas</p>
+                    {% endif %}
+                </div>
+
+                <!-- Agregar nuevas imágenes -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Agregar nuevas imágenes:</h3>
+
+                    <div id="dropZone" class="drop-zone" onclick="document.getElementById('inputImagenes').click()">
+                        <div class="text-4xl mb-2">📷</div>
+                        <p class="font-semibold text-gray-700">Arrastra imágenes aquí o haz clic</p>
+                        <p class="text-sm text-gray-500 mt-1">Máximo 10 imágenes • JPG, PNG, WebP • Hasta 5MB cada una</p>
+                    </div>
+
+                    <!-- Input de archivos (IMPORTANTE: multiple) -->
+                    <input type="file"
+                           id="inputImagenes"
+                           name="imagenes"
+                           accept="image/*"
+                           multiple
+                           class="hidden">
+
+                    <!-- Preview de nuevas imágenes -->
+                    <div id="previewNuevasImagenes" class="preview-grid"></div>
+                    <p id="contadorImagenes" class="text-sm text-green-600 font-medium mt-2" style="display: none;">
+                        <span id="numImagenes">0</span> imagen(es) seleccionada(s)
+                    </p>
+                </div>
+            </div>
+
+            <!-- ==================== VIDEOS ==================== -->
+            <div class="border-t pt-6">
+                <h2 class="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+                    🎬 Videos
+                </h2>
+
+                <!-- Videos existentes -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Videos actuales:</h3>
+                    {% if animal.videos.all %}
+                        <div class="media-grid" id="videosExistentes">
+                            {% for video in animal.videos.all %}
+                            <div class="media-item" id="vid-{{ video.id }}">
+                                <video src="{{ video.video }}" controls></video>
+                                <button type="button" class="delete-btn" onclick="toggleEliminarVideo({{ video.id }})" title="Marcar para eliminar">
+                                    ×
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-gray-400 text-sm italic">No hay videos cargados</p>
+                    {% endif %}
+                </div>
+
+                <!-- Agregar nuevos videos -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Agregar nuevos videos:</h3>
+                    <input type="file"
+                           id="inputVideos"
+                           name="videos"
+                           accept="video/*"
+                           multiple
+                           class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 cursor-pointer">
+                    <p class="text-xs text-gray-500 mt-1">Máximo 5 videos • MP4, MOV, AVI</p>
+                    <div id="previewNuevosVideos" class="preview-grid"></div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex gap-4 pt-6 border-t">
+                <button type="submit" id="btnGuardar" class="flex-1 btn-neon px-4 py-3 rounded-lg uppercase tracking-wider text-sm font-semibold">
+                    Guardar Cambios
+                </button>
+                <a href="/mis_animales/" class="flex-1 text-center bg-gray-200 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-300 transition uppercase tracking-wider text-sm font-semibold">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // ============ VARIABLES GLOBALES ============
+        let imagenesAEliminar = [];
+        let videosAEliminar = [];
+        let nuevasImagenes = [];
+        let nuevosVideos = [];
+
+        // ============ INICIALIZACIÓN ============
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragAndDrop();
+            setupInputImagenes();
+            setupInputVideos();
+            setupFormSubmit();
+        });
+
+        // ============ DRAG AND DROP ============
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                agregarNuevasImagenes(files);
+            }, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // ============ INPUT IMÁGENES ============
+        function setupInputImagenes() {
+            const input = document.getElementById('inputImagenes');
+            input.addEventListener('change', function() {
+                agregarNuevasImagenes(this.files);
+            });
+        }
+
+        function agregarNuevasImagenes(files) {
+            const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+
+            // Límite de 10 imágenes nuevas
+            const espacioDisponible = 10 - nuevasImagenes.length;
+
+            if (espacioDisponible <= 0) {
+                mostrarNotificacion('Máximo 10 imágenes nuevas permitidas', 'warning');
+                return;
+            }
+
+            let agregadas = 0;
+            imageFiles.forEach(file => {
+                if (nuevasImagenes.length >= 10) return;
+
+                // Verificar tamaño (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    mostrarNotificacion(`${file.name} es muy grande (máx 5MB)`, 'error');
+                    return;
+                }
+
+                // Verificar duplicados
+                const yaExiste = nuevasImagenes.some(f => f.name === file.name && f.size === file.size);
+                if (yaExiste) {
+                    mostrarNotificacion(`${file.name} ya está agregada`, 'warning');
+                    return;
+                }
+
+                nuevasImagenes.push(file);
+                agregadas++;
+            });
+
+            if (agregadas > 0) {
+                mostrarNotificacion(`${agregadas} imagen(es) agregada(s)`, 'success');
+                actualizarPreviewImagenes();
+                actualizarInputImagenes();
+            }
+        }
+
+        function actualizarPreviewImagenes() {
+            const preview = document.getElementById('previewNuevasImagenes');
+            const contador = document.getElementById('contadorImagenes');
+            const numEl = document.getElementById('numImagenes');
+
+            preview.innerHTML = '';
+
+            if (nuevasImagenes.length === 0) {
+                contador.style.display = 'none';
+                return;
+            }
+
+            contador.style.display = 'block';
+            numEl.textContent = nuevasImagenes.length;
+
+            nuevasImagenes.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <span class="new-badge">NUEVA</span>
+                        <button type="button" class="remove-btn" onclick="quitarNuevaImagen(${index})">×</button>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function quitarNuevaImagen(index) {
+            nuevasImagenes.splice(index, 1);
+            actualizarPreviewImagenes();
+            actualizarInputImagenes();
+            mostrarNotificacion('Imagen eliminada', 'info');
+        }
+
+        function actualizarInputImagenes() {
+            const input = document.getElementById('inputImagenes');
+            const dataTransfer = new DataTransfer();
+            nuevasImagenes.forEach(file => dataTransfer.items.add(file));
+            input.files = dataTransfer.files;
+        }
+
+        // ============ INPUT VIDEOS ============
+        function setupInputVideos() {
+            const input = document.getElementById('inputVideos');
+            input.addEventListener('change', function() {
+                agregarNuevosVideos(this.files);
+            });
+        }
+
+        function agregarNuevosVideos(files) {
+            const videoFiles = Array.from(files).filter(f => f.type.startsWith('video/'));
+
+            const espacioDisponible = 5 - nuevosVideos.length;
+            if (espacioDisponible <= 0) {
+                mostrarNotificacion('Máximo 5 videos nuevos permitidos', 'warning');
+                return;
+            }
+
+            let agregados = 0;
+            videoFiles.slice(0, espacioDisponible).forEach(file => {
+                if (file.size > 50 * 1024 * 1024) {
+                    mostrarNotificacion(`${file.name} es muy grande (máx 50MB)`, 'error');
+                    return;
+                }
+                nuevosVideos.push(file);
+                agregados++;
+            });
+
+            if (agregados > 0) {
+                mostrarNotificacion(`${agregados} video(s) agregado(s)`, 'success');
+                actualizarPreviewVideos();
+            }
+        }
+
+        function actualizarPreviewVideos() {
+            const preview = document.getElementById('previewNuevosVideos');
+            preview.innerHTML = '';
+
+            nuevosVideos.forEach((file, index) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <video src="${URL.createObjectURL(file)}"></video>
+                    <span class="new-badge">NUEVO</span>
+                    <button type="button" class="remove-btn" onclick="quitarNuevoVideo(${index})">×</button>
+                `;
+                preview.appendChild(div);
+            });
+        }
+
+        function quitarNuevoVideo(index) {
+            nuevosVideos.splice(index, 1);
+            actualizarPreviewVideos();
+            mostrarNotificacion('Video eliminado', 'info');
+        }
+
+        // ============ ELIMINAR EXISTENTES ============
+        function toggleEliminarImagen(id) {
+            const elemento = document.getElementById(`img-${id}`);
+            const index = imagenesAEliminar.indexOf(id);
+
+            if (index > -1) {
+                imagenesAEliminar.splice(index, 1);
+                elemento.classList.remove('marked-for-deletion');
+                mostrarNotificacion('Imagen restaurada', 'info');
+            } else {
+                imagenesAEliminar.push(id);
+                elemento.classList.add('marked-for-deletion');
+                mostrarNotificacion('Imagen marcada para eliminar', 'warning');
+            }
+        }
+
+        function toggleEliminarVideo(id) {
+            const elemento = document.getElementById(`vid-${id}`);
+            const index = videosAEliminar.indexOf(id);
+
+            if (index > -1) {
+                videosAEliminar.splice(index, 1);
+                elemento.classList.remove('marked-for-deletion');
+                mostrarNotificacion('Video restaurado', 'info');
+            } else {
+                videosAEliminar.push(id);
+                elemento.classList.add('marked-for-deletion');
+                mostrarNotificacion('Video marcado para eliminar', 'warning');
+            }
+        }
+
+        // ============ SUBMIT DEL FORMULARIO ============
+        function setupFormSubmit() {
+            const form = document.getElementById('editForm');
+
+            form.addEventListener('submit', function(e) {
+                // Agregar IDs de imágenes a eliminar
+                imagenesAEliminar.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'eliminar_imagenes';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+
+                // Agregar IDs de videos a eliminar
+                videosAEliminar.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'eliminar_videos';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+
+                // Mostrar loading
+                document.getElementById('loadingOverlay').classList.add('active');
+            });
+        }
+
+        // ============ NOTIFICACIONES ============
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            // Eliminar notificaciones anteriores
+            document.querySelectorAll('.notification').forEach(n => n.remove());
+
+            const colors = {
+                'info': '#3b82f6',
+                'success': '#10b981',
+                'warning': '#f59e0b',
+                'error': '#ef4444'
+            };
+
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.style.background = colors[tipo] || colors.info;
+            notif.textContent = mensaje;
+            document.body.appendChild(notif);
+
+            setTimeout(() => notif.classList.add('show'), 10);
+            setTimeout(() => {
+                notif.classList.remove('show');
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+    </script>
 </body>
+</html>

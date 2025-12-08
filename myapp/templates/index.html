@@ -1,21 +1,90 @@
-{% load static tailwind_tags %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Adopta - Encuentra tu compañero perfecto</title>  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectamos Corazones - Adopta un Animal | Perros, Gatos y más</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Encuentra tu compañero perfecto para adoptar. Miles de perros, gatos y otros animales esperan un hogar. Conectamos asociaciones de animales con familias amorosas en toda España.">
+    <meta name="keywords" content="adoptar animales, adopción perros, adopción gatos, protectoras de animales, asociaciones animales, mascotas en adopción, adoptar mascota España, refugio animales">
+    <meta name="author" content="Conectamos Corazones">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    <meta name="revisit-after" content="7 days">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="Conectamos Corazones - Adopta un Animal">
+    <meta property="og:description" content="Encuentra tu compañero perfecto para adoptar. Miles de animales esperan un hogar amoroso.">
+    <meta property="og:image" content="{% static 'img/og-image.jpg' %}">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="Conectamos Corazones">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta name="twitter:title" content="Conectamos Corazones - Adopta un Animal">
+    <meta name="twitter:description" content="Encuentra tu compañero perfecto para adoptar. Miles de animales esperan un hogar amoroso.">
+    <meta name="twitter:image" content="{% static 'img/og-image.jpg' %}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Conectamos Corazones",
+        "description": "Plataforma de adopción de animales que conecta asociaciones protectoras con familias amorosas",
+        "url": "{{ request.scheme }}://{{ request.get_host }}/",
+        "logo": "{% static 'img/logo.png' %}",
+        "sameAs": [],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "availableLanguage": "Spanish"
+        }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Conectamos Corazones",
+        "url": "{{ request.scheme }}://{{ request.get_host }}/",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ request.scheme }}://{{ request.get_host }}/resultados-busqueda/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
+    <!-- Google AdSense Script - Reemplaza XXXXXXXXXXXXXXXX con tu ID de publicador -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+            crossorigin="anonymous"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style type="text/tailwindcss">
         html {
             font-size: 16px;
         }
         
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Pacifico', cursive;
             background: #0a0a0a;
-            color: #ffffff;
+            color: #ffe4cc;
             text-align: center;
             padding-top: 100px;
             position: relative;
@@ -51,8 +120,8 @@
         }
         
         .star.bright {
-            background: #60a5fa;
-            box-shadow: 0 0 4px #60a5fa;
+            background: #ffd89b;
+            box-shadow: 0 0 4px #ffd89b;
         }
         
         @keyframes twinkle {
@@ -65,7 +134,7 @@
             position: absolute;
             width: 2px;
             height: 2px;
-            background: linear-gradient(45deg, #60a5fa, transparent);
+            background: linear-gradient(45deg, #ffd89b, transparent);
             border-radius: 50%;
             opacity: 0;
             animation: shoot 2s linear infinite;
@@ -97,16 +166,17 @@
         
         /* Botones con efectos modernos */
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #ffb4a2, #ff9a7f);
+            border: 1px solid rgba(255, 180, 162, 0.4);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            color: #5c4a42;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(255, 180, 162, 0.4);
         }
         
         .btn-primary::before {
@@ -125,15 +195,16 @@
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 201, 217, 0.15);
+            border: 1px solid rgba(255, 201, 217, 0.3);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            color: #ffc9d9;
         }
-        
+
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 201, 217, 0.25);
+            border-color: rgba(255, 201, 217, 0.5);
             transform: translateY(-1px);
         }
         
@@ -154,7 +225,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            background: linear-gradient(135deg, rgba(255, 180, 162, 0.1), rgba(255, 201, 217, 0.1));
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 0;
@@ -166,16 +237,45 @@
         
         .animal-card:hover {
             transform: translateY(-8px);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
-                        0 0 0 1px rgba(59, 130, 246, 0.1);
+            border-color: rgba(255, 180, 162, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 180, 162, 0.2);
         }
         
         .card-content {
             position: relative;
             z-index: 1;
         }
-        
+
+        /* Contenedor de anuncios */
+        .ad-container {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ad-wrapper {
+            width: 100%;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ad-wrapper .adsbygoogle {
+            width: 100%;
+            min-height: 90px;
+        }
+
+        /* Responsive para anuncios */
+        @media (max-width: 768px) {
+            .ad-container {
+                min-height: 80px;
+            }
+        }
+
         /* Botón de favorito */
         .favorite-btn {
             position: absolute;
@@ -223,12 +323,12 @@
         }
         
         .favorite-btn:hover .heart-outline {
-            stroke: #ef4444;
+            stroke: #ffc9d9;
         }
-        
+
         .heart-filled {
-            fill: #ef4444;
-            stroke: #ef4444;
+            fill: #ffc9d9;
+            stroke: #ffc9d9;
             stroke-width: 1;
         }
         
@@ -249,28 +349,153 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        /* Estilos del buscador avanzado */
+        .animal-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .animal-card-selector {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 140px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .animal-card-selector::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .animal-card-selector:hover::before {
+            left: 100%;
+        }
+
+        .animal-card-selector:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .animal-card-selector.active {
+            background: rgba(255, 180, 162, 0.2);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 30px rgba(255, 180, 162, 0.4);
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .animal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .animal-card-selector:hover .animal-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .animal-card-selector.active .animal-icon {
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% { transform: scale(1.1); }
+            40%, 43% { transform: scale(1.3); }
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            position: relative;
+        }
+
+        .filter-label {
+            display: block;
+            color: #ffd4b8;
+            font-weight: 500;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .filter-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #ffb4a2;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
+        }
+
+        .filter-input option {
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 12px;
+        }
+
+        .otros-animales {
+            display: none;
+        }
+
+        .otros-animales.show {
+            display: block;
+        }
         
         .filter-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
+            color: #ffd4b8;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             min-height: 44px;
             font-size: 16px;
         }
-        
+
         .filter-btn.active {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-color: #3b82f6;
-            color: #ffffff;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #ffb4a2, #ff9a7f);
+            border-color: #ffb4a2;
+            color: #5c4a42;
+            box-shadow: 0 0 20px rgba(255, 180, 162, 0.5);
         }
-        
+
         .filter-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            background: rgba(255, 180, 162, 0.1);
+            color: #ffe4cc;
         }
         
         /* Responsive para filtros */
@@ -321,26 +546,28 @@
         
         .search-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
         }
         
         /* Título principal */
         .main-title {
             font-size: 3.5rem;
             font-weight: 700;
-            line-height: 1.1;
+            line-height: 1.4;
             letter-spacing: -0.025em;
-            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            background: linear-gradient(135deg, #ffe4cc, #ffb4a2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 2rem;
+            padding: 0.5rem 0;
         }
-        
+
         @media (max-width: 768px) {
             .main-title {
                 font-size: 2.5rem;
+                line-height: 1.3;
             }
             
             body {
@@ -359,15 +586,15 @@
         
         /* Contador de resultados */
         .results-counter {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+            background: rgba(255, 216, 155, 0.15);
+            border: 1px solid rgba(255, 216, 155, 0.3);
+            color: #ffd89b;
         }
-        
+
         .results-counter.no-results {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            background: rgba(255, 180, 162, 0.15);
+            border: 1px solid rgba(255, 180, 162, 0.3);
+            color: #ffb4a2;
         }
         
         /* Placeholders de carga */
@@ -383,20 +610,38 @@
         }
         
         .loading-shimmer {
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.05) 25%, 
-                rgba(255, 255, 255, 0.1) 50%, 
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.05) 25%,
+                rgba(255, 255, 255, 0.1) 50%,
                 rgba(255, 255, 255, 0.05) 75%
             );
             background-size: 200% 100%;
             animation: shimmer 2s infinite;
         }
-        
+
         @keyframes shimmer {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
-        
+
+        /* Lazy loading visual para imágenes */
+        img[loading="lazy"] {
+            opacity: 1;
+        }
+
+        img[loading="lazy"].loaded {
+            opacity: 1;
+        }
+
+        /* Skeleton loader para el contenedor de imagen */
+        .image-container {
+            position: relative;
+        }
+
+        .image-container.image-loaded {
+            background: transparent;
+        }
+
         /* Modal moderno */
         .modal-backdrop {
             backdrop-filter: blur(10px);
@@ -418,8 +663,8 @@
         
         .form-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
         }
 
         /* Estilos para campos con error */
@@ -435,7 +680,7 @@
         }
 
         .form-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: #ffe4cc;
         }
         
         /* Estilos para select en modo oscuro */
@@ -461,14 +706,14 @@
 
         select.form-input option:checked,
         select.form-input option:hover {
-            background-color: #3b82f6;
-            color: #ffffff;
+            background-color: #ffb4a2;
+            color: #5c4a42;
         }
 
         select.form-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ffb4a2;
+            box-shadow: 0 0 0 3px rgba(255, 180, 162, 0.2);
         }
         
         /* Efectos de entrada */
@@ -517,17 +762,17 @@
         
         /* Spinners para crear animal */
         .create-spinner {
-            border: 3px solid rgba(59, 130, 246, 0.3);
-            border-left: 3px solid #3b82f6;
+            border: 3px solid rgba(255, 180, 162, 0.3);
+            border-left: 3px solid #ffb4a2;
             border-radius: 50%;
             width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
         }
-        
+
         .create-spinner-small {
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            border-left: 2px solid #3b82f6;
+            border: 2px solid rgba(255, 180, 162, 0.3);
+            border-left: 2px solid #ffb4a2;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -560,27 +805,27 @@
         
         /* Indicadores de archivo */
         .file-indicator {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+            background: rgba(255, 216, 155, 0.15);
+            border: 1px solid rgba(255, 216, 155, 0.3);
+            color: #ffd89b;
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 12px;
         }
-        
+
         /* Spinners de loading */
         .register-spinner {
-            border: 3px solid rgba(59, 130, 246, 0.3);
-            border-left: 3px solid #3b82f6;
+            border: 3px solid rgba(255, 180, 162, 0.3);
+            border-left: 3px solid #ffb4a2;
             border-radius: 50%;
             width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
         }
-        
+
         .register-spinner-small {
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            border-left: 2px solid #3b82f6;
+            border: 2px solid rgba(255, 180, 162, 0.3);
+            border-left: 2px solid #ffb4a2;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -605,9 +850,9 @@
         
         /* Contador de favoritos */
         .favorites-counter {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            background: rgba(255, 201, 217, 0.15);
+            border: 1px solid rgba(255, 201, 217, 0.3);
+            color: #ffc9d9;
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 12px;
@@ -632,13 +877,59 @@
             <!-- Formulario de Login -->
             <div id="loginForm">
                 <h2 class="text-2xl font-semibold mb-6 text-center text-white">Iniciar sesión</h2>
+
+                <!-- Mensaje de error de login -->
+                <div id="loginErrorMessage" class="{% if not login_error %}hidden{% endif %} mb-4 p-4 rounded-lg border
+                    {% if login_error.tipo == 'pendiente' %}bg-yellow-900/50 border-yellow-500{% endif %}
+                    {% if login_error.tipo == 'rechazada' %}bg-red-900/50 border-red-500{% endif %}
+                    {% if login_error.tipo == 'suspendida' %}bg-orange-900/50 border-orange-500{% endif %}
+                    {% if login_error.tipo == 'eliminada' %}bg-red-900/50 border-red-500{% endif %}
+                    {% if login_error.tipo == 'credenciales' %}bg-red-900/50 border-red-500{% endif %}
+                    {% if login_error.tipo == 'desconocido' %}bg-gray-900/50 border-gray-500{% endif %}">
+                    <div class="flex items-start">
+                        {% if login_error.tipo == 'pendiente' %}
+                        <svg class="w-5 h-5 text-yellow-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                        </svg>
+                        {% elif login_error.tipo == 'rechazada' or login_error.tipo == 'eliminada' or login_error.tipo == 'credenciales' %}
+                        <svg class="w-5 h-5 text-red-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        {% elif login_error.tipo == 'suspendida' %}
+                        <svg class="w-5 h-5 text-orange-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        {% else %}
+                        <svg class="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        {% endif %}
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-sm
+                                {% if login_error.tipo == 'pendiente' %}text-yellow-300{% endif %}
+                                {% if login_error.tipo == 'rechazada' or login_error.tipo == 'eliminada' or login_error.tipo == 'credenciales' %}text-red-300{% endif %}
+                                {% if login_error.tipo == 'suspendida' %}text-orange-300{% endif %}
+                                {% if login_error.tipo == 'desconocido' %}text-gray-300{% endif %}">
+                                {{ login_error.mensaje }}
+                            </h4>
+                            <p class="text-xs mt-1
+                                {% if login_error.tipo == 'pendiente' %}text-yellow-200/80{% endif %}
+                                {% if login_error.tipo == 'rechazada' or login_error.tipo == 'eliminada' or login_error.tipo == 'credenciales' %}text-red-200/80{% endif %}
+                                {% if login_error.tipo == 'suspendida' %}text-orange-200/80{% endif %}
+                                {% if login_error.tipo == 'desconocido' %}text-gray-200/80{% endif %}">
+                                {{ login_error.detalle }}
+                            </p>
+                        </div>
+                        <button type="button" onclick="cerrarErrorLogin()" class="ml-2 text-gray-400 hover:text-white">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
                 <form method="post" action="/login/">
                     {% csrf_token %}
-                    {% if form.non_field_errors %}
-                        <div class="mb-4 text-red-400 text-sm">
-                            {{ form.non_field_errors }}
-                        </div>
-                    {% endif %}
                     <div class="mb-4">
                         <label for="username" class="block text-sm font-medium form-label mb-2">Usuario</label>
                         <input type="text" id="username" name="username" 
@@ -652,8 +943,14 @@
                     <button type="submit" class="btn-primary w-full px-6 py-3 rounded-lg font-medium text-white">
                         Iniciar sesión
                     </button>
+
+                    <div class="mt-4 text-center">
+                        <a href="{% url 'solicitar_reset_password' %}" class="text-gray-400 hover:text-white text-sm transition-colors duration-300">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
                 </form>
-                
+
                 <div class="mt-6 pt-6 border-t border-gray-700 text-center">
                     <p class="text-gray-400 text-sm mb-3">¿No tienes cuenta?</p>
                     <button onclick="mostrarRegistro()" class="btn-secondary inline-block px-6 py-2 rounded-lg text-sm font-medium text-white">
@@ -735,27 +1032,15 @@
                         <div id="email-error" class="hidden mt-1 text-sm text-red-400"></div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label for="reg_telefono" class="block text-sm font-medium form-label mb-2">
-                                Teléfono <span class="text-red-400">*</span>
-                            </label>
-                            <input type="tel" id="reg_telefono" name="telefono"
-                                   class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
-                                   required maxlength="15"
-                                   placeholder="+34 600 123 456">
-                            <div id="telefono-error" class="hidden mt-1 text-sm text-red-400"></div>
-                        </div>
-
-                        <div>
-                            <label for="reg_logo" class="block text-sm font-medium form-label mb-2">
-                                Logo (opcional)
-                            </label>
-                            <input type="file" id="reg_logo" name="logo" accept="image/*"
-                                   class="form-input w-full px-4 py-3 rounded-lg text-sm file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                            <div id="logoStatus" class="mt-1 text-sm text-gray-400 hidden"></div>
-                            <div id="logo-error" class="hidden mt-1 text-sm text-red-400"></div>
-                        </div>
+                    <div class="mb-4">
+                        <label for="reg_telefono" class="block text-sm font-medium form-label mb-2">
+                            Teléfono <span class="text-red-400">*</span>
+                        </label>
+                        <input type="tel" id="reg_telefono" name="telefono"
+                               class="form-input w-full px-4 py-3 rounded-lg transition-all duration-300"
+                               required maxlength="15"
+                               placeholder="+34 600 123 456">
+                        <div id="telefono-error" class="hidden mt-1 text-sm text-red-400"></div>
                     </div>
 
                     <div class="mb-4">
@@ -831,7 +1116,25 @@
             
             <div id="crearAnimalForm">
                 <h2 class="text-3xl font-semibold mb-8 text-center text-white">Registrar Nuevo Animal</h2>
-                
+
+                <!-- Contenedor de errores del formulario -->
+                <div id="formErrorsContainer" class="hidden mb-6 p-4 bg-red-900/50 border-2 border-red-400 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-red-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="flex-1">
+                            <h3 class="text-red-300 font-semibold mb-2">Error al crear el animal</h3>
+                            <ul id="formErrorsList" class="list-disc list-inside text-red-200 text-sm space-y-1"></ul>
+                        </div>
+                        <button onclick="cerrarErrores()" class="text-red-400 hover:text-red-300 ml-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Overlay de loading -->
                 <div id="crearAnimalLoadingOverlay" class="absolute inset-0 flex items-center justify-center hidden bg-black/80 backdrop-blur-sm rounded-2xl">
                     <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center border border-gray-600">
@@ -912,9 +1215,25 @@
                                 <label for="animal_raza" class="block text-sm font-medium form-label mb-2">
                                     Raza <span class="text-red-400">*</span>
                                 </label>
-                                <input type="text" id="animal_raza" name="raza" 
-                                       class="form-input w-full px-4 py-3 rounded-lg" required 
+                                <input type="text" id="animal_raza" name="raza"
+                                       class="form-input w-full px-4 py-3 rounded-lg" required
                                        placeholder="Raza del animal">
+                            </div>
+
+                            <div>
+                                <label for="animal_tamano" class="block text-sm font-medium form-label mb-2">
+                                    Tamaño <span class="text-red-400">*</span>
+                                </label>
+                                <select id="animal_tamano" name="tamano"
+                                        class="form-input w-full px-4 py-3 rounded-lg" required>
+                                    <option value="" class="bg-gray-800">Seleccionar tamaño</option>
+                                    <option value="Mini" class="bg-gray-800">Mini</option>
+                                    <option value="Pequeño" class="bg-gray-800">Pequeño</option>
+                                    <option value="Mediano-Pequeño" class="bg-gray-800">Mediano-Pequeño</option>
+                                    <option value="Mediano" class="bg-gray-800">Mediano</option>
+                                    <option value="Mediano-Grande" class="bg-gray-800">Mediano-Grande</option>
+                                    <option value="Grande" class="bg-gray-800">Grande</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -924,33 +1243,40 @@
                         <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-600 pb-2">Multimedia</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium form-label mb-2">Imagen</label>
-                                <div class="relative">
-                                    <input type="file" id="animal_imagen" name="imagen" accept="image/*" class="hidden">
-                                    <button type="button" onclick="document.getElementById('animal_imagen').click()" 
-                                            class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group">
-                                        <div class="flex flex-col items-center gap-3">
-                                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="text-center">
-                                                <p class="text-white font-medium">Subir Imagen</p>
-                                                <p class="text-gray-400 text-sm">Haz clic para seleccionar</p>
-                                            </div>
+                                <label class="block text-sm font-medium form-label mb-2">Imágenes</label>
+                                <!-- Zona de drag and drop para múltiples imágenes -->
+                                <label for="modal_imagenes" id="modalDropZone" class="file-upload-btn px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group block" style="cursor: pointer;">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
                                         </div>
-                                    </button>
-                                    <div id="imagenStatus" class="mt-2 hidden"></div>
-                                </div>
+                                        <div class="text-center">
+                                            <p class="text-white font-medium">Subir Imágenes</p>
+                                            <p class="text-gray-400 text-sm">Arrastra aquí o haz clic para seleccionar</p>
+                                            <input type="file"
+                                                   id="modal_imagenes"
+                                                   name="imagenes"
+                                                   accept="image/*"
+                                                   multiple
+                                                   class="hidden"
+                                                   onchange="handleModalImageSelection(this.files)">
+                                            <p class="text-xs text-gray-500 mt-2">Máximo 10 imágenes • JPG, PNG, GIF, WebP • Hasta 5MB</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <div id="modalImagePreview" class="grid grid-cols-3 gap-2 mt-3" style="display: none;"></div>
+                                <p class="text-xs text-blue-400 mt-2 font-semibold" id="modalImageCounter" style="display: none;">
+                                    <span id="modalImageCount">0</span> de 10 imágenes seleccionadas
+                                </p>
                             </div>
-                            
+
                             <div>
-                                <label class="block text-sm font-medium form-label mb-2">Video</label>
+                                <label class="block text-sm font-medium form-label mb-2">Videos</label>
                                 <div class="relative">
-                                    <input type="file" id="animal_video" name="video" accept="video/*" class="hidden">
-                                    <button type="button" onclick="document.getElementById('animal_video').click()" 
-                                            class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-purple-400 transition-all duration-300 group">
+                                    <input type="file" id="modal_videos" name="videos" accept="video/*" multiple class="hidden" onchange="handleModalVideoSelection(this.files)">
+                                    <label for="modal_videos" class="file-upload-btn w-full px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-purple-400 transition-all duration-300 group block cursor-pointer">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
                                                 <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -958,12 +1284,16 @@
                                                 </svg>
                                             </div>
                                             <div class="text-center">
-                                                <p class="text-white font-medium">Subir Video</p>
+                                                <p class="text-white font-medium">Subir Videos</p>
                                                 <p class="text-gray-400 text-sm">Haz clic para seleccionar</p>
+                                                <p class="text-xs text-gray-500 mt-1">Máximo 5 videos • MP4, AVI, MOV • Hasta 10MB</p>
                                             </div>
                                         </div>
-                                    </button>
-                                    <div id="videoStatus" class="mt-2 hidden"></div>
+                                    </label>
+                                    <div id="modalVideoPreview" class="grid grid-cols-3 gap-2 mt-3" style="display: none;"></div>
+                                    <p class="text-xs text-purple-400 mt-2 font-semibold" id="modalVideoCounter" style="display: none;">
+                                        <span id="modalVideoCount">0</span> de 5 videos seleccionados
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -1055,21 +1385,13 @@
     <!-- Navbar -->
 <nav class="navbar-glass fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40">
     <div class="text-left">
-        <h1 class="text-xl font-bold text-white">Adopta</h1>
+        <h1 class="text-xl font-bold text-white">Conectamos Corazones</h1>
         {% if request.session.esta_logueado %}
             <p class="text-sm text-gray-400">Hola, {{ request.session.asociacion_nombre }}</p>
         {% endif %}
     </div>
 
     <div class="flex items-center gap-4">
-        <!-- Nuevo botón de Buscador Avanzado -->
-        <a href="/buscador-avanzado/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            Búsqueda Avanzada
-        </a>
-        
         <a href="/mis-favoritos/" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center">
             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
@@ -1095,6 +1417,164 @@
         {% endif %}
     </div>
 </nav>
+
+    <!-- Mensajes de Django -->
+    {% if messages %}
+    <div class="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-3xl px-4">
+        {% for message in messages %}
+        <div class="message-card mb-4 relative overflow-hidden rounded-2xl shadow-2xl backdrop-blur-xl animate-slide-down {% if message.tags == 'error' %}bg-gradient-to-r from-red-900/95 to-red-800/95 border-2 border-red-400/50{% elif message.tags == 'success' %}bg-gradient-to-r from-green-900/95 to-green-800/95 border-2 border-green-400/50{% elif message.tags == 'warning' %}bg-gradient-to-r from-yellow-900/95 to-yellow-800/95 border-2 border-yellow-400/50{% else %}bg-gradient-to-r from-blue-900/95 via-blue-800/95 to-purple-900/95 border-2 border-blue-400/50{% endif %}">
+
+            <!-- Efecto de brillo animado -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r {% if message.tags == 'error' %}from-red-400 via-red-300 to-red-400{% elif message.tags == 'success' %}from-green-400 via-green-300 to-green-400{% elif message.tags == 'warning' %}from-yellow-400 via-yellow-300 to-yellow-400{% else %}from-blue-400 via-purple-400 to-blue-400{% endif %} animate-shimmer"></div>
+
+            <!-- Patrón de fondo sutil -->
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 20% 50%, white 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+            <div class="relative p-6">
+                <div class="flex items-start">
+                    <!-- Icono grande y destacado -->
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center {% if message.tags == 'error' %}bg-red-500/30 border-2 border-red-400{% elif message.tags == 'success' %}bg-green-500/30 border-2 border-green-400{% elif message.tags == 'warning' %}bg-yellow-500/30 border-2 border-yellow-400{% else %}bg-blue-500/30 border-2 border-blue-400{% endif %} animate-pulse-slow">
+                            <svg class="w-7 h-7 {% if message.tags == 'error' %}text-red-300{% elif message.tags == 'success' %}text-green-300{% elif message.tags == 'warning' %}text-yellow-300{% else %}text-blue-300{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                                {% if message.tags == 'error' %}
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                {% elif message.tags == 'success' %}
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                {% else %}
+                                <path d="M10 2C5 2 2 5.5 2 9.5c0 3.78 2.38 6.5 6 8.5L10 20l2-2c3.62-2 6-4.72 6-8.5C18 5.5 15 2 10 2zm0 14.5l-1.5-1.5C5.5 13 4 11 4 9.5 4 6.5 6.5 4 10 4s6 2.5 6 5.5c0 1.5-1.5 3.5-4.5 5.5L10 16.5z"/>
+                                {% endif %}
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Contenido del mensaje -->
+                    <div class="flex-1 pt-1">
+                        <h3 class="text-base font-semibold mb-2 {% if message.tags == 'error' %}text-red-100{% elif message.tags == 'success' %}text-green-100{% elif message.tags == 'warning' %}text-yellow-100{% else %}text-blue-100{% endif %}">
+                            {% if message.tags == 'error' %}
+                            Error
+                            {% elif message.tags == 'success' %}
+                            Éxito
+                            {% elif message.tags == 'warning' %}
+                            Aviso
+                            {% else %}
+                            Bienvenido
+                            {% endif %}
+                        </h3>
+                        <p class="text-sm leading-relaxed text-white/90 font-medium">{{ message }}</p>
+                    </div>
+
+                    <!-- Botón de cerrar mejorado -->
+                    <button onclick="cerrarMensaje(this)" class="ml-4 flex-shrink-0 w-8 h-8 rounded-full hover:bg-white/20 transition-all duration-300 flex items-center justify-center group">
+                        <svg class="w-5 h-5 text-white/70 group-hover:text-white group-hover:rotate-90 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barra de progreso para cierre automático -->
+            <div class="absolute bottom-0 left-0 h-1 bg-white/30 progress-bar" style="animation: progress 8s linear forwards;"></div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <style>
+        @keyframes slide-down {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes progress {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        .animate-slide-down {
+            animation: slide-down 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .animate-shimmer {
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 2s ease-in-out infinite;
+        }
+
+        .message-card {
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(59, 130, 246, 0.2);
+        }
+
+        .progress-bar {
+            transform-origin: left;
+        }
+    </style>
+
+    <script>
+        function cerrarMensaje(btn) {
+            const messageCard = btn.closest('.message-card');
+            messageCard.style.animation = 'slide-up 0.4s ease-out forwards';
+            setTimeout(() => messageCard.remove(), 400);
+        }
+
+        // Auto-cerrar mensajes después de 8 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.message-card');
+            messages.forEach(msg => {
+                setTimeout(() => {
+                    if (msg.parentElement) {
+                        msg.style.animation = 'slide-up 0.4s ease-out forwards';
+                        setTimeout(() => msg.remove(), 400);
+                    }
+                }, 8000);
+            });
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slide-up {
+                to {
+                    opacity: 0;
+                    transform: translateY(-30px) scale(0.95);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    {% endif %}
+
     <!-- Contenido principal -->
     <div class="max-w-7xl mx-auto px-6 py-20">
         
@@ -1112,47 +1592,65 @@
         <div class="mb-12 fade-in">
             <!-- Filtros -->
             <div class="filter-container rounded-2xl p-6 mb-8">
-                <div class="flex flex-wrap justify-center gap-3 mb-6">
-                    <button onclick="filtrarPorTipo('')" 
-                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 active" 
-                            id="btn-todos">
-                        Todos
-                    </button>
-                    <button onclick="filtrarPorTipo('perro')" 
-                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
-                            id="btn-perro">
-                        Perros
-                    </button>
-                    <button onclick="filtrarPorTipo('gato')" 
-                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
-                            id="btn-gato">
-                        Gatos
-                    </button>
-                    <button onclick="filtrarPorTipo('conejo')" 
-                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
-                            id="btn-conejo">
-                        Conejos
-                    </button>
-                    <button onclick="filtrarPorTipo('pájaro')" 
-                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
-                            id="btn-pájaro">
-                        Pájaros
-                    </button>
-                    <button onclick="filtrarPorTipo('otros')" 
-                            class="filter-btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300" 
-                            id="btn-otros">
-                        Otros
-                    </button>
+                <!-- Selector de tipo de animal -->
+                <div class="animal-selector">
+                    <div class="animal-card-selector active" onclick="selectAnimalIndex('todos')" id="card-todos">
+                        <span class="animal-icon">🐾</span>
+                        <span class="font-semibold">Todos</span>
+                    </div>
+                    <div class="animal-card-selector" onclick="selectAnimalIndex('perro')" id="card-perro">
+                        <span class="animal-icon">🐕</span>
+                        <span class="font-semibold">Perros</span>
+                    </div>
+                    <div class="animal-card-selector" onclick="selectAnimalIndex('gato')" id="card-gato">
+                        <span class="animal-icon">🐱</span>
+                        <span class="font-semibold">Gatos</span>
+                    </div>
+                    <div class="animal-card-selector" onclick="selectAnimalIndex('otros')" id="card-otros">
+                        <span class="animal-icon">🐦</span>
+                        <span class="font-semibold">Otros</span>
+                    </div>
                 </div>
-                
-                <!-- Buscador -->
-                <div class="max-w-md mx-auto">
-                    <input 
-                        type="text" 
-                        id="buscadorAnimales" 
-                        placeholder="Buscar por nombre, raza o provincia..." 
-                        class="search-input w-full px-4 py-3 rounded-xl transition-all duration-300"
-                    >
+
+                <!-- Filtros -->
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Ubicación</label>
+                        <select id="ubicacion-select" class="filter-input">
+                            <option value="">Todas las ubicaciones</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label" id="raza-label">Raza</label>
+                        <select id="raza-select" class="filter-input">
+                            <option value="">Cualquier raza</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Color</label>
+                        <select id="color-select" class="filter-input">
+                            <option value="">Cualquier color</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Tamaño</label>
+                        <select id="tamano-select" class="filter-input">
+                            <option value="">Cualquier tamaño</option>
+                        </select>
+                    </div>
+
+                    <!-- Campo especial para otros animales -->
+                    <div class="otros-animales show" id="otros-animales-field">
+                        <div class="filter-group">
+                            <label class="filter-label">Tipo de Animal</label>
+                            <select id="otros-animales-select" class="filter-input">
+                                <option value="">Selecciona un tipo</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1181,18 +1679,35 @@
             tipo: "{{ animal.tipo_de_animal|escapejs }}",
             raza: "{{ animal.raza|escapejs }}",
             color: "{{ animal.color|escapejs }}",
+            tamano: "{{ animal.tamano|escapejs }}",
             email: "{{ animal.email|escapejs }}",
             telefono: "{{ animal.telefono|escapejs }}",
             poblacion: "{{ animal.poblacion|escapejs }}",
             provincia: "{{ animal.provincia|escapejs }}",
             descripcion: "{{ animal.descripcion|escapejs }}",
-            imagen: "{% if animal.imagen %}{{ animal.imagen.url }}{% endif %}"
+            imagen: "{% if animal.get_primera_imagen %}{{ animal.get_primera_imagen }}{% endif %}"
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
 
-    let filtroActual = '';
-    let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+    // Cargar favoritos con error handling
+    let favoritos = [];
+    try {
+        favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+    } catch (e) {
+        console.error('Error al cargar favoritos desde localStorage:', e);
+        favoritos = [];
+    }
+
+    // Variables para carga por lotes
+    let animalesFiltrados = [];
+    let animalesMostrados = 0;
+    const ANIMALES_POR_LOTE = 12; // Número de animales a cargar por vez
+    let cargando = false;
+
+    // Configuración de anuncios
+    const ANIMALES_ENTRE_ANUNCIOS = 6; // Mostrar anuncio cada 6 animales
+    let anunciosMostrados = 0;
 
     // Función para manejar cambios en el selector de color
 // Versión corregida sin event listeners duplicados
@@ -1313,7 +1828,7 @@ function actualizarColorPersonalizado() {
     function crearPlaceholder(index) {
         return `
             <div class="loading-card rounded-2xl p-6 h-auto" data-index="${index}">
-                <div class="loading-shimmer aspect-square rounded-xl mb-4"></div>
+                <div class="loading-shimmer aspect-[3/4] rounded-xl mb-4"></div>
                 <div class="loading-shimmer rounded h-6 mb-2"></div>
                 <div class="loading-shimmer rounded h-4 w-3/4 mb-2"></div>
                 <div class="loading-shimmer rounded h-4 w-1/2"></div>
@@ -1324,13 +1839,15 @@ function actualizarColorPersonalizado() {
     // Crear tarjeta de animal
     function crearTarjetaAnimal(animal) {
         const esFavorito = favoritos.includes(animal.id);
-        
+
         return `
-            <div class="animal-card rounded-2xl overflow-hidden fade-in" 
-                 data-nombre="${animal.nombre.toLowerCase()}" 
+            <div class="animal-card rounded-2xl overflow-hidden fade-in"
+                 data-nombre="${animal.nombre.toLowerCase()}"
                  data-tipo="${animal.tipo.toLowerCase()}"
                  data-raza="${animal.raza.toLowerCase()}"
                  data-provincia="${animal.provincia.toLowerCase()}"
+                 data-color="${animal.color ? animal.color.toLowerCase() : ''}"
+                 data-tamano="${animal.tamano || ''}"
                  data-id="${animal.id}">
                 
                 <!-- Botón de favorito -->
@@ -1350,11 +1867,13 @@ function actualizarColorPersonalizado() {
                 
                 <a href="/ver_animal/${animal.id}/" class="block">
                     <div class="card-content">
-                        <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative">
+                        <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative image-container">
                             ${animal.imagen ? `
-                                <img src="${animal.imagen}" 
-                                     alt="${animal.nombre}" 
-                                     class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110">
+                                <img src="${animal.imagen}"
+                                     alt="${animal.nombre}"
+                                     class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110"
+                                     loading="lazy"
+                                     decoding="async">
                             ` : `
                                 <div class="w-full h-full flex items-center justify-center text-gray-500">
                                     <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1363,11 +1882,12 @@ function actualizarColorPersonalizado() {
                                 </div>
                             `}
                         </div>
-                        
+
                         <div class="p-6 text-center">
                             <h3 class="text-2xl font-bold text-white mb-1 tracking-wide">${animal.nombre}</h3>
-                            <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-3 opacity-90">${animal.raza}</p>
-                            
+                            <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-1 opacity-90">${animal.raza}</p>
+                            <p class="text-gray-400 text-xs uppercase tracking-wide mb-3 opacity-75">Tamaño: ${animal.tamano}</p>
+
                             <div class="flex items-center justify-center text-gray-400 text-sm">
                                 <svg class="w-4 h-4 mr-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -1423,7 +1943,8 @@ function actualizarColorPersonalizado() {
     // Actualizar contador de favoritos
     function actualizarContadorFavoritos() {
         const counter = document.getElementById('favoritesCounter');
-        
+        if (!counter) return;
+
         if (favoritos.length > 0) {
             counter.textContent = favoritos.length;
             counter.classList.remove('hidden');
@@ -1432,37 +1953,98 @@ function actualizarColorPersonalizado() {
         }
     }
 
-    // Intersection Observer para cargar tarjetas
-    const observer = new IntersectionObserver((entries) => {
+    // El lazy loading se maneja con el atributo loading="lazy" nativo del navegador
+
+    // Detectar scroll para cargar más - crear sentinela ANTES de usarla
+    const sentinela = document.createElement('div');
+    sentinela.id = 'scroll-sentinela';
+    sentinela.style.height = '1px';
+
+    const scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const placeholder = entry.target;
-                const index = parseInt(placeholder.dataset.index);
-                const animal = animalesData[index];
-                
-                if (animal) {
-                    placeholder.outerHTML = crearTarjetaAnimal(animal);
-                }
-                
-                observer.unobserve(placeholder);
+            if (entry.isIntersecting && !cargando) {
+                cargarSiguienteLote();
             }
         });
-    }, { rootMargin: '100px' });
+    }, { rootMargin: '500px' });
 
-    // Inicializar placeholders
+    // Crear bloque de anuncio de Google AdSense
+    function crearAnuncio() {
+        anunciosMostrados++;
+        return `
+            <div class="ad-container rounded-2xl overflow-hidden col-span-1 md:col-span-2 lg:col-span-3 my-4"
+                 data-ad="true">
+                <div class="ad-wrapper bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
+                    <p class="text-xs text-gray-500 mb-2 text-center uppercase tracking-wider">Publicidad</p>
+                    <!-- Google AdSense - Reemplaza con tu código real -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="XXXXXXXXXX"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+            </div>
+        `;
+    }
+
+    // Cargar siguiente lote de animales
+    function cargarSiguienteLote() {
+        if (cargando || animalesMostrados >= animalesFiltrados.length) {
+            return;
+        }
+
+        cargando = true;
+        const contenedor = document.getElementById('contenedorAnimales');
+
+        const fin = Math.min(animalesMostrados + ANIMALES_POR_LOTE, animalesFiltrados.length);
+
+        for (let i = animalesMostrados; i < fin; i++) {
+            const animal = animalesFiltrados[i];
+            const tarjeta = document.createElement('div');
+            tarjeta.innerHTML = crearTarjetaAnimal(animal);
+            contenedor.appendChild(tarjeta.firstElementChild);
+
+            // Insertar anuncio cada ANIMALES_ENTRE_ANUNCIOS animales
+            const posicionGlobal = i + 1; // Posición real (1-indexed)
+            if (posicionGlobal > 0 && posicionGlobal % ANIMALES_ENTRE_ANUNCIOS === 0) {
+                const anuncioDiv = document.createElement('div');
+                anuncioDiv.innerHTML = crearAnuncio();
+                contenedor.appendChild(anuncioDiv.firstElementChild);
+            }
+        }
+
+        animalesMostrados = fin;
+        cargando = false;
+
+        // Actualizar contador
+        actualizarContador(animalesFiltrados.length);
+
+        // Mover el sentinela al final (reutilizando variable contenedor)
+        if (sentinela.parentNode) {
+            contenedor.appendChild(sentinela);
+        }
+    }
+
+    // Inicializar animales con filtros
     function inicializarAnimales() {
         const contenedor = document.getElementById('contenedorAnimales');
         contenedor.innerHTML = '';
-        
-        animalesData.forEach((animal, index) => {
-            contenedor.innerHTML += crearPlaceholder(index);
-        });
-        
-        setTimeout(() => {
-            document.querySelectorAll('.loading-card').forEach(card => {
-                observer.observe(card);
-            });
-        }, 100);
+
+        // Reiniciar contadores
+        animalesMostrados = 0;
+        anunciosMostrados = 0;
+        animalesFiltrados = animalesData;
+
+        // Cargar primer lote
+        cargarSiguienteLote();
+
+        // Agregar sentinela al final para detectar scroll
+        contenedor.appendChild(sentinela);
+        scrollObserver.observe(sentinela);
     }
 
     // Normalizar texto para búsqueda
@@ -1473,74 +2055,359 @@ function actualizarColorPersonalizado() {
                    .trim();
     }
 
-    // Filtrar por tipo
-    function filtrarPorTipo(tipo) {
-        filtroActual = tipo;
-        
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        if (tipo === '') {
-            document.getElementById('btn-todos').classList.add('active');
-        } else {
-            document.getElementById('btn-' + tipo).classList.add('active');
-        }
-        
-        aplicarFiltros();
-    }
-
-    // Aplicar filtros
-    function aplicarFiltros() {
-        const busqueda = normalizarTexto(document.getElementById('buscadorAnimales').value);
-        const tarjetas = document.querySelectorAll('.animal-card');
-        let contador = 0;
-        
-        tarjetas.forEach(tarjeta => {
-            const nombre = normalizarTexto(tarjeta.dataset.nombre);
-            const tipo = normalizarTexto(tarjeta.dataset.tipo);
-            const raza = normalizarTexto(tarjeta.dataset.raza);
-            const provincia = normalizarTexto(tarjeta.dataset.provincia);
-            
-            const cumpleBusqueda = !busqueda || 
-                nombre.includes(busqueda) || 
-                tipo.includes(busqueda) || 
-                raza.includes(busqueda) || 
-                provincia.includes(busqueda);
-            
-            let cumpleTipo = true;
-            if (filtroActual !== '') {
-                if (filtroActual === 'otros') {
-                    cumpleTipo = !tipo.includes('perro') && 
-                                !tipo.includes('gato') && 
-                                !tipo.includes('conejo') && 
-                                !tipo.includes('pájaro');
-                } else {
-                    cumpleTipo = tipo.includes(filtroActual);
-                }
-            }
-            
-            if (cumpleBusqueda && cumpleTipo) {
-                tarjeta.style.display = 'block';
-                contador++;
-            } else {
-                tarjeta.style.display = 'none';
-            }
-        });
-        
-        actualizarContador(contador);
-    }
+    // Funciones obsoletas eliminadas - filtrarPorTipo y aplicarFiltros
+    // Ahora se usa selectAnimalIndex() y aplicarFiltrosAvanzados()
 
     // Actualizar contador
     function actualizarContador(cantidad) {
         const contador = document.getElementById('contadorResultados');
-        
+        if (!contador) return;
+
         if (cantidad === 0) {
             contador.textContent = 'No se encontraron animales';
             contador.className = 'results-counter no-results inline-block px-4 py-2 rounded-full text-sm font-medium';
         } else {
             contador.textContent = `${cantidad} animal${cantidad !== 1 ? 'es' : ''} disponible${cantidad !== 1 ? 's' : ''}`;
             contador.className = 'results-counter inline-block px-4 py-2 rounded-full text-sm font-medium';
+        }
+    }
+
+    // ================ BUSCADOR AVANZADO ================
+
+    // Variables para el buscador avanzado
+    let filtrosAvanzados = {
+        categoria: 'todos',
+        provincia: '',
+        raza: '',
+        color: '',
+        tamano: '',
+        tipo_animal: ''
+    };
+
+    // Selección de tipo de animal (con iconos)
+    function selectAnimalIndex(tipo) {
+        document.querySelectorAll('.animal-card-selector').forEach(card => {
+            card.classList.remove('active');
+        });
+
+        const targetCard = document.getElementById(`card-${tipo}`);
+        if (targetCard) {
+            targetCard.classList.add('active');
+        }
+
+        filtrosAvanzados.categoria = tipo;
+        filtrosAvanzados.provincia = '';
+        filtrosAvanzados.raza = '';
+        filtrosAvanzados.color = '';
+        filtrosAvanzados.tamano = '';
+        filtrosAvanzados.tipo_animal = '';
+
+        const razaLabel = document.getElementById('raza-label');
+        const otrosField = document.getElementById('otros-animales-field');
+
+        if (razaLabel) {
+            if (tipo === 'todos') {
+                razaLabel.textContent = 'Raza';
+            } else if (tipo === 'otros') {
+                razaLabel.textContent = 'VARIEDAD';
+            } else {
+                razaLabel.textContent = 'RAZA';
+            }
+        }
+
+        if (otrosField) {
+            if (tipo === 'otros') {
+                otrosField.classList.add('show');
+            } else {
+                otrosField.classList.remove('show');
+            }
+        }
+
+        actualizarSelectoresAvanzados('');
+        aplicarFiltrosAvanzados();
+    }
+
+    // Filtrar animales según filtros avanzados
+    function filtrarAnimalesAvanzado() {
+        return animalesData.filter(animal => {
+            const tipo = animal.tipo.toLowerCase();
+
+            // Filtro de categoría
+            let cumpleCategoria = true;
+            if (filtrosAvanzados.categoria && filtrosAvanzados.categoria !== 'todos') {
+                if (filtrosAvanzados.categoria === 'otros') {
+                    cumpleCategoria = !tipo.includes('perro') && !tipo.includes('gato');
+                } else {
+                    cumpleCategoria = tipo.includes(filtrosAvanzados.categoria);
+                }
+            }
+
+            // Filtro de provincia
+            const cumpleProvincia = !filtrosAvanzados.provincia ||
+                                   animal.provincia === filtrosAvanzados.provincia;
+
+            // Filtro de raza
+            const cumpleRaza = !filtrosAvanzados.raza ||
+                              animal.raza === filtrosAvanzados.raza;
+
+            // Filtro de color
+            const cumpleColor = !filtrosAvanzados.color ||
+                               animal.color === filtrosAvanzados.color;
+
+            // Filtro de tamaño
+            const cumpleTamano = !filtrosAvanzados.tamano ||
+                                animal.tamano === filtrosAvanzados.tamano;
+
+            // Filtro de tipo específico para "otros"
+            const cumpleTipoAnimal = !filtrosAvanzados.tipo_animal ||
+                                    animal.tipo === filtrosAvanzados.tipo_animal;
+
+            return cumpleCategoria && cumpleProvincia && cumpleRaza &&
+                   cumpleColor && cumpleTamano && cumpleTipoAnimal;
+        });
+    }
+
+    // Obtener valores únicos de un campo
+    function obtenerValoresUnicosAvanzado(animales, campo) {
+        return animales
+            .map(animal => animal[campo])
+            .filter(valor => valor && valor.trim() !== '' && valor !== 'Sin especificar')
+            .filter((valor, index, arr) => arr.indexOf(valor) === index)
+            .sort();
+    }
+
+    // Actualizar selectores dinámicamente
+    function actualizarSelectoresAvanzados(selectCambiado = '') {
+        function filtrarAnimalesSin(campoExcluido) {
+            return animalesData.filter(animal => {
+                const tipo = animal.tipo.toLowerCase();
+
+                // Filtro de categoría
+                if (filtrosAvanzados.categoria && filtrosAvanzados.categoria !== 'todos') {
+                    if (filtrosAvanzados.categoria === 'otros') {
+                        if (tipo.includes('perro') || tipo.includes('gato')) {
+                            return false;
+                        }
+                    } else {
+                        if (!tipo.includes(filtrosAvanzados.categoria)) {
+                            return false;
+                        }
+                    }
+                }
+
+                if (campoExcluido !== 'provincia' && filtrosAvanzados.provincia &&
+                    animal.provincia !== filtrosAvanzados.provincia) return false;
+                if (campoExcluido !== 'raza' && filtrosAvanzados.raza &&
+                    animal.raza !== filtrosAvanzados.raza) return false;
+                if (campoExcluido !== 'color' && filtrosAvanzados.color &&
+                    animal.color !== filtrosAvanzados.color) return false;
+                if (campoExcluido !== 'tamano' && filtrosAvanzados.tamano &&
+                    animal.tamano !== filtrosAvanzados.tamano) return false;
+                if (campoExcluido !== 'tipo_animal' && filtrosAvanzados.tipo_animal &&
+                    animal.tipo !== filtrosAvanzados.tipo_animal) return false;
+
+                return true;
+            });
+        }
+
+        // Actualizar provincias
+        if (selectCambiado !== 'provincia') {
+            const animalesParaUbicaciones = filtrarAnimalesSin('provincia');
+            const provincias = obtenerValoresUnicosAvanzado(animalesParaUbicaciones, 'provincia');
+            actualizarSelectAvanzado('ubicacion-select', provincias, 'Todas las ubicaciones', selectCambiado !== '' && selectCambiado !== 'provincia');
+        }
+
+        // Actualizar razas
+        if (selectCambiado !== 'raza') {
+            const animalesParaRazas = filtrarAnimalesSin('raza');
+            const razas = obtenerValoresUnicosAvanzado(animalesParaRazas, 'raza');
+            const textoRaza = filtrosAvanzados.categoria === 'otros' ? 'Cualquier variedad' : 'Cualquier raza';
+            actualizarSelectAvanzado('raza-select', razas, textoRaza, selectCambiado !== '' && selectCambiado !== 'raza');
+        }
+
+        // Actualizar colores
+        if (selectCambiado !== 'color') {
+            const animalesParaColores = filtrarAnimalesSin('color');
+            const colores = obtenerValoresUnicosAvanzado(animalesParaColores, 'color');
+            actualizarSelectAvanzado('color-select', colores, 'Cualquier color', selectCambiado !== '' && selectCambiado !== 'color');
+        }
+
+        // Actualizar tamaños
+        if (selectCambiado !== 'tamano') {
+            const animalesParaTamanos = filtrarAnimalesSin('tamano');
+            const tamanos = obtenerValoresUnicosAvanzado(animalesParaTamanos, 'tamano');
+            actualizarSelectAvanzado('tamano-select', tamanos, 'Cualquier tamaño', selectCambiado !== '' && selectCambiado !== 'tamano');
+        }
+
+        // Actualizar tipos de animal para "otros"
+        if (filtrosAvanzados.categoria === 'otros' && selectCambiado !== 'tipo_animal') {
+            const animalesParaTipos = filtrarAnimalesSin('tipo_animal');
+            const tipos = obtenerValoresUnicosAvanzado(animalesParaTipos, 'tipo');
+            actualizarSelectAvanzado('otros-animales-select', tipos, 'Selecciona un tipo', selectCambiado !== '' && selectCambiado !== 'tipo_animal');
+        }
+    }
+
+    // Actualizar un selector específico
+    function actualizarSelectAvanzado(selectId, opciones, textoDefault, mantenerValor = false) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const valorActual = select.value;
+
+        select.innerHTML = `<option value="">${textoDefault}</option>`;
+
+        opciones.forEach(opcion => {
+            const optionElement = document.createElement('option');
+            optionElement.value = opcion;
+            optionElement.textContent = opcion;
+            select.appendChild(optionElement);
+        });
+
+        if (mantenerValor && valorActual && opciones.includes(valorActual)) {
+            select.value = valorActual;
+        } else if (mantenerValor && valorActual && !opciones.includes(valorActual)) {
+            const campo = selectId.replace('-select', '').replace('ubicacion', 'provincia').replace('otros-animales', 'tipo_animal');
+            if (filtrosAvanzados[campo] === valorActual) {
+                filtrosAvanzados[campo] = '';
+            }
+        }
+    }
+
+    // Aplicar filtros avanzados
+    function aplicarFiltrosAvanzados() {
+        // Filtrar animales según criterios
+        animalesFiltrados = animalesData.filter(animal => {
+            const tipo = normalizarTexto(animal.tipo);
+            const raza = animal.raza || '';
+            const provincia = animal.provincia || '';
+            const color = animal.color || '';
+            const tamano = animal.tamano || '';
+
+            // Filtro de categoría
+            let cumpleCategoria = true;
+            if (filtrosAvanzados.categoria && filtrosAvanzados.categoria !== 'todos') {
+                if (filtrosAvanzados.categoria === 'otros') {
+                    cumpleCategoria = !tipo.includes('perro') && !tipo.includes('gato');
+                } else {
+                    cumpleCategoria = tipo.includes(filtrosAvanzados.categoria);
+                }
+            }
+
+            const cumpleProvincia = !filtrosAvanzados.provincia || provincia === filtrosAvanzados.provincia;
+            const cumpleRaza = !filtrosAvanzados.raza || raza === filtrosAvanzados.raza;
+            const cumpleColor = !filtrosAvanzados.color || color === filtrosAvanzados.color;
+            const cumpleTamano = !filtrosAvanzados.tamano || tamano === filtrosAvanzados.tamano;
+            const cumpleTipoAnimal = !filtrosAvanzados.tipo_animal || animal.tipo === filtrosAvanzados.tipo_animal;
+
+            return cumpleCategoria && cumpleProvincia && cumpleRaza &&
+                   cumpleColor && cumpleTamano && cumpleTipoAnimal;
+        });
+
+        // Reiniciar contenedor y cargar primer lote
+        const contenedor = document.getElementById('contenedorAnimales');
+        contenedor.innerHTML = '';
+        animalesMostrados = 0;
+
+        cargarSiguienteLote();
+
+        // Re-agregar y re-observar sentinela
+        contenedor.appendChild(sentinela);
+        scrollObserver.observe(sentinela);
+    }
+
+    // Limpiar todos los filtros avanzados
+    function limpiarFiltrosAvanzados() {
+        filtrosAvanzados = {
+            categoria: 'todos',
+            provincia: '',
+            raza: '',
+            color: '',
+            tamano: '',
+            tipo_animal: ''
+        };
+
+        document.querySelectorAll('.animal-card-selector').forEach(card => {
+            card.classList.remove('active');
+        });
+        document.getElementById('card-todos').classList.add('active');
+
+        const ubicacionSelect = document.getElementById('ubicacion-select');
+        const razaSelect = document.getElementById('raza-select');
+        const colorSelect = document.getElementById('color-select');
+        const tamanoSelect = document.getElementById('tamano-select');
+        const otrosAnimalesSelect = document.getElementById('otros-animales-select');
+
+        if (ubicacionSelect) ubicacionSelect.value = '';
+        if (razaSelect) razaSelect.value = '';
+        if (colorSelect) colorSelect.value = '';
+        if (tamanoSelect) tamanoSelect.value = '';
+        if (otrosAnimalesSelect) otrosAnimalesSelect.value = '';
+
+        const otrosField = document.getElementById('otros-animales-field');
+        if (otrosField) {
+            otrosField.classList.remove('show');
+        }
+
+        actualizarSelectoresAvanzados('');
+        aplicarFiltrosAvanzados();
+    }
+
+    // Configurar event listeners para filtros avanzados
+    function configurarFiltrosAvanzados() {
+        const ubicacionSelect = document.getElementById('ubicacion-select');
+        if (ubicacionSelect) {
+            ubicacionSelect.addEventListener('change', function() {
+                filtrosAvanzados.provincia = this.value;
+                actualizarSelectoresAvanzados('provincia');
+                aplicarFiltrosAvanzados();
+            });
+        }
+
+        const razaSelect = document.getElementById('raza-select');
+        if (razaSelect) {
+            razaSelect.addEventListener('change', function() {
+                filtrosAvanzados.raza = this.value;
+                actualizarSelectoresAvanzados('raza');
+                aplicarFiltrosAvanzados();
+            });
+        }
+
+        const colorSelect = document.getElementById('color-select');
+        if (colorSelect) {
+            colorSelect.addEventListener('change', function() {
+                filtrosAvanzados.color = this.value;
+                actualizarSelectoresAvanzados('color');
+                aplicarFiltrosAvanzados();
+            });
+        }
+
+        const tamanoSelect = document.getElementById('tamano-select');
+        if (tamanoSelect) {
+            tamanoSelect.addEventListener('change', function() {
+                filtrosAvanzados.tamano = this.value;
+                actualizarSelectoresAvanzados('tamano');
+                aplicarFiltrosAvanzados();
+            });
+        }
+
+        const otrosSelect = document.getElementById('otros-animales-select');
+        if (otrosSelect) {
+            otrosSelect.addEventListener('change', function() {
+                filtrosAvanzados.tipo_animal = this.value;
+                actualizarSelectoresAvanzados('tipo_animal');
+                aplicarFiltrosAvanzados();
+            });
+        }
+
+        // Event listeners para el formulario de crear animal - selector de color
+        const animalColorSelect = document.getElementById('animal_color_select');
+        if (animalColorSelect) {
+            animalColorSelect.addEventListener('change', manejarCambioColor);
+        }
+
+        const animalColorCustom = document.getElementById('animal_color_custom');
+        if (animalColorCustom) {
+            animalColorCustom.addEventListener('input', actualizarColorPersonalizado);
         }
     }
 
@@ -1559,13 +2426,18 @@ function actualizarColorPersonalizado() {
     function cerrarCrearAnimal() {
         const modal = document.getElementById('crearAnimalModal');
         const content = document.getElementById('crearAnimalContent');
-        
+
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
-        
+
         setTimeout(() => {
             modal.classList.add('hidden');
             resetCrearAnimalForm();
+            // Limpiar las imágenes y videos seleccionados
+            modalSelectedImages = [];
+            modalSelectedVideos = [];
+            updateModalImagePreview();
+            updateModalVideoPreview();
         }, 500);
     }
 
@@ -1612,6 +2484,119 @@ function actualizarColorPersonalizado() {
                 overlay.classList.add('hidden');
             }
         }
+    }
+
+    // Función para cerrar el contenedor de errores
+    function cerrarErrores() {
+        const container = document.getElementById('formErrorsContainer');
+        if (container) {
+            container.classList.add('hidden');
+        }
+    }
+
+    // Función para mostrar errores en el modal
+    function mostrarErroresFormulario(errores) {
+        const container = document.getElementById('formErrorsContainer');
+        const lista = document.getElementById('formErrorsList');
+
+        if (!container || !lista) return;
+
+        // Limpiar errores anteriores
+        lista.innerHTML = '';
+
+        // Traducir nombres de campos a español
+        const traducciones = {
+            'nombre': 'Nombre',
+            'tipo_de_animal': 'Tipo de Animal',
+            'raza': 'Raza',
+            'tamano': 'Tamaño',
+            'color': 'Color',
+            'imagen': 'Imagen',
+            'video': 'Video',
+            'email': 'Email',
+            'telefono': 'Teléfono',
+            'poblacion': 'Población',
+            'provincia': 'Provincia',
+            'codigo_postal': 'Código Postal',
+            'descripcion': 'Descripción'
+        };
+
+        // Agregar cada error a la lista
+        for (const [campo, mensajes] of Object.entries(errores)) {
+            const nombreCampo = traducciones[campo] || campo;
+            mensajes.forEach(mensaje => {
+                const li = document.createElement('li');
+                li.textContent = `${nombreCampo}: ${mensaje}`;
+                lista.appendChild(li);
+            });
+        }
+
+        // Mostrar el contenedor
+        container.classList.remove('hidden');
+
+        // Scroll hacia arriba del modal para ver los errores
+        const modalContent = document.getElementById('crearAnimalContent');
+        if (modalContent) {
+            modalContent.scrollTop = 0;
+        }
+    }
+
+    // Manejar el envío del formulario de crear animal por AJAX
+    function initCrearAnimalFormSubmit() {
+        const form = document.getElementById('crearAnimalFormElement');
+        if (!form) return;
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Ocultar errores anteriores
+            cerrarErrores();
+
+            // Validar color antes de enviar
+            if (!validarColorAntesDelEnvio()) {
+                return;
+            }
+
+            // Mostrar loading
+            setCrearAnimalButtonLoading(true);
+            showCrearAnimalOverlay(true);
+
+            // Crear FormData con todos los campos del formulario
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/crear_animal/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Éxito: cerrar modal y recargar página
+                    cerrarCrearAnimal();
+                    window.location.href = '/mis_animales/';
+                } else {
+                    // Error: mostrar errores en el modal
+                    if (data.errors) {
+                        mostrarErroresFormulario(data.errors);
+                    }
+                    setCrearAnimalButtonLoading(false);
+                    showCrearAnimalOverlay(false);
+                }
+            } catch (error) {
+                console.error('Error al crear animal:', error);
+                mostrarErroresFormulario({
+                    'general': ['Error al conectar con el servidor. Por favor, intenta de nuevo.']
+                });
+                setCrearAnimalButtonLoading(false);
+                showCrearAnimalOverlay(false);
+            }
+        });
     }
 
     // Indicadores de archivos con opción de quitar
@@ -1689,48 +2674,336 @@ function actualizarColorPersonalizado() {
             });
         }
 
-        // Agregar validación al formulario de crear animal
-        const crearAnimalForm = document.getElementById('crearAnimalFormElement');
-        if (crearAnimalForm) {
-            crearAnimalForm.addEventListener('submit', function(e) {
-                if (!validarColorAntesDelEnvio()) {
-                    e.preventDefault();
-                    return false;
-                }
-                setCrearAnimalButtonLoading(true);
-                showCrearAnimalOverlay(true);
-            });
+        // La validación del formulario se maneja en initCrearAnimalFormSubmit()
+        // No es necesario agregar otro event listener aquí
+    }
+
+    // ========== FUNCIONES PARA MÚLTIPLES IMÁGENES Y VIDEOS EN MODAL ==========
+    let modalSelectedImages = [];
+    let modalSelectedVideos = [];
+
+    // Manejar selección de imágenes en el modal
+    function handleModalImageSelection(files) {
+        const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+        // Verificar cuántas imágenes podemos agregar
+        const espacioDisponible = 10 - modalSelectedImages.length;
+
+        if (espacioDisponible === 0) {
+            showModalNotification('⚠️ Ya has alcanzado el máximo de 10 imágenes', 'warning');
+            return;
+        }
+
+        if (imageFiles.length > espacioDisponible) {
+            showModalNotification(`⚠️ Solo puedes agregar ${espacioDisponible} imagen(es) más`, 'warning');
+            imageFiles.splice(espacioDisponible);
+        }
+
+        // Validar tamaño de archivos (5MB max)
+        const validFiles = imageFiles.filter(file => {
+            // Verificar que no sea un archivo duplicado
+            const isDuplicate = modalSelectedImages.some(existingFile =>
+                existingFile.name === file.name &&
+                existingFile.size === file.size &&
+                existingFile.lastModified === file.lastModified
+            );
+
+            if (isDuplicate) {
+                showModalNotification(`⚠️ ${file.name} ya fue agregada`, 'warning');
+                return false;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showModalNotification(`❌ ${file.name} es demasiado grande (máx. 5MB)`, 'error');
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length > 0) {
+            modalSelectedImages.push(...validFiles);
+            showModalNotification(`✅ ${validFiles.length} imagen(es) agregada(s)`, 'success');
+            updateModalImagePreview();
+            updateModalImageInput();
         }
     }
 
-    // Funciones para quitar archivos
-    function quitarImagen() {
-        const imagenInput = document.getElementById('animal_imagen');
-        const statusDiv = document.getElementById('imagenStatus');
-        
-        if (imagenInput) {
-            imagenInput.value = '';
+    // Actualizar preview de imágenes en el modal
+    function updateModalImagePreview() {
+        const preview = document.getElementById('modalImagePreview');
+        const dropZone = document.getElementById('modalDropZone');
+        const counter = document.getElementById('modalImageCounter');
+        const count = document.getElementById('modalImageCount');
+
+        if (!preview || !dropZone || !counter || !count) return;
+
+        if (modalSelectedImages.length === 0) {
+            // Restaurar la zona de drop completa (mantener como label completo)
+            dropZone.outerHTML = `
+                <label for="modal_imagenes" id="modalDropZone" class="file-upload-btn px-6 py-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group block cursor-pointer">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-white font-medium">Subir Imágenes</p>
+                            <p class="text-gray-400 text-sm">Arrastra aquí o haz clic para seleccionar</p>
+                            <input type="file" id="modal_imagenes" name="imagenes" accept="image/*" multiple class="hidden" onchange="handleModalImageSelection(this.files)">
+                            <p class="text-xs text-gray-500 mt-2">Máximo 10 imágenes • JPG, PNG, GIF, WebP • Hasta 5MB</p>
+                        </div>
+                    </div>
+                </label>
+            `;
+            preview.style.display = 'none';
+            counter.style.display = 'none';
+            // Re-obtener el dropZone después de reemplazarlo
+            setTimeout(() => setupModalDragAndDrop(), 100);
+            return;
         }
-        
-        if (statusDiv) {
-            statusDiv.classList.add('hidden');
-            statusDiv.innerHTML = '';
+
+        // Mostrar botón más pequeño para agregar más (también completamente clickeable)
+        if (modalSelectedImages.length < 10) {
+            dropZone.outerHTML = `
+                <label for="modal_imagenes_2" id="modalDropZone" class="file-upload-btn px-6 py-2 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all duration-300 group block cursor-pointer">
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-sm text-blue-400">➕ Agregar más imágenes</span>
+                        <input type="file" id="modal_imagenes_2" name="imagenes" accept="image/*" multiple class="hidden" onchange="handleModalImageSelection(this.files)">
+                    </div>
+                </label>
+            `;
+        } else {
+            dropZone.style.display = 'none';
+        }
+
+        preview.style.display = 'grid';
+        counter.style.display = 'block';
+        count.textContent = modalSelectedImages.length;
+
+        preview.innerHTML = '';
+
+        modalSelectedImages.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="${file.name}" class="w-full h-full object-cover">
+                    ${index === 0 ? '<span class="absolute top-1 left-1 text-xs bg-green-500 text-white px-2 py-1 rounded">Principal</span>' : ''}
+                    <button type="button" onclick="removeModalImage(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
+                        ×
+                    </button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Re-configurar drag & drop para la nueva zona
+        setTimeout(() => setupModalDragAndDrop(), 100);
+    }
+
+    // Eliminar imagen del modal
+    function removeModalImage(index) {
+        modalSelectedImages.splice(index, 1);
+        updateModalImagePreview();
+        updateModalImageInput();
+        showModalNotification('🗑️ Imagen eliminada', 'info');
+    }
+
+    // Actualizar el input de imágenes del modal
+    function updateModalImageInput() {
+        const input = document.getElementById('modal_imagenes');
+        if (!input) return;
+
+        const dataTransfer = new DataTransfer();
+        modalSelectedImages.forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+    }
+
+    // Manejar selección de videos en el modal
+    function handleModalVideoSelection(files) {
+        const videoFiles = Array.from(files).filter(file => file.type.startsWith('video/'));
+
+        const espacioDisponible = 5 - modalSelectedVideos.length;
+
+        if (espacioDisponible === 0) {
+            showModalNotification('⚠️ Ya has alcanzado el máximo de 5 videos', 'warning');
+            return;
+        }
+
+        if (videoFiles.length > espacioDisponible) {
+            showModalNotification(`⚠️ Solo puedes agregar ${espacioDisponible} video(s) más`, 'warning');
+            videoFiles.splice(espacioDisponible);
+        }
+
+        // Validar tamaño de archivos (10MB max)
+        const validFiles = videoFiles.filter(file => {
+            const isDuplicate = modalSelectedVideos.some(existingFile =>
+                existingFile.name === file.name &&
+                existingFile.size === file.size
+            );
+
+            if (isDuplicate) {
+                showModalNotification(`⚠️ ${file.name} ya fue agregado`, 'warning');
+                return false;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showModalNotification(`❌ ${file.name} es demasiado grande (máx. 10MB)`, 'error');
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length > 0) {
+            modalSelectedVideos.push(...validFiles);
+            showModalNotification(`✅ ${validFiles.length} video(s) agregado(s)`, 'success');
+            updateModalVideoPreview();
         }
     }
 
-    function quitarVideo() {
-        const videoInput = document.getElementById('animal_video');
-        const statusDiv = document.getElementById('videoStatus');
-        
-        if (videoInput) {
-            videoInput.value = '';
+    // Actualizar preview de videos en el modal
+    function updateModalVideoPreview() {
+        const preview = document.getElementById('modalVideoPreview');
+        const counter = document.getElementById('modalVideoCounter');
+        const count = document.getElementById('modalVideoCount');
+
+        if (!preview || !counter || !count) return;
+
+        if (modalSelectedVideos.length === 0) {
+            preview.style.display = 'none';
+            counter.style.display = 'none';
+            return;
         }
-        
-        if (statusDiv) {
-            statusDiv.classList.add('hidden');
-            statusDiv.innerHTML = '';
+
+        preview.style.display = 'grid';
+        counter.style.display = 'block';
+        count.textContent = modalSelectedVideos.length;
+
+        preview.innerHTML = '';
+
+        modalSelectedVideos.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+                div.innerHTML = `
+                    <video src="${e.target.result}" class="w-full h-full object-cover"></video>
+                    <button type="button" onclick="removeModalVideo(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600">
+                        ×
+                    </button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        updateModalVideoInput();
+    }
+
+    // Eliminar video del modal
+    function removeModalVideo(index) {
+        modalSelectedVideos.splice(index, 1);
+        updateModalVideoPreview();
+        showModalNotification('🗑️ Video eliminado', 'info');
+    }
+
+    // Actualizar el input de videos del modal
+    function updateModalVideoInput() {
+        const input = document.getElementById('modal_videos');
+        if (!input) return;
+
+        const dataTransfer = new DataTransfer();
+        modalSelectedVideos.forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+    }
+
+    // Función para mostrar notificaciones en el modal
+    function showModalNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg z-[60] transform transition-all duration-300 translate-x-full`;
+
+        const colors = {
+            'info': 'bg-blue-500',
+            'success': 'bg-green-500',
+            'warning': 'bg-yellow-500',
+            'error': 'bg-red-500'
+        };
+
+        notification.classList.add(colors[type] || colors.info, 'text-white');
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.remove('translate-x-full');
+        }, 10);
+
+        setTimeout(() => {
+            notification.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    // Configurar drag and drop para el modal
+    function setupModalDragAndDrop() {
+        const dropZone = document.getElementById('modalDropZone');
+        if (!dropZone) return;
+
+        // Prevenir comportamiento por defecto
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.removeEventListener(eventName, preventDefaultsModal);
+            dropZone.addEventListener(eventName, preventDefaultsModal, false);
+        });
+
+        // Highlight drop zone
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.removeEventListener(eventName, highlightDropZone);
+            dropZone.addEventListener(eventName, highlightDropZone, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.removeEventListener(eventName, unhighlightDropZone);
+            dropZone.addEventListener(eventName, unhighlightDropZone, false);
+        });
+
+        // Manejar drop
+        dropZone.removeEventListener('drop', handleModalDrop);
+        dropZone.addEventListener('drop', handleModalDrop, false);
+    }
+
+    function preventDefaultsModal(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlightDropZone() {
+        const dropZone = document.getElementById('modalDropZone');
+        if (dropZone) {
+            dropZone.classList.add('border-blue-500', 'bg-blue-500', 'bg-opacity-10');
         }
     }
+
+    function unhighlightDropZone() {
+        const dropZone = document.getElementById('modalDropZone');
+        if (dropZone) {
+            dropZone.classList.remove('border-blue-500', 'bg-blue-500', 'bg-opacity-10');
+        }
+    }
+
+    function handleModalDrop(e) {
+        const files = e.dataTransfer.files;
+        handleModalImageSelection(files);
+    }
+
+    // Inicializar drag and drop cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        setupModalDragAndDrop();
+    });
 
     function abrirLogin() {
         const modal = document.getElementById('authModal');
@@ -1748,15 +3021,37 @@ function actualizarColorPersonalizado() {
     function cerrarModal() {
         const modal = document.getElementById('authModal');
         const content = document.getElementById('modalContent');
-        
+
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
-        
+
         setTimeout(() => {
             modal.classList.add('hidden');
             resetForms();
+            // Ocultar mensaje de error al cerrar
+            const errorMsg = document.getElementById('loginErrorMessage');
+            if (errorMsg) {
+                errorMsg.classList.add('hidden');
+            }
         }, 500);
     }
+
+    function cerrarErrorLogin() {
+        const errorMsg = document.getElementById('loginErrorMessage');
+        if (errorMsg) {
+            errorMsg.classList.add('hidden');
+        }
+    }
+
+    // Abrir modal automáticamente si hay error de login
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if login_error %}
+        // Hay un error de login, abrir el modal automáticamente
+        setTimeout(function() {
+            abrirLogin();
+        }, 300);
+        {% endif %}
+    });
 
     function mostrarLogin() {
         const loginForm = document.getElementById('loginForm');
@@ -1795,9 +3090,6 @@ function actualizarColorPersonalizado() {
         
         setRegisterButtonLoading(false);
         showRegisterOverlay(false);
-        
-        const logoStatus = document.getElementById('logoStatus');
-        if (logoStatus) logoStatus.classList.add('hidden');
     }
 
     function setRegisterButtonLoading(loading = true) {
@@ -1833,29 +3125,11 @@ function actualizarColorPersonalizado() {
 
     function initModalForms() {
         const registerForm = document.getElementById('registerFormElement');
-        const logoInput = document.getElementById('reg_logo');
 
         if (registerForm) {
             registerForm.addEventListener('submit', function(e) {
                 setRegisterButtonLoading(true);
                 showRegisterOverlay(true);
-            });
-        }
-
-        if (logoInput) {
-            logoInput.addEventListener('change', function(e) {
-                const statusDiv = document.getElementById('logoStatus');
-                if (e.target.files.length > 0) {
-                    const fileName = e.target.files[0].name;
-                    if (statusDiv) {
-                        statusDiv.innerHTML = `<span class="text-green-400">✓ ${fileName} seleccionado</span>`;
-                        statusDiv.classList.remove('hidden');
-                    }
-                } else {
-                    if (statusDiv) {
-                        statusDiv.classList.add('hidden');
-                    }
-                }
             });
         }
 
@@ -1866,9 +3140,9 @@ function actualizarColorPersonalizado() {
         if (registerFormDiv) registerFormDiv.style.opacity = '1';
     }
 
-    // Event listeners
-    document.getElementById('buscadorAnimales').addEventListener('input', aplicarFiltros);
-    
+    // Event listeners (ya no se usan, reemplazados por el buscador avanzado)
+    // Los event listeners ahora están en configurarFiltrosAvanzados()
+
     document.getElementById('authModal').addEventListener('click', function(e) {
         if (e.target === this) cerrarModal();
     });
@@ -1895,6 +3169,12 @@ function actualizarColorPersonalizado() {
 
         initModalForms();
         initFileIndicators();
+        initCrearAnimalFormSubmit();
+
+        // Inicializar buscador avanzado
+        configurarFiltrosAvanzados();
+        actualizarSelectoresAvanzados('');
+        selectAnimalIndex('todos'); // Iniciar con todos activos
     });
 
     // Efecto parallax
@@ -2230,56 +3510,9 @@ function actualizarColorPersonalizado() {
         });
     }
 
-    // Mejorar manejo del archivo logo
-    function setupLogoHandling() {
-        const logoInput = document.getElementById('reg_logo');
-        if (logoInput) {
-            logoInput.addEventListener('change', function(e) {
-                const statusDiv = document.getElementById('logoStatus');
-                const errorDiv = document.getElementById('logo-error');
-
-                // Limpiar errores previos
-                if (errorDiv) {
-                    errorDiv.classList.add('hidden');
-                }
-
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const fileName = file.name;
-                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-
-                    // Validar tipo de archivo
-                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-                    if (!allowedTypes.includes(file.type)) {
-                        showFieldError('logo', 'Solo se permiten archivos de imagen (JPG, PNG, GIF, WebP)');
-                        logoInput.value = '';
-                        return;
-                    }
-
-                    // Validar tamaño (máximo 2MB)
-                    if (file.size > 2 * 1024 * 1024) {
-                        showFieldError('logo', 'El archivo no puede ser mayor a 2MB');
-                        logoInput.value = '';
-                        return;
-                    }
-
-                    if (statusDiv) {
-                        statusDiv.innerHTML = `<span class="text-green-400">✓ ${fileName} (${fileSize} MB)</span>`;
-                        statusDiv.classList.remove('hidden');
-                    }
-                } else {
-                    if (statusDiv) {
-                        statusDiv.classList.add('hidden');
-                    }
-                }
-            });
-        }
-    }
-
     // Limpiar error cuando el usuario cambie el nombre
     document.addEventListener('DOMContentLoaded', function() {
         setupRealTimeValidation();
-        setupLogoHandling();
     });
 </script>
 

@@ -7,7 +7,7 @@ from .models import CreacionAnimales
 class RegistroAsociacionForm(forms.ModelForm):
     class Meta:
         model = RegistroAsociacion
-        fields = ['nombre', 'password', 'email', 'telefono', 'direccion', 'poblacion', 'provincia', 'codigo_postal', 'logo']
+        fields = ['nombre', 'password', 'email', 'telefono', 'direccion', 'poblacion', 'provincia', 'codigo_postal']
         error_messages = {
             'nombre': {
                 'unique': 'Ya existe una asociación registrada con este nombre. Por favor, elige otro nombre.',
@@ -54,11 +54,6 @@ class RegistroAsociacionForm(forms.ModelForm):
                 'autocomplete': 'postal-code',
                 'id': 'codigo_postal',
             }),
-            'logo': forms.FileInput(attrs={
-                'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none',
-                'id': 'logo',
-                'accept': 'image/*',
-            }),
         }
 
     def clean_nombre(self):
@@ -95,11 +90,49 @@ class LoginForm(forms.Form):
     remember_me = forms.BooleanField(required=False, initial=False, label="Recuérdame")
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    """Widget personalizado para permitir múltiples archivos"""
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    """Campo personalizado para manejar múltiples archivos"""
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
 class CreacionAnimalesForm(forms.ModelForm):
+    # Campos adicionales para manejar MÚLTIPLES archivos
+    imagenes = MultipleFileField(
+        required=False,
+        widget=MultipleFileInput(attrs={
+            'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100',
+            'accept': 'image/*'
+        }),
+        label='Imágenes',
+        help_text='Puedes seleccionar múltiples imágenes (máximo 10)'
+    )
+    videos = MultipleFileField(
+        required=False,
+        widget=MultipleFileInput(attrs={
+            'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100',
+            'accept': 'video/*'
+        }),
+        label='Videos',
+        help_text='Puedes seleccionar múltiples videos (máximo 5)'
+    )
+
     class Meta:
         model = CreacionAnimales
-        fields = ['nombre', 'tipo_de_animal', 'raza', 'imagen', 'video', 
-                 'email', 'telefono', 'poblacion', 'provincia', 
+        fields = ['nombre', 'tipo_de_animal', 'raza', 'tamano',
+                 'email', 'telefono', 'poblacion', 'provincia',
                  'codigo_postal', 'descripcion', 'adoptado']
         widgets = {
             'nombre': forms.TextInput(attrs={
@@ -113,11 +146,8 @@ class CreacionAnimalesForm(forms.ModelForm):
                 'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
                 'placeholder': 'Ej: pastor alemán, border collie...'
             }),
-            'imagen': forms.ClearableFileInput(attrs={
-                'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100'
-            }),
-            'video': forms.ClearableFileInput(attrs={
-                'class': 'block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-cyan-400 hover:file:bg-indigo-100'
+            'tamano': forms.Select(attrs={
+                'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm'
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 sm:text-sm',
@@ -148,11 +178,11 @@ class CreacionAnimalesForm(forms.ModelForm):
                 'class': 'h-4 w-4 text-cyan-400 focus:ring-cyan-400 border-gray-300 rounded'
             })
         }
-    
+
     def __init__(self, *args, **kwargs):
         asociacion = kwargs.pop('asociacion', None)
         super().__init__(*args, **kwargs)
-        
+
         if asociacion:
             # Autocompletar campos con datos de la asociación
             self.fields['email'].initial = asociacion.email
@@ -160,20 +190,3 @@ class CreacionAnimalesForm(forms.ModelForm):
             self.fields['poblacion'].initial = asociacion.poblacion
             self.fields['provincia'].initial = asociacion.provincia
             self.fields['codigo_postal'].initial = asociacion.codigo_postal
-
-    # Guarda los datos como modelo
-def save(self, commit=True):
-    data = self.cleaned_data
-    imagen = data.pop('imagen', None)
-    video = data.pop('video', None)
-    instancia = CreacionAnimales(**data)  # todavía no se guarda en la base de datos
-
-    if imagen:
-        instancia.imagen = imagen
-    if video:
-        instancia.video = video
-
-    if commit:
-        instancia.save()
-
-    return instancia
