@@ -1632,7 +1632,7 @@ def enviar_email_admin_nueva_asociacion(asociacion, request):
             subject=subject,
             body=f"Nueva asociación registrada: {asociacion.nombre}. Token: {asociacion.token_aprobacion}",
             from_email=None,
-            to=['asociacionanimales2@gmail.com']
+            to=['conectamoscorazones@gmail.com']
         )
         email.attach_alternative(mensaje_html, "text/html")
         email.send(fail_silently=False)
@@ -1736,11 +1736,59 @@ def logout_view(request):
 
 
 def Inicio(request):
-    """Vista de inicio actualizada que filtra asociaciones eliminadas"""
-    # Solo mostrar animales de asociaciones activas y suspendidas
-    animales = CreacionAnimales.objects.filter(
-        asociacion__estado__in=['activa', 'suspendida']
-    ).select_related('asociacion')
+    """Vista de inicio con sistema de caché optimizado"""
+    from django.core.cache import cache
+
+    # Intentar obtener animales del caché (serializados como diccionarios)
+    cache_key = 'inicio_animales_v2'  # Nueva versión del caché con diccionarios
+    animales_data = cache.get(cache_key)
+
+    if animales_data is None:
+        # No está en caché, consultar BD
+        animales_queryset = CreacionAnimales.objects.filter(
+            asociacion__estado__in=['activa', 'suspendida']
+        ).select_related('asociacion').prefetch_related('imagenes')
+
+        # Serializar a diccionarios (más seguro y eficiente que cachear objetos ORM)
+        animales_data = []
+        for animal in animales_queryset:
+            animales_data.append({
+                'id': animal.id,
+                'nombre': animal.nombre,
+                'tipo_de_animal': animal.tipo_de_animal,
+                'raza': animal.raza or '',
+                'color': animal.color or '',
+                'tamano': animal.tamano or '',
+                'email': animal.email,
+                'telefono': animal.telefono,
+                'poblacion': animal.poblacion or '',
+                'provincia': animal.provincia or '',
+                'descripcion': animal.descripcion or '',
+                # Pre-calcular get_primera_imagen() para evitar queries adicionales
+                'primera_imagen': animal.get_primera_imagen(),
+                'asociacion_nombre': animal.asociacion.nombre if animal.asociacion else '',
+            })
+
+        # Guardar diccionarios en caché (más seguro que objetos ORM)
+        cache.set(cache_key, animales_data, timeout=300)
+
+    # Convertir diccionarios a objetos simples para compatibilidad con template
+    # Esto permite usar animal.id en lugar de animal['id'] en el template
+    class AnimalData:
+        def __init__(self, data):
+            for key, value in data.items():
+                setattr(self, key, value)
+
+        def get_primera_imagen(self):
+            return self.primera_imagen
+
+    animales = [AnimalData(data) for data in animales_data]
+
+    # NOTA: El caché se invalida automáticamente cuando:
+    # - Se crea un animal nuevo
+    # - Se edita un animal existente
+    # - Se elimina un animal
+    # - Se cambian imágenes/videos de un animal
 
     # Leer y limpiar errores de login de la sesión
     login_error = request.session.pop('login_error', None)
@@ -1834,6 +1882,10 @@ def crear_animal(request):
             # Guardar el animal primero para poder asociar las imágenes y videos
             animal.save()
 
+            # Variables para almacenar URLs legacy (evitar múltiples saves)
+            primera_imagen_url = None
+            primer_video_url = None
+
             # SUBIR MÚLTIPLES IMÁGENES A CLOUDINARY
             imagenes_files = request.FILES.getlist('imagenes')
             if imagenes_files:
@@ -1847,10 +1899,9 @@ def crear_animal(request):
                             orden=idx,
                             es_principal=(idx == 0)  # Primera imagen es principal
                         )
-                        # Si es la primera imagen, también guardarla en el campo legacy
+                        # Guardar URL de la primera imagen para el campo legacy
                         if idx == 0:
-                            animal.imagen = imagen_url
-                            animal.save()
+                            primera_imagen_url = imagen_url
 
             # SUBIR MÚLTIPLES VIDEOS A CLOUDINARY
             videos_files = request.FILES.getlist('videos')
@@ -1864,10 +1915,18 @@ def crear_animal(request):
                             video=video_url,
                             orden=idx
                         )
-                        # Si es el primer video, también guardarlo en el campo legacy
+                        # Guardar URL del primer video para el campo legacy
                         if idx == 0:
-                            animal.video = video_url
-                            animal.save()
+                            primer_video_url = video_url
+
+            # OPTIMIZACIÓN: Una sola llamada a save() para campos legacy
+            # Esto reduce las invalidaciones de caché de 3 a 2 veces
+            if primera_imagen_url or primer_video_url:
+                if primera_imagen_url:
+                    animal.imagen = primera_imagen_url
+                if primer_video_url:
+                    animal.video = primer_video_url
+                animal.save()  # Solo una invalidación adicional
 
             # OPCIONAL: Notificar nuevos animales por Telegram
             # from .telegram_utils import enviar_notificacion_nuevo_animal
@@ -2159,40 +2218,50 @@ def obtener_animales_favoritos(request):
 
 def buscador_avanzado(request):
     """
-    Buscador avanzado con filtros dependientes
+    Buscador avanzado con sistema de caché optimizado
     """
+    from django.core.cache import cache
+
     try:
-        # Solo incluir animales de asociaciones activas y suspendidas, no adoptados
-        animales_disponibles = CreacionAnimales.objects.filter(
-            asociacion__estado__in=['activa', 'suspendida'],
-            adoptado=False
-        ).select_related('asociacion')
-        
-        # Convertir animales a lista de diccionarios para JavaScript
-        animales_list = []
-        for animal in animales_disponibles:
-            # Determinar categoría del animal
-            tipo_lower = animal.tipo_de_animal.lower()
-            if 'perro' in tipo_lower:
-                categoria = 'perro'
-            elif 'gato' in tipo_lower:
-                categoria = 'gato'
-            else:
-                categoria = 'otros'
-                
-            animales_list.append({
-                'id': animal.id,
-                'nombre': animal.nombre,
-                'tipo_de_animal': animal.tipo_de_animal,
-                'raza': animal.raza or 'Sin especificar',
-                'color': animal.color or 'Sin especificar',
-                'provincia': animal.provincia or 'Sin especificar',
-                'poblacion': animal.poblacion or 'Sin especificar',
-                'categoria': categoria,
-                'descripcion': animal.descripcion[:100] + '...' if len(animal.descripcion or '') > 100 else animal.descripcion,
-                'imagen_url': animal.imagen.url if animal.imagen else None,
-                'asociacion_nombre': animal.asociacion.nombre
-            })
+        # Intentar obtener datos del caché (diccionarios serializados)
+        cache_key = 'buscador_animales_v2'  # Nueva versión con diccionarios
+        animales_list = cache.get(cache_key)
+
+        if animales_list is None:
+            # No está en caché, consultar BD
+            animales_queryset = CreacionAnimales.objects.filter(
+                asociacion__estado__in=['activa', 'suspendida'],
+                adoptado=False
+            ).select_related('asociacion').prefetch_related('imagenes')
+
+            # Convertir a diccionarios y cachear (más eficiente que cachear objetos ORM)
+            animales_list = []
+            for animal in animales_queryset:
+                # Determinar categoría del animal
+                tipo_lower = animal.tipo_de_animal.lower()
+                if 'perro' in tipo_lower:
+                    categoria = 'perro'
+                elif 'gato' in tipo_lower:
+                    categoria = 'gato'
+                else:
+                    categoria = 'otros'
+
+                animales_list.append({
+                    'id': animal.id,
+                    'nombre': animal.nombre,
+                    'tipo_de_animal': animal.tipo_de_animal,
+                    'raza': animal.raza or 'Sin especificar',
+                    'color': animal.color or 'Sin especificar',
+                    'provincia': animal.provincia or 'Sin especificar',
+                    'poblacion': animal.poblacion or 'Sin especificar',
+                    'categoria': categoria,
+                    'descripcion': animal.descripcion[:100] + '...' if len(animal.descripcion or '') > 100 else animal.descripcion,
+                    'imagen_url': animal.imagen.url if animal.imagen else None,
+                    'asociacion_nombre': animal.asociacion.nombre
+                })
+
+            # Guardar diccionarios en caché (más seguro que objetos ORM)
+            cache.set(cache_key, animales_list, timeout=300)
         
         # Preparar datos para JavaScript
         datos_filtros = {

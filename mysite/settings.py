@@ -201,14 +201,29 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = ''
 LOGOUT_REDIRECT_URL = 'login'
 
+# ==================== CONFIGURACIÓN DE CACHÉ ====================
+# Sistema de caché usando la base de datos existente (SQLite/PostgreSQL)
+# Se invalida automáticamente cuando se crean/editan/eliminan animales
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'app_cache_table',  # Nombre de la tabla de caché
+        'TIMEOUT': 300,  # 5 minutos por defecto
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,  # Máximo 1000 entradas en caché
+            'CULL_FREQUENCY': 3,  # Eliminar 1/3 de las entradas cuando se alcance MAX_ENTRIES
+        }
+    }
+}
+
 # Configuración segura de email (Gmail)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'asociacionanimales2@gmail.com')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'conectamoscorazones@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # Contraseña de aplicación de Gmail
-DEFAULT_FROM_EMAIL = 'asociacionanimales2@gmail.com'
+DEFAULT_FROM_EMAIL = 'conectamoscorazones@gmail.com'
 
 # Verificar configuración de email
 if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
@@ -304,6 +319,11 @@ LOGGING = {
             'filename': BASE_DIR / 'telegram_webhook.log',
             'formatter': 'verbose',
         },
+        'cache_file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'cache_invalidation.log',
+            'formatter': 'simple',
+        },
     },
     'root': {
         'handlers': ['console'],
@@ -313,6 +333,11 @@ LOGGING = {
         'myapp.telegram_utils': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'myapp.signals': {
+            'handlers': ['console', 'cache_file'],
+            'level': 'INFO',
             'propagate': False,
         },
         'django.request': {

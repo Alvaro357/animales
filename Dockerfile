@@ -12,6 +12,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
+    netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements e instalar dependencias Python
@@ -30,5 +31,10 @@ RUN python manage.py collectstatic --noinput
 # Exponer puerto
 EXPOSE 8000
 
+# Script de inicio que crea la tabla de caché y ejecuta migraciones
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 # Comando para ejecutar la aplicación
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "mysite.wsgi:application"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "--graceful-timeout", "120", "mysite.wsgi:application"]

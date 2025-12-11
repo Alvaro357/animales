@@ -8,7 +8,7 @@
     <title>Conectamos Corazones - Adopta un Animal | Perros, Gatos y más</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Encuentra tu compañero perfecto para adoptar. Miles de perros, gatos y otros animales esperan un hogar. Conectamos asociaciones de animales con familias amorosas en toda España.">
+    <meta name="description" content="Encuentra tu compañero perfecto. Perros, gatos y animales esperan un hogar. Conectamos protectoras con familias amorosas.">
     <meta name="keywords" content="adoptar animales, adopción perros, adopción gatos, protectoras de animales, asociaciones animales, mascotas en adopción, adoptar mascota España, refugio animales">
     <meta name="author" content="Conectamos Corazones">
     <meta name="robots" content="index, follow">
@@ -872,7 +872,7 @@
     <!-- Modal de Login/Registro -->
     <div id="authModal" class="fixed inset-0 flex items-center justify-center z-50 modal-backdrop hidden">
         <div id="modalContent" class="modal-content p-8 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-500">
-            <button onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10">&times;</button>
+            <button type="button" onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10" aria-label="Cerrar modal">&times;</button>
             
             <!-- Formulario de Login -->
             <div id="loginForm">
@@ -920,7 +920,7 @@
                                 {{ login_error.detalle }}
                             </p>
                         </div>
-                        <button type="button" onclick="cerrarErrorLogin()" class="ml-2 text-gray-400 hover:text-white">
+                        <button type="button" onclick="cerrarErrorLogin()" class="ml-2 text-gray-400 hover:text-white" aria-label="Cerrar mensaje de error">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                             </svg>
@@ -1112,7 +1112,7 @@
     <!-- Modal de Crear Animal -->
     <div id="crearAnimalModal" class="fixed inset-0 flex items-center justify-center z-50 modal-backdrop hidden">
         <div id="crearAnimalContent" class="modal-content p-8 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-500">
-            <button onclick="cerrarCrearAnimal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10">&times;</button>
+            <button type="button" onclick="cerrarCrearAnimal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10" aria-label="Cerrar modal">&times;</button>
             
             <div id="crearAnimalForm">
                 <h2 class="text-3xl font-semibold mb-8 text-center text-white">Registrar Nuevo Animal</h2>
@@ -1127,7 +1127,7 @@
                             <h3 class="text-red-300 font-semibold mb-2">Error al crear el animal</h3>
                             <ul id="formErrorsList" class="list-disc list-inside text-red-200 text-sm space-y-1"></ul>
                         </div>
-                        <button onclick="cerrarErrores()" class="text-red-400 hover:text-red-300 ml-2">
+                        <button type="button" onclick="cerrarErrores()" class="text-red-400 hover:text-red-300 ml-2" aria-label="Cerrar errores">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
@@ -1464,7 +1464,7 @@
                     </div>
 
                     <!-- Botón de cerrar mejorado -->
-                    <button onclick="cerrarMensaje(this)" class="ml-4 flex-shrink-0 w-8 h-8 rounded-full hover:bg-white/20 transition-all duration-300 flex items-center justify-center group">
+                    <button type="button" onclick="cerrarMensaje(this)" class="ml-4 flex-shrink-0 w-8 h-8 rounded-full hover:bg-white/20 transition-all duration-300 flex items-center justify-center group" aria-label="Cerrar mensaje">
                         <svg class="w-5 h-5 text-white/70 group-hover:text-white group-hover:rotate-90 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -1763,27 +1763,33 @@ function actualizarColorPersonalizado() {
         const colorSelect = document.getElementById('animal_color_select');
         const colorCustom = document.getElementById('animal_color_custom');
         const colorFinal = document.getElementById('animal_color_final');
-        
-        if (colorSelect.value === '') {
-            alert('Por favor, selecciona un color para el animal.');
-            colorSelect.focus();
+
+        if (!colorSelect || colorSelect.value === '') {
+            mostrarErroresFormulario({
+                'color': ['Por favor, selecciona un color para el animal.']
+            });
+            if (colorSelect) colorSelect.focus();
             return false;
         }
-        
-        if (colorSelect.value === 'Otro' && (!colorCustom.value || colorCustom.value.trim() === '')) {
-            alert('Por favor, especifica el color del animal.');
-            colorCustom.focus();
+
+        if (colorSelect.value === 'Otro' && (!colorCustom || !colorCustom.value || colorCustom.value.trim() === '')) {
+            mostrarErroresFormulario({
+                'color': ['Por favor, especifica el color del animal.']
+            });
+            if (colorCustom) colorCustom.focus();
             return false;
         }
-        
-        if (!colorFinal.value || colorFinal.value.trim() === '') {
+
+        if (!colorFinal || !colorFinal.value || colorFinal.value.trim() === '') {
             manejarCambioColor();
-            if (!colorFinal.value || colorFinal.value.trim() === '') {
-                alert('Error al procesar el color. Por favor, intenta de nuevo.');
+            if (!colorFinal || !colorFinal.value || colorFinal.value.trim() === '') {
+                mostrarErroresFormulario({
+                    'color': ['Error al procesar el color. Por favor, intenta de nuevo.']
+                });
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -1840,43 +1846,55 @@ function actualizarColorPersonalizado() {
     function crearTarjetaAnimal(animal) {
         const esFavorito = favoritos.includes(animal.id);
 
+        // Null checks para todos los campos
+        const nombre = animal.nombre || 'Sin nombre';
+        const tipo = animal.tipo ? animal.tipo.toLowerCase() : '';
+        const raza = animal.raza || 'Sin especificar';
+        const provincia = animal.provincia || '';
+        const poblacion = animal.poblacion || '';
+        const color = animal.color ? animal.color.toLowerCase() : '';
+        const tamano = animal.tamano || 'No especificado';
+
         return `
             <div class="animal-card rounded-2xl overflow-hidden fade-in"
-                 data-nombre="${animal.nombre.toLowerCase()}"
-                 data-tipo="${animal.tipo.toLowerCase()}"
-                 data-raza="${animal.raza.toLowerCase()}"
-                 data-provincia="${animal.provincia.toLowerCase()}"
-                 data-color="${animal.color ? animal.color.toLowerCase() : ''}"
-                 data-tamano="${animal.tamano || ''}"
+                 data-nombre="${nombre.toLowerCase()}"
+                 data-tipo="${tipo}"
+                 data-raza="${raza.toLowerCase()}"
+                 data-provincia="${provincia.toLowerCase()}"
+                 data-color="${color}"
+                 data-tamano="${tamano}"
                  data-id="${animal.id}">
-                
+
                 <!-- Botón de favorito -->
-                <button onclick="toggleFavorito(${animal.id}, this, event)" 
-                        class="favorite-btn ${esFavorito ? 'active' : ''}" 
-                        data-favorito="${esFavorito}">
+                <button type="button"
+                        onclick="toggleFavorito(${animal.id}, this, event)"
+                        class="favorite-btn ${esFavorito ? 'active' : ''}"
+                        data-favorito="${esFavorito}"
+                        aria-label="${esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}">
                     ${esFavorito ? `
-                        <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                        <svg class="heart-icon heart-filled" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                     ` : `
-                        <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="heart-icon heart-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                     `}
                 </button>
-                
+
                 <a href="/ver_animal/${animal.id}/" class="block">
                     <div class="card-content">
                         <div class="aspect-square bg-gray-800 rounded-t-2xl overflow-hidden relative image-container">
                             ${animal.imagen ? `
                                 <img src="${animal.imagen}"
-                                     alt="${animal.nombre}"
+                                     alt="${nombre} - ${raza} en adopción"
                                      class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110"
                                      loading="lazy"
-                                     decoding="async">
+                                     decoding="async"
+                                     onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-gray-500\\'><svg class=\\'w-16 h-16\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'></path></svg></div>'">
                             ` : `
                                 <div class="w-full h-full flex items-center justify-center text-gray-500">
-                                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                 </div>
@@ -1884,16 +1902,16 @@ function actualizarColorPersonalizado() {
                         </div>
 
                         <div class="p-6 text-center">
-                            <h3 class="text-2xl font-bold text-white mb-1 tracking-wide">${animal.nombre}</h3>
-                            <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-1 opacity-90">${animal.raza}</p>
-                            <p class="text-gray-400 text-xs uppercase tracking-wide mb-3 opacity-75">Tamaño: ${animal.tamano}</p>
+                            <h3 class="text-2xl font-bold text-white mb-1 tracking-wide">${nombre}</h3>
+                            <p class="text-blue-300 font-medium text-sm uppercase tracking-wider mb-1 opacity-90">${raza}</p>
+                            ${tamano !== 'No especificado' ? `<p class="text-gray-400 text-xs uppercase tracking-wide mb-3 opacity-75">Tamaño: ${tamano}</p>` : ''}
 
                             <div class="flex items-center justify-center text-gray-400 text-sm">
-                                <svg class="w-4 h-4 mr-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 mr-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-                                <span class="font-medium">${animal.poblacion}, ${animal.provincia}</span>
+                                <span class="font-medium">${poblacion}${poblacion && provincia ? ', ' : ''}${provincia}</span>
                             </div>
                         </div>
                     </div>
@@ -1960,10 +1978,17 @@ function actualizarColorPersonalizado() {
     sentinela.id = 'scroll-sentinela';
     sentinela.style.height = '1px';
 
+    // Variable para debounce del lazy loading
+    let loadingTimeout = null;
+
     const scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !cargando) {
-                cargarSiguienteLote();
+                // Debounce para evitar race conditions
+                clearTimeout(loadingTimeout);
+                loadingTimeout = setTimeout(() => {
+                    cargarSiguienteLote();
+                }, 100);
             }
         });
     }, { rootMargin: '500px' });
@@ -1973,7 +1998,8 @@ function actualizarColorPersonalizado() {
         anunciosMostrados++;
         return `
             <div class="ad-container rounded-2xl overflow-hidden col-span-1 md:col-span-2 lg:col-span-3 my-4"
-                 data-ad="true">
+                 data-ad="true"
+                 data-ad-index="${anunciosMostrados}">
                 <div class="ad-wrapper bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
                     <p class="text-xs text-gray-500 mb-2 text-center uppercase tracking-wider">Publicidad</p>
                     <!-- Google AdSense - Reemplaza con tu código real -->
@@ -1983,12 +2009,23 @@ function actualizarColorPersonalizado() {
                          data-ad-slot="XXXXXXXXXX"
                          data-ad-format="auto"
                          data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
                 </div>
             </div>
         `;
+    }
+
+    // Inicializar anuncios de AdSense después de insertar en el DOM
+    function inicializarAnuncios() {
+        try {
+            if (typeof adsbygoogle !== 'undefined') {
+                const ads = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
+                ads.forEach(() => {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                });
+            }
+        } catch (e) {
+            // AdSense no cargado o bloqueado
+        }
     }
 
     // Cargar siguiente lote de animales
@@ -2022,6 +2059,9 @@ function actualizarColorPersonalizado() {
 
         // Actualizar contador
         actualizarContador(animalesFiltrados.length);
+
+        // Inicializar anuncios de AdSense
+        inicializarAnuncios();
 
         // Mover el sentinela al final (reutilizando variable contenedor)
         if (sentinela.parentNode) {
@@ -2441,14 +2481,44 @@ function actualizarColorPersonalizado() {
         }, 500);
     }
 
+    // Función para quitar imagen seleccionada
+    function quitarImagen() {
+        const input = document.getElementById('animal_imagen');
+        const statusDiv = document.getElementById('imagenStatus');
+
+        if (input) {
+            input.value = '';
+        }
+
+        if (statusDiv) {
+            statusDiv.classList.add('hidden');
+            statusDiv.innerHTML = '';
+        }
+    }
+
+    // Función para quitar video seleccionado
+    function quitarVideo() {
+        const input = document.getElementById('animal_video');
+        const statusDiv = document.getElementById('videoStatus');
+
+        if (input) {
+            input.value = '';
+        }
+
+        if (statusDiv) {
+            statusDiv.classList.add('hidden');
+            statusDiv.innerHTML = '';
+        }
+    }
+
     // Reset del formulario de crear animal
     function resetCrearAnimalForm() {
         const form = document.getElementById('crearAnimalFormElement');
         if (form) form.reset();
-        
+
         setCrearAnimalButtonLoading(false);
         showCrearAnimalOverlay(false);
-        
+
         quitarImagen();
         quitarVideo();
         resetColorSelector(); // Agregado para resetear el selector de color
@@ -3000,10 +3070,7 @@ function actualizarColorPersonalizado() {
         handleModalImageSelection(files);
     }
 
-    // Inicializar drag and drop cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', function() {
-        setupModalDragAndDrop();
-    });
+    // setupModalDragAndDrop se inicializa en el DOMContentLoaded principal
 
     function abrirLogin() {
         const modal = document.getElementById('authModal');
@@ -3043,15 +3110,7 @@ function actualizarColorPersonalizado() {
         }
     }
 
-    // Abrir modal automáticamente si hay error de login
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if login_error %}
-        // Hay un error de login, abrir el modal automáticamente
-        setTimeout(function() {
-            abrirLogin();
-        }, 300);
-        {% endif %}
-    });
+    // La apertura automática del modal de login se maneja en el DOMContentLoaded principal
 
     function mostrarLogin() {
         const loginForm = document.getElementById('loginForm');
@@ -3151,13 +3210,15 @@ function actualizarColorPersonalizado() {
         if (e.target === this) cerrarCrearAnimal();
     });
 
-    // Inicialización
+    // Inicialización principal - TODOS los DOMContentLoaded consolidados aquí
     document.addEventListener('DOMContentLoaded', function() {
+        // Inicialización de estrellas y animales
         crearEstrellas();
         inicializarAnimales();
         actualizarContador(animalesData.length);
         actualizarContadorFavoritos();
-        
+
+        // Animaciones fade-in
         setTimeout(() => {
             document.querySelectorAll('.fade-in').forEach((el, i) => {
                 setTimeout(() => {
@@ -3167,6 +3228,7 @@ function actualizarColorPersonalizado() {
             });
         }, 200);
 
+        // Inicializar modales y formularios
         initModalForms();
         initFileIndicators();
         initCrearAnimalFormSubmit();
@@ -3175,6 +3237,19 @@ function actualizarColorPersonalizado() {
         configurarFiltrosAvanzados();
         actualizarSelectoresAvanzados('');
         selectAnimalIndex('todos'); // Iniciar con todos activos
+
+        // Inicializar drag and drop para modal
+        setupModalDragAndDrop();
+
+        // Inicializar validación en tiempo real
+        setupRealTimeValidation();
+
+        // Abrir modal automáticamente si hay error de login
+        {% if login_error %}
+        setTimeout(function() {
+            abrirLogin();
+        }, 300);
+        {% endif %}
     });
 
     // Efecto parallax
@@ -3510,10 +3585,7 @@ function actualizarColorPersonalizado() {
         });
     }
 
-    // Limpiar error cuando el usuario cambie el nombre
-    document.addEventListener('DOMContentLoaded', function() {
-        setupRealTimeValidation();
-    });
+    // setupRealTimeValidation se inicializa en el DOMContentLoaded principal
 </script>
 
 </body>

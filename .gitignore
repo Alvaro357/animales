@@ -11,6 +11,10 @@ __pycache__/
 #Media
 /media/videos/*.mp4
 
+# Variables de entorno (credenciales sensibles)
+.env
+
+# Claude
 .claude\agents
 
 nul
